@@ -1,5 +1,7 @@
+[English](README.md) | **Bahasa Indonesia**
+
 # ApportionmentCalc
-Matematika pemilu, disederhanakan.
+*Electoral math, simplified.*
 
 ## Pengantar
 ApportionmentCalc adalah kalkulator berbasis peramban (browser) file tunggal untuk membandingkan dua metode alokasi kursi pemilu yang populer: **Sainte Laguë** dan **Kuota Hare**. Dirancang untuk pelajar, peneliti, pengamat pemilu, dan siapa saja yang ingin tahu tentang representasi proporsional, alat ini memvisualisasikan bagaimana metode yang berbeda dapat menghasilkan hasil yang berbeda dari jumlah suara yang sama.
