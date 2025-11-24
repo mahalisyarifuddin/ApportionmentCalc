@@ -402,6 +402,9 @@
                     quotientColumn: 'Quotient',
                     divisorColumn: 'Divisor',
                     seatAllocated: 'Seat #{n}',
+                    divisorsText: 'Divisors: 1, 3, 5, 7...',
+                    quotientDetail: 'Quotient Detail',
+                    winnerPrefix: 'Winner: ',
                 },
                 id: {
                     title: 'ApportionmentCalc',
@@ -439,6 +442,9 @@
                     quotientColumn: 'Bilangan',
                     divisorColumn: 'Pembagi',
                     seatAllocated: 'Kursi ke-{n}',
+                    divisorsText: 'Pembagi: 1, 3, 5, 7...',
+                    quotientDetail: 'Rincian Bilangan',
+                    winnerPrefix: 'Pemenang: ',
                 }
             };
 
@@ -758,7 +764,7 @@
                     this.elements.hareResults.innerHTML = hareHtml;
 
                      let slHtml = `
-                        <p class="info-text">Divisors: 1, 3, 5, 7...</p>
+                        <p class="info-text">${this.translate('divisorsText')}</p>
                         <p class="info-text">&nbsp;</p>
                          <p class="info-text">&nbsp;</p>
                         <table>
@@ -848,11 +854,11 @@
 
                     html += '</tbody></table>';
 
-                    html += `<h3 style="margin-top:2rem">${this.translate('quotientColumn')} Detail</h3>`;
+                    html += `<h3 style="margin-top:2rem">${this.translate('quotientDetail')}</h3>`;
 
                     steps.forEach(step => {
                         html += `<div class="viz-step">
-                            <h4>${this.formatString('seatAllocated', {n: step.round})} - Winner: ${escapeHtml(step.winner)}</h4>
+                            <h4>${this.formatString('seatAllocated', {n: step.round})} - ${this.translate('winnerPrefix')}${escapeHtml(step.winner)}</h4>
                             <table>
                                 <tr>
                                     ${step.quotients.map(q => `<th>${escapeHtml(q.name)} (/${q.divisor})</th>`).join('')}
