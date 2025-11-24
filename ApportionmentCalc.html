@@ -13,9 +13,8 @@
 				--text: #414754;
 				--border: #c1c6d7;
 				--hover: #d7d9e5;
-                --success: #28a745;
-                --danger: #dc3545;
-                --warning: #ffc107;
+				--success: #28a745;
+				--danger: #dc3545;
 			}
 
 			@media (prefers-color-scheme: dark) {
@@ -61,7 +60,7 @@
 				padding: 2rem;
 				width: 100%;
 				position: relative;
-                margin-top: 2rem;
+				margin-top: 2rem;
 			}
 
 			.hidden {
@@ -93,43 +92,39 @@
 				transition: background 0.2s;
 			}
 
-			.button-primary {
+			.primary {
 				background: var(--primary);
 				border: none;
 				color: #fff;
 			}
 
-			.button-primary:hover {
+			.primary:hover {
 				background: var(--primary-hover);
 			}
 
-            .button-secondary {
-                background: var(--surface);
-            }
-
-			.button-secondary:hover {
+			.secondary:hover {
 				background: var(--hover);
 			}
-            
-            .button-danger {
-                background: var(--danger);
-                color: #fff;
-                border: none;
-            }
-            
-            .button-danger:hover {
-                filter: brightness(0.9);
-            }
-            
-            .button-success {
-                background: var(--success);
-                color: #fff;
-                border: none;
-            }
-            
-             .button-success:hover {
-                filter: brightness(0.9);
-            }
+
+			.danger {
+				background: var(--danger);
+				color: #fff;
+				border: none;
+			}
+
+			.danger:hover {
+				filter: brightness(0.9);
+			}
+
+			.success {
+				background: var(--success);
+				color: #fff;
+				border: none;
+			}
+
+			.success:hover {
+				filter: brightness(0.9);
+			}
 
 			.selectors {
 				position: absolute;
@@ -145,72 +140,53 @@
 				width: auto;
 			}
 
-            .form-row {
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 1rem;
-            }
+			.row {
+				display: flex;
+				gap: 1rem;
+				margin-bottom: 1rem;
+			}
 
-            .form-group {
-                flex: 1;
-                margin-bottom: 1rem;
-            }
+			.group {
+				flex: 1;
+				margin-bottom: 1rem;
+			}
 
-            .party-list {
-                margin-bottom: 1rem;
-            }
+			.party-list {
+				margin-bottom: 1rem;
+			}
 
-            .party-row {
-                display: flex;
-                gap: 0.5rem;
-                margin-bottom: 0.5rem;
-                align-items: center;
-            }
+			.party-row {
+				display: flex;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+				align-items: center;
+			}
 
-            .party-row input[type="text"] {
-                flex: 2;
-            }
+			.party-row input[type="text"] {
+				flex: 2;
+			}
 
-            .party-row input[type="number"] {
-                flex: 1;
-            }
+			.party-row input[type="number"] {
+				flex: 1;
+			}
 
-            .party-row button {
-                width: auto;
-                padding: 0.5rem 1rem;
-            }
+			.party-row button {
+				width: auto;
+				padding: 0.5rem 1rem;
+			}
 
-            .results-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1rem;
-                margin-top: 1rem;
-            }
+			.results-grid {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+				margin-top: 1rem;
+			}
 
-            @media (max-width: 768px) {
-                 .results-grid {
-                    grid-template-columns: 1fr;
-                 }
-                 .selectors {
-					position: static;
-					justify-content: flex-end;
-					margin-bottom: 0.5rem;
-					gap: 4px;
-				}
-                .form-row {
-                    flex-direction: column;
-                    gap: 0;
-                }
-                .spacer {
-                    display: none;
-                }
-            }
-
-            table {
+			table {
 				border-collapse: collapse;
 				margin-top: 1rem;
 				width: 100%;
-                font-size: 0.9rem;
+				font-size: 0.9rem;
 			}
 
 			th, td {
@@ -223,80 +199,113 @@
 				background: var(--primary);
 				color: #fff;
 			}
-            
-            .comparison-section {
-                margin-top: 2rem;
-                padding-top: 1rem;
-                border-top: 1px solid var(--border);
-            }
-            
-            .diff-positive { color: var(--success); font-weight: bold; }
-            .diff-negative { color: var(--danger); font-weight: bold; }
-            .diff-neutral { color: var(--text); opacity: 0.5; }
 
-            .viz-step {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                margin-bottom: 1rem;
-                padding: 1rem;
-                border-radius: 4px;
-            }
-            
-            .viz-step h4 {
-                margin-top: 0;
-            }
-            
-            .viz-row-highlight {
-                background-color: rgba(0, 112, 234, 0.1);
-            }
+			.comparison-section {
+				margin-top: 2rem;
+				padding-top: 1rem;
+				border-top: 1px solid var(--border);
+			}
 
-            #vizModal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-            }
+			.diff-positive {
+				color: var(--success);
+				font-weight: bold;
+			}
 
-            #vizContent {
-                background: var(--surface);
-                padding: 2rem;
-                border-radius: 8px;
-                max-width: 90%;
-                max-height: 90%;
-                overflow-y: auto;
-                width: 800px;
-                position: relative;
-            }
+			.diff-negative {
+				color: var(--danger);
+				font-weight: bold;
+			}
 
-            #closeVizButton {
-                position: absolute;
-                top: 1rem;
-                right: 1rem;
-                width: auto;
-            }
+			.diff-neutral {
+				color: var(--text);
+				opacity: 0.5;
+			}
 
-            .action-buttons {
-                display: flex;
-                gap: 1rem;
-                margin-top: 1rem;
-                flex-wrap: wrap;
-            }
-            
-            .action-buttons button {
-                flex: 1;
-            }
-            
-            .info-text {
-                font-size: 0.9rem;
-                opacity: 0.8;
-                margin-bottom: 0.5rem;
-            }
+			.viz-step {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				margin-bottom: 1rem;
+				padding: 1rem;
+				border-radius: 4px;
+			}
+
+			.viz-step h4 {
+				margin-top: 0;
+			}
+
+			.viz-row-highlight {
+				background-color: rgba(0, 112, 234, 0.1);
+			}
+
+			#vizModal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0,0,0,0.5);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+			}
+
+			#vizContent {
+				background: var(--surface);
+				padding: 2rem;
+				border-radius: 8px;
+				max-width: 90%;
+				max-height: 90%;
+				overflow-y: auto;
+				width: 800px;
+				position: relative;
+			}
+
+			#closeVizButton {
+				position: absolute;
+				top: 1rem;
+				right: 1rem;
+				width: auto;
+			}
+
+			.action-buttons {
+				display: flex;
+				gap: 1rem;
+				margin-top: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.action-buttons button {
+				flex: 1;
+			}
+
+			.info-text {
+				font-size: 0.9rem;
+				opacity: 0.8;
+				margin-bottom: 0.5rem;
+			}
+
+			@media (max-width: 768px) {
+				.results-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.selectors {
+					position: static;
+					justify-content: flex-end;
+					margin-bottom: 0.5rem;
+					gap: 4px;
+				}
+
+				.row {
+					flex-direction: column;
+					gap: 0;
+				}
+
+				.spacer {
+					display: none;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -312,621 +321,644 @@
 					<option value="dark"></option>
 				</select>
 			</div>
-
-            <h1 id="mainTitle">ApportionmentCalc</h1>
-            <p id="subTitle" style="margin-bottom: 1.5rem; opacity: 0.8;"></p>
-
+			<h1 id="mainTitle">ApportionmentCalc</h1>
+			<p id="subTitle" style="margin-bottom: 1.5rem; opacity: 0.8;"></p>
 			<div id="inputSection">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label id="totalSeatsLabel" for="totalSeatsInput"></label>
-                        <input type="number" id="totalSeatsInput" min="1" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label id="thresholdLabel" for="thresholdInput"></label>
-                        <input type="number" id="thresholdInput" min="0" max="100" step="0.1" value="4">
-                    </div>
-                </div>
-
-                <div class="party-list" id="partyList"></div>
-
-                <button id="addPartyButton" class="button-secondary" style="margin-bottom: 1rem;"></button>
-				<button id="calculateButton" class="button-primary"></button>
+				<div class="row">
+					<div class="group">
+						<label id="totalSeatsLabel" for="totalSeatsInput"></label>
+						<input type="number" id="totalSeatsInput" min="1" value="10">
+					</div>
+					<div class="group">
+						<label id="thresholdLabel" for="thresholdInput"></label>
+						<input type="number" id="thresholdInput" min="0" max="100" step="0.1" value="4">
+					</div>
+				</div>
+				<div class="party-list" id="partyList"></div>
+				<button id="addPartyButton" class="secondary" style="margin-bottom: 1rem;"></button>
+				<button id="calculateButton" class="primary"></button>
 			</div>
-
-            <div id="resultsSection" class="hidden">
-                <div class="action-buttons">
-                    <button id="editInputsButton" class="button-secondary"></button>
-                    <button id="showVizButton" class="button-secondary"></button>
-                    <button id="exportCsvButton" class="button-success"></button>
-                </div>
-
-                <div class="results-grid">
-                    <div>
-                        <h2 id="hareTitle"></h2>
-                        <div id="hareResults"></div>
-                    </div>
-                    <div>
-                        <h2 id="sainteLagueTitle"></h2>
-                        <div id="sainteLagueResults"></div>
-                    </div>
-                </div>
-
-                <div class="comparison-section">
-                    <h2 id="comparisonTitle"></h2>
-                    <div id="comparisonResults"></div>
-                </div>
-            </div>
+			<div id="resultsSection" class="hidden">
+				<div class="action-buttons">
+					<button id="editInputsButton" class="secondary"></button>
+					<button id="showVizButton" class="secondary"></button>
+					<button id="exportCsvButton" class="success"></button>
+				</div>
+				<div class="results-grid">
+					<div>
+						<h2 id="hareTitle"></h2>
+						<div id="hareResults"></div>
+					</div>
+					<div>
+						<h2 id="sainteLagueTitle"></h2>
+						<div id="sainteLagueResults"></div>
+					</div>
+				</div>
+				<div class="comparison-section">
+					<h2 id="comparisonTitle"></h2>
+					<div id="comparisonResults"></div>
+				</div>
+			</div>
 		</div>
-
-        <div id="vizModal" class="hidden">
-            <div id="vizContent">
-                <button id="closeVizButton" class="button-secondary">X</button>
-                <h2 id="vizTitle"></h2>
-                <div id="vizSteps"></div>
-            </div>
-        </div>
-
+		<div id="vizModal" class="hidden">
+			<div id="vizContent">
+				<button id="closeVizButton" class="secondary">×</button>
+				<h2 id="vizTitle"></h2>
+				<div id="vizSteps"></div>
+			</div>
+		</div>
 		<script>
-            const languageStrings = {
-                en: {
-                    title: 'ApportionmentCalc',
-                    subtitle: 'Electoral seat allocation calculator: Sainte Laguë vs Hare Quota',
-                    automaticTheme: 'Auto Theme',
-                    lightTheme: 'Light',
-                    darkTheme: 'Dark',
-                    totalSeatsLabel: 'Total Seats',
-                    thresholdLabel: 'Electoral Threshold (%)',
-                    addPartyButton: '+ Add Party',
-                    calculateButton: 'Calculate Allocation',
-                    editInputsButton: 'Edit Inputs',
-                    showVizButton: 'Show Sainte Laguë Steps',
-                    exportCsvButton: 'Export to CSV',
-                    hareTitle: 'Hare Quota Method',
-                    sainteLagueTitle: 'Sainte Laguë Method',
-                    comparisonTitle: 'Results Comparison',
-                    vizTitle: 'Sainte Laguë Step-by-Step',
-                    rankColumn: 'Rank',
-                    partyColumn: 'Party',
-                    votesColumn: 'Votes',
-                    seatsColumn: 'Seats',
-                    remainderColumn: 'Remainder',
-                    differenceColumn: 'Diff',
-                    quotaLabel: 'Quota',
-                    totalVotesLabel: 'Total Valid Votes',
-                    thresholdVotesLabel: 'Threshold Votes',
-                    partiesBelowThreshold: 'Parties below threshold',
-                    partyPlaceholder: 'Party Name',
-                    votesPlaceholder: 'Votes',
-                    alertSeats: 'Total seats must be at least 1.',
-                    alertParties: 'Please add at least one party with votes.',
-                    roundColumn: 'Round',
-                    winnerColumn: 'Winner',
-                    quotientColumn: 'Quotient',
-                    divisorColumn: 'Divisor',
-                    seatAllocated: 'Seat #{n}',
-                    divisorsText: 'Divisors: 1, 3, 5, 7...',
-                    quotientDetail: 'Quotient Detail',
-                    winnerPrefix: 'Winner: ',
-                },
-                id: {
-                    title: 'ApportionmentCalc',
-                    subtitle: 'Kalkulator alokasi kursi pemilu: Sainte Laguë vs Kuota Hare',
-                    automaticTheme: 'Tema Otomatis',
-                    lightTheme: 'Terang',
-                    darkTheme: 'Gelap',
-                    totalSeatsLabel: 'Jumlah Kursi',
-                    thresholdLabel: 'Ambang Batas Parlemen (%)',
-                    addPartyButton: '+ Tambah Partai',
-                    calculateButton: 'Hitung Alokasi',
-                    editInputsButton: 'Ubah Input',
-                    showVizButton: 'Tampilkan Langkah Sainte Laguë',
-                    exportCsvButton: 'Ekspor ke CSV',
-                    hareTitle: 'Metode Kuota Hare',
-                    sainteLagueTitle: 'Metode Sainte Laguë',
-                    comparisonTitle: 'Perbandingan Hasil',
-                    vizTitle: 'Langkah-langkah Sainte Laguë',
-                    rankColumn: 'Peringkat',
-                    partyColumn: 'Partai',
-                    votesColumn: 'Suara',
-                    seatsColumn: 'Kursi',
-                    remainderColumn: 'Sisa',
-                    differenceColumn: 'Selisih',
-                    quotaLabel: 'BPP (Bilangan Pembagi Pemilih)',
-                    totalVotesLabel: 'Total Suara Sah',
-                    thresholdVotesLabel: 'Suara Ambang Batas',
-                    partiesBelowThreshold: 'Partai di bawah ambang batas',
-                    partyPlaceholder: 'Nama Partai',
-                    votesPlaceholder: 'Jumlah Suara',
-                    alertSeats: 'Jumlah kursi harus minimal 1.',
-                    alertParties: 'Harap tambahkan setidaknya satu partai dengan suara.',
-                    roundColumn: 'Putaran',
-                    winnerColumn: 'Pemenang',
-                    quotientColumn: 'Bilangan',
-                    divisorColumn: 'Pembagi',
-                    seatAllocated: 'Kursi ke-{n}',
-                    divisorsText: 'Pembagi: 1, 3, 5, 7...',
-                    quotientDetail: 'Rincian Bilangan',
-                    winnerPrefix: 'Pemenang: ',
-                }
-            };
-
-            class ApportionmentCalc {
-                constructor() {
-                    this.elements = {};
-                    document.querySelectorAll('[id]').forEach(element => {
-                        this.elements[element.id] = element;
-                    });
-                    
-                    const detectedLanguageCode = navigator.language?.startsWith('id') ? 'id' : 'en';
-                    
-                    this.state = {
-                        language: detectedLanguageCode,
-                        theme: 'auto',
-                        parties: [
-                            { id: 1, name: 'Partai A', votes: 25000 },
-                            { id: 2, name: 'Partai B', votes: 15000 },
-                            { id: 3, name: 'Partai C', votes: 9000 },
-                            { id: 4, name: 'Partai D', votes: 5000 },
-                            { id: 5, name: 'Partai E', votes: 1500 }
-                        ],
-                        nextPartyId: 6,
-                        results: null,
-                        vizSteps: []
-                    };
-
-                    this.initialize();
-                }
-
-                translate(key) {
-                    return languageStrings[this.state.language][key] || key;
-                }
-
-                formatString(key, replacements) {
-                    let text = this.translate(key);
-                    if (replacements) {
-                        for (const [placeholder, value] of Object.entries(replacements)) {
-                            text = text.replace(`{${placeholder}}`, value);
-                        }
-                    }
-                    return text;
-                }
-
-                initialize() {
-                    this.bindEvents();
-                    this.renderPartyList();
-                    this.setTheme('auto');
-                    this.updateLanguage(this.state.language);
-                }
-                
-                bindEvents() {
-                    const elements = this.elements;
-
-                    elements.addPartyButton.addEventListener('click', () => this.addParty());
-                    elements.calculateButton.addEventListener('click', () => this.calculate());
-                    elements.editInputsButton.addEventListener('click', () => this.showSection('inputSection'));
-                    elements.showVizButton.addEventListener('click', () => this.toggleViz(true));
-                    elements.closeVizButton.addEventListener('click', () => this.toggleViz(false));
-                    elements.vizModal.addEventListener('click', (e) => {
-                        if (e.target === elements.vizModal) this.toggleViz(false);
-                    });
-                    elements.exportCsvButton.addEventListener('click', () => this.exportToCsv());
-
-                    elements.languageSelection.addEventListener('change', e => this.updateLanguage(e.target.value));
-                    elements.themeSelection.addEventListener('change', e => this.setTheme(e.target.value));
-                }
-
-                setTheme(theme) {
-                    const documentRoot = document.documentElement;
-                    documentRoot.classList.remove('light', 'dark');
-                    if (theme !== 'auto') {
-                        documentRoot.classList.add(theme);
-                    }
-                    this.elements.themeSelection.value = theme;
-                    this.state.theme = theme;
-                }
-
-                updateLanguage(language) {
-                    this.state.language = language;
-                    this.elements.languageSelection.value = language;
-                    document.documentElement.lang = language;
-
-                    const elements = this.elements;
-                    const strings = languageStrings[language];
-
-                    elements.mainTitle.textContent = strings.title;
-                    elements.subTitle.textContent = strings.subtitle;
-
-                    const themeOptions = elements.themeSelection.options;
-                    themeOptions[0].textContent = strings.automaticTheme;
-                    themeOptions[1].textContent = strings.lightTheme;
-                    themeOptions[2].textContent = strings.darkTheme;
-
-                    elements.totalSeatsLabel.textContent = strings.totalSeatsLabel;
-                    elements.thresholdLabel.textContent = strings.thresholdLabel;
-                    elements.addPartyButton.textContent = strings.addPartyButton;
-                    elements.calculateButton.textContent = strings.calculateButton;
-                    elements.editInputsButton.textContent = strings.editInputsButton;
-                    elements.showVizButton.textContent = strings.showVizButton;
-                    elements.exportCsvButton.textContent = strings.exportCsvButton;
-                    elements.hareTitle.textContent = strings.hareTitle;
-                    elements.sainteLagueTitle.textContent = strings.sainteLagueTitle;
-                    elements.comparisonTitle.textContent = strings.comparisonTitle;
-                    elements.vizTitle.textContent = strings.vizTitle;
-
-                    this.renderPartyList();
-
-                    if (!elements.resultsSection.classList.contains('hidden') && this.state.results) {
-                        this.renderResults();
-                    }
-                }
-
-                showSection(sectionId) {
-                    ['inputSection', 'resultsSection'].forEach(id => {
-                        this.elements[id].classList.toggle('hidden', id !== sectionId);
-                    });
-                }
-
-                toggleViz(show) {
-                    this.elements.vizModal.classList.toggle('hidden', !show);
-                    if (show) this.renderViz();
-                }
-
-                addParty() {
-                    this.state.parties.push({
-                        id: this.state.nextPartyId++,
-                        name: '',
-                        votes: 0
-                    });
-                    this.renderPartyList();
-                }
-
-                removeParty(id) {
-                    this.state.parties = this.state.parties.filter(p => p.id !== id);
-                    this.renderPartyList();
-                }
-
-                updateParty(id, field, value) {
-                    const party = this.state.parties.find(p => p.id === id);
-                    if (party) {
-                        party[field] = value;
-                    }
-                }
-
-                renderPartyList() {
-                    const container = this.elements.partyList;
-                    container.innerHTML = '';
-
-                    this.state.parties.forEach(party => {
-                        const row = document.createElement('div');
-                        row.className = 'party-row';
-
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.placeholder = this.translate('partyPlaceholder');
-                        nameInput.value = party.name;
-                        nameInput.onchange = (e) => this.updateParty(party.id, 'name', e.target.value);
-
-                        const votesInput = document.createElement('input');
-                        votesInput.type = 'number';
-                        votesInput.placeholder = this.translate('votesPlaceholder');
-                        votesInput.value = party.votes || '';
-                        votesInput.min = '0';
-                        votesInput.onchange = (e) => this.updateParty(party.id, 'votes', parseInt(e.target.value) || 0);
-
-                        const removeButton = document.createElement('button');
-                        removeButton.className = 'button-danger';
-                        removeButton.textContent = '×';
-                        removeButton.onclick = () => this.removeParty(party.id);
-
-                        row.appendChild(nameInput);
-                        row.appendChild(votesInput);
-                        row.appendChild(removeButton);
-                        container.appendChild(row);
-                    });
-                }
-
-                calculate() {
-                    const totalSeats = parseInt(this.elements.totalSeatsInput.value);
-                    const thresholdPercent = parseFloat(this.elements.thresholdInput.value) || 0;
-
-                    if (totalSeats < 1) {
-                        alert(this.translate('alertSeats'));
-                        return;
-                    }
-
-                    const validParties = this.state.parties.filter(p => p.name && p.votes >= 0);
-                    if (validParties.length === 0) {
-                        alert(this.translate('alertParties'));
-                        return;
-                    }
-
-                    const totalVotes = validParties.reduce((sum, p) => sum + p.votes, 0);
-                    const thresholdVotes = totalVotes * (thresholdPercent / 100);
-
-                    const passedParties = validParties.filter(p => p.votes >= thresholdVotes);
-                    const failedParties = validParties.filter(p => p.votes < thresholdVotes);
-
-                    if (passedParties.length === 0) {
-                        alert(this.translate('partiesBelowThreshold')); // Or a more specific message if available
-                        return;
-                    }
-
-                    const quota = passedParties.reduce((sum, p) => sum + p.votes, 0) / totalSeats;
-                    let hareResults = passedParties.map(p => {
-                        const fullSeats = Math.floor(p.votes / quota);
-                        return {
-                            ...p,
-                            hareSeats: fullSeats,
-                            remainder: p.votes - (fullSeats * quota)
-                        };
-                    });
-
-                    let allocatedSeats = hareResults.reduce((sum, p) => sum + p.hareSeats, 0);
-                    const remainingSeats = totalSeats - allocatedSeats;
-
-                    hareResults.sort((a, b) => b.remainder - a.remainder);
-                    for (let i = 0; i < remainingSeats; i++) {
-                        if (hareResults[i]) hareResults[i].hareSeats++;
-                    }
-
-                    let slResults = passedParties.map(p => ({ ...p, slSeats: 0 }));
-                    const steps = [];
-
-                    for (let i = 1; i <= totalSeats; i++) {
-                        let maxQuotient = -1;
-                        let winnerIndex = -1;
-                        let roundQuotients = [];
-
-                        slResults.forEach((p, idx) => {
-                            const divisor = 2 * p.slSeats + 1;
-                            const quotient = p.votes / divisor;
-
-                            roundQuotients.push({
-                                name: p.name,
-                                quotient: quotient,
-                                divisor: divisor
-                            });
-
-                            if (quotient > maxQuotient) {
-                                maxQuotient = quotient;
-                                winnerIndex = idx;
-                            }
-                        });
-
-                        if (winnerIndex !== -1) {
-                            slResults[winnerIndex].slSeats++;
-                            steps.push({
-                                round: i,
-                                winner: slResults[winnerIndex].name,
-                                winningQuotient: maxQuotient,
-                                quotients: roundQuotients
-                            });
-                        }
-                    }
-
-                    const finalResults = validParties.map(p => {
-                        const hare = hareResults.find(h => h.id === p.id);
-                        const sl = slResults.find(s => s.id === p.id);
-                        return {
-                            ...p,
-                            passedThreshold: p.votes >= thresholdVotes,
-                            hareSeats: hare ? hare.hareSeats : 0,
-                            slSeats: sl ? sl.slSeats : 0,
-                            hareRemainder: hare ? hare.remainder : 0
-                        };
-                    });
-
-                    this.state.results = {
-                        totalVotes,
-                        thresholdVotes,
-                        thresholdPercent,
-                        totalSeats,
-                        quota,
-                        finalResults,
-                        slSteps: steps
-                    };
-
-                    this.renderResults();
-                    this.showSection('resultsSection');
-                }
-
-                renderResults() {
-                    if (!this.state.results) return;
-
-                    const { finalResults, totalVotes, thresholdVotes, thresholdPercent, quota } = this.state.results;
-                    const passed = finalResults.filter(r => r.passedThreshold);
-                    const failed = finalResults.filter(r => !r.passedThreshold);
-
-                    let hareHtml = `
-                        <p class="info-text">${this.translate('quotaLabel')}: ${quota.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
-                        <p class="info-text">${this.translate('totalVotesLabel')}: ${totalVotes.toLocaleString()}</p>
-                        <p class="info-text">${this.translate('thresholdVotesLabel')} (${thresholdPercent}%): ${thresholdVotes.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>${this.translate('partyColumn')}</th>
-                                    <th>${this.translate('votesColumn')}</th>
-                                    <th>${this.translate('seatsColumn')}</th>
-                                    <th>${this.translate('remainderColumn')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    passed.sort((a,b) => b.hareSeats - a.hareSeats).forEach(r => {
-                        hareHtml += `
-                            <tr>
-                                <td>${escapeHtml(r.name)}</td>
-                                <td>${r.votes.toLocaleString()}</td>
-                                <td><strong>${r.hareSeats}</strong></td>
-                                <td>${r.hareRemainder.toLocaleString(undefined, {maximumFractionDigits: 0})}</td>
-                            </tr>
-                        `;
-                    });
-
-                    hareHtml += '</tbody></table>';
-                    if (failed.length > 0) {
-                        hareHtml += `<p class="info-text" style="margin-top:0.5rem; font-style:italic;">${this.translate('partiesBelowThreshold')}: ${failed.map(p => escapeHtml(p.name)).join(', ')}</p>`;
-                    }
-                    this.elements.hareResults.innerHTML = hareHtml;
-
-                     let slHtml = `
-                        <p class="info-text">${this.translate('divisorsText')}</p>
-                        <p class="info-text spacer">&nbsp;</p>
-                         <p class="info-text spacer">&nbsp;</p>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>${this.translate('partyColumn')}</th>
-                                    <th>${this.translate('votesColumn')}</th>
-                                    <th>${this.translate('seatsColumn')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    passed.sort((a,b) => b.slSeats - a.slSeats).forEach(r => {
-                        slHtml += `
-                            <tr>
-                                <td>${escapeHtml(r.name)}</td>
-                                <td>${r.votes.toLocaleString()}</td>
-                                <td><strong>${r.slSeats}</strong></td>
-                            </tr>
-                        `;
-                    });
-                    slHtml += '</tbody></table>';
-                    this.elements.sainteLagueResults.innerHTML = slHtml;
-
-                    let compHtml = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>${this.translate('partyColumn')}</th>
-                                    <th>Hare</th>
-                                    <th>Sainte-Laguë</th>
-                                    <th>${this.translate('differenceColumn')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    finalResults.sort((a,b) => b.votes - a.votes).forEach(r => {
-                         const diff = r.slSeats - r.hareSeats;
-                         const diffClass = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-neutral');
-                         const diffText = diff > 0 ? `+${diff}` : diff;
-
-                         compHtml += `
-                            <tr>
-                                <td>${escapeHtml(r.name)} ${!r.passedThreshold ? '( < ' + thresholdPercent + '%)' : ''}</td>
-                                <td>${r.hareSeats}</td>
-                                <td>${r.slSeats}</td>
-                                <td class="${diffClass}">${diffText}</td>
-                            </tr>
-                         `;
-                    });
-                    compHtml += '</tbody></table>';
-                    this.elements.comparisonResults.innerHTML = compHtml;
-                }
-                
-                renderViz() {
-                    const steps = this.state.results.slSteps;
-                    const container = this.elements.vizSteps;
-                    container.innerHTML = '';
-
-                    if (!steps || steps.length === 0) return;
-
-                    let html = `
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>${this.translate('roundColumn')}</th>
-                                    <th>${this.translate('winnerColumn')}</th>
-                                    <th>${this.translate('quotientColumn')}</th>
-                                    <th>${this.translate('divisorColumn')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                    `;
-
-                    steps.forEach(step => {
-                         html += `
-                            <tr>
-                                <td>${this.formatString('seatAllocated', {n: step.round})}</td>
-                                <td><strong>${escapeHtml(step.winner)}</strong></td>
-                                <td>${step.winningQuotient.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>
-                                <td>${step.quotients.find(q => q.name === step.winner).divisor}</td>
-                            </tr>
-                         `;
-                    });
-
-                    html += '</tbody></table>';
-
-                    html += `<h3 style="margin-top:2rem">${this.translate('quotientDetail')}</h3>`;
-
-                    steps.forEach(step => {
-                        html += `<div class="viz-step">
-                            <h4>${this.formatString('seatAllocated', {n: step.round})} - ${this.translate('winnerPrefix')}${escapeHtml(step.winner)}</h4>
-                            <table>
-                                <tr>
-                                    ${step.quotients.map(q => `<th>${escapeHtml(q.name)} (/${q.divisor})</th>`).join('')}
-                                </tr>
-                                <tr>
-                                    ${step.quotients.map(q => {
-                                        const isWinner = q.name === step.winner;
-                                        return `<td class="${isWinner ? 'viz-row-highlight' : ''}" style="${isWinner ? 'font-weight:bold' : ''}">${q.quotient.toLocaleString(undefined, {maximumFractionDigits: 2})}</td>`;
-                                    }).join('')}
-                                </tr>
-                            </table>
-                        </div>`;
-                    });
-
-                    container.innerHTML = html;
-                }
-
-                exportToCsv() {
-                    if (!this.state.results) return;
-                    const { finalResults, thresholdPercent } = this.state.results;
-
-                    let csv = 'Party,Votes,Share (%),Passed Threshold?,Hare Seats,Sainte-Laguë Seats,Difference\n';
-                    const totalVotes = finalResults.reduce((sum, p) => sum + p.votes, 0);
-
-                    finalResults.forEach(r => {
-                        const share = (r.votes / totalVotes) * 100;
-                        const diff = r.slSeats - r.hareSeats;
-                        const line = [
-                            `"${r.name.replace(/"/g, '""')}"`,
-                            r.votes,
-                            share.toFixed(2),
-                            r.passedThreshold ? 'Yes' : 'No',
-                            r.hareSeats,
-                            r.slSeats,
-                            diff
-                        ].join(',');
-                        csv += line + '\n';
-                    });
-
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.setAttribute('href', url);
-                    const now = new Date();
-                    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
-                    link.setAttribute('download', `apportionment_results_${timestamp}.csv`);
-                    link.style.visibility = 'hidden';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            }
-            
-            const escapeHtml = text => {
+			const strings = {
+				en: {
+					title: 'ApportionmentCalc',
+					subtitle: 'Electoral seat allocation calculator: Sainte Laguë vs Hare Quota',
+					automaticTheme: 'Auto Theme',
+					lightTheme: 'Light',
+					darkTheme: 'Dark',
+					totalSeatsLabel: 'Total Seats',
+					thresholdLabel: 'Electoral Threshold (%)',
+					addPartyButton: '+ Add Party',
+					calculateButton: 'Calculate Allocation',
+					editInputsButton: 'Edit Inputs',
+					showVizButton: 'Show Sainte Laguë Steps',
+					exportCsvButton: 'Export to CSV',
+					hareTitle: 'Hare Quota Method',
+					sainteLagueTitle: 'Sainte Laguë Method',
+					comparisonTitle: 'Results Comparison',
+					vizTitle: 'Sainte Laguë Step-by-Step',
+					rankColumn: 'Rank',
+					partyColumn: 'Party',
+					votesColumn: 'Votes',
+					seatsColumn: 'Seats',
+					remainderColumn: 'Remainder',
+					differenceColumn: 'Diff',
+					quotaLabel: 'Quota',
+					totalVotesLabel: 'Total Valid Votes',
+					thresholdVotesLabel: 'Threshold Votes',
+					partiesBelowThreshold: 'Parties below threshold',
+					partyPlaceholder: 'Party Name',
+					votesPlaceholder: 'Votes',
+					alertSeats: 'Total seats must be at least 1.',
+					alertParties: 'Please add at least one party with votes.',
+					roundColumn: 'Round',
+					winnerColumn: 'Winner',
+					quotientColumn: 'Quotient',
+					divisorColumn: 'Divisor',
+					seatAllocated: 'Seat #{n}',
+					divisorsText: 'Divisors: 1, 3, 5, 7...',
+					quotientDetail: 'Quotient Detail',
+					winnerPrefix: 'Winner: ',
+				},
+				id: {
+					title: 'ApportionmentCalc',
+					subtitle: 'Kalkulator alokasi kursi pemilu: Sainte Laguë vs Kuota Hare',
+					automaticTheme: 'Tema Otomatis',
+					lightTheme: 'Terang',
+					darkTheme: 'Gelap',
+					totalSeatsLabel: 'Jumlah Kursi',
+					thresholdLabel: 'Ambang Batas Parlemen (%)',
+					addPartyButton: '+ Tambah Partai',
+					calculateButton: 'Hitung Alokasi',
+					editInputsButton: 'Ubah Input',
+					showVizButton: 'Tampilkan Langkah Sainte Laguë',
+					exportCsvButton: 'Ekspor ke CSV',
+					hareTitle: 'Metode Kuota Hare',
+					sainteLagueTitle: 'Metode Sainte Laguë',
+					comparisonTitle: 'Perbandingan Hasil',
+					vizTitle: 'Langkah-langkah Sainte Laguë',
+					rankColumn: 'Peringkat',
+					partyColumn: 'Partai',
+					votesColumn: 'Suara',
+					seatsColumn: 'Kursi',
+					remainderColumn: 'Sisa',
+					differenceColumn: 'Selisih',
+					quotaLabel: 'BPP (Bilangan Pembagi Pemilih)',
+					totalVotesLabel: 'Total Suara Sah',
+					thresholdVotesLabel: 'Suara Ambang Batas',
+					partiesBelowThreshold: 'Partai di bawah ambang batas',
+					partyPlaceholder: 'Nama Partai',
+					votesPlaceholder: 'Jumlah Suara',
+					alertSeats: 'Jumlah kursi harus minimal 1.',
+					alertParties: 'Harap tambahkan setidaknya satu partai dengan suara.',
+					roundColumn: 'Putaran',
+					winnerColumn: 'Pemenang',
+					quotientColumn: 'Bilangan',
+					divisorColumn: 'Pembagi',
+					seatAllocated: 'Kursi ke-{n}',
+					divisorsText: 'Pembagi: 1, 3, 5, 7...',
+					quotientDetail: 'Rincian Bilangan',
+					winnerPrefix: 'Pemenang: ',
+				}
+			};
+
+			const escapeHtml = text=>{
 				const element = document.createElement('p');
 				element.textContent = text;
 				return element.innerHTML;
-			};
-            
-            new ApportionmentCalc();
+			}
+			;
+
+			class ApportionmentCalc {
+				constructor() {
+					this.elements = Object.fromEntries([...document.querySelectorAll('[id]')].map(element=>[element.id, element]));
+
+					this.state = {
+						language: navigator.language?.startsWith('id') ? 'id' : 'en',
+						theme: 'auto',
+						parties: [{
+							id: 1,
+							name: 'Partai A',
+							votes: 25000
+						}, {
+							id: 2,
+							name: 'Partai B',
+							votes: 15000
+						}, {
+							id: 3,
+							name: 'Partai C',
+							votes: 9000
+						}, {
+							id: 4,
+							name: 'Partai D',
+							votes: 5000
+						}, {
+							id: 5,
+							name: 'Partai E',
+							votes: 1500
+						}],
+						nextPartyId: 6,
+						results: null,
+						vizSteps: []
+					};
+
+					this.initialize();
+				}
+
+				initialize() {
+					this.bindEvents();
+					this.renderPartyList();
+					this.setTheme('auto');
+					this.updateLanguage(this.state.language);
+				}
+
+				bindEvents() {
+					const {elements} = this;
+
+					elements.addPartyButton.onclick = ()=>this.addParty();
+					elements.calculateButton.onclick = ()=>this.calculate();
+					elements.editInputsButton.onclick = ()=>this.showSection('inputSection');
+					elements.showVizButton.onclick = ()=>this.toggleViz(true);
+					elements.closeVizButton.onclick = ()=>this.toggleViz(false);
+					elements.vizModal.onclick = event=>event.target === elements.vizModal && this.toggleViz(false);
+					elements.exportCsvButton.onclick = ()=>this.exportToCsv();
+					elements.languageSelection.onchange = event=>this.updateLanguage(event.target.value);
+					elements.themeSelection.onchange = event=>this.setTheme(event.target.value);
+				}
+
+				translate(key) {
+					return strings[this.state.language][key] || key;
+				}
+
+				formatString(key, replacements) {
+					let text = this.translate(key);
+					if (replacements) {
+						for (const [placeholder,value] of Object.entries(replacements)) {
+							text = text.replace(`{${placeholder}}`, value);
+						}
+					}
+					return text;
+				}
+
+				setTheme(theme) {
+					document.documentElement.classList.remove('light', 'dark');
+					if (theme !== 'auto') {
+						document.documentElement.classList.add(theme);
+					}
+					this.elements.themeSelection.value = theme;
+					this.state.theme = theme;
+				}
+
+				updateLanguage(language) {
+					this.state.language = language;
+					this.elements.languageSelection.value = language;
+					document.documentElement.lang = language;
+
+					const {elements} = this;
+					const text = strings[language];
+
+					elements.mainTitle.textContent = text.title;
+					elements.subTitle.textContent = text.subtitle;
+
+					const themeOptions = elements.themeSelection.options;
+					themeOptions[0].textContent = text.automaticTheme;
+					themeOptions[1].textContent = text.lightTheme;
+					themeOptions[2].textContent = text.darkTheme;
+
+					elements.totalSeatsLabel.textContent = text.totalSeatsLabel;
+					elements.thresholdLabel.textContent = text.thresholdLabel;
+					elements.addPartyButton.textContent = text.addPartyButton;
+					elements.calculateButton.textContent = text.calculateButton;
+					elements.editInputsButton.textContent = text.editInputsButton;
+					elements.showVizButton.textContent = text.showVizButton;
+					elements.exportCsvButton.textContent = text.exportCsvButton;
+					elements.hareTitle.textContent = text.hareTitle;
+					elements.sainteLagueTitle.textContent = text.sainteLagueTitle;
+					elements.comparisonTitle.textContent = text.comparisonTitle;
+					elements.vizTitle.textContent = text.vizTitle;
+
+					this.renderPartyList();
+
+					if (!elements.resultsSection.classList.contains('hidden') && this.state.results) {
+						this.renderResults();
+					}
+				}
+
+				showSection(sectionId) {
+					['inputSection', 'resultsSection'].forEach(id=>{
+						this.elements[id].classList.toggle('hidden', id !== sectionId);
+					}
+					);
+				}
+
+				toggleViz(show) {
+					this.elements.vizModal.classList.toggle('hidden', !show);
+					if (show)
+						this.renderViz();
+				}
+
+				addParty() {
+					this.state.parties.push({
+						id: this.state.nextPartyId++,
+						name: '',
+						votes: 0
+					});
+					this.renderPartyList();
+				}
+
+				removeParty(id) {
+					this.state.parties = this.state.parties.filter(party=>party.id !== id);
+					this.renderPartyList();
+				}
+
+				updateParty(id, field, value) {
+					const party = this.state.parties.find(party=>party.id === id);
+					if (party)
+						party[field] = value;
+				}
+
+				renderPartyList() {
+					const container = this.elements.partyList;
+					container.innerHTML = '';
+
+					this.state.parties.forEach(party=>{
+						const row = document.createElement('div');
+						row.className = 'party-row';
+
+						const nameInput = document.createElement('input');
+						nameInput.type = 'text';
+						nameInput.placeholder = this.translate('partyPlaceholder');
+						nameInput.value = party.name;
+						nameInput.onchange = event=>this.updateParty(party.id, 'name', event.target.value);
+
+						const votesInput = document.createElement('input');
+						votesInput.type = 'number';
+						votesInput.placeholder = this.translate('votesPlaceholder');
+						votesInput.value = party.votes || '';
+						votesInput.min = '0';
+						votesInput.onchange = event=>this.updateParty(party.id, 'votes', parseInt(event.target.value) || 0);
+
+						const removeButton = document.createElement('button');
+						removeButton.className = 'danger';
+						removeButton.textContent = '×';
+						removeButton.onclick = ()=>this.removeParty(party.id);
+
+						row.append(nameInput, votesInput, removeButton);
+						container.appendChild(row);
+					}
+					);
+				}
+
+				calculate() {
+					const totalSeats = parseInt(this.elements.totalSeatsInput.value);
+					const thresholdPercent = parseFloat(this.elements.thresholdInput.value) || 0;
+
+					if (totalSeats < 1) {
+						alert(this.translate('alertSeats'));
+						return;
+					}
+
+					const validParties = this.state.parties.filter(party=>party.name && party.votes >= 0);
+					if (validParties.length === 0) {
+						alert(this.translate('alertParties'));
+						return;
+					}
+
+					const totalVotes = validParties.reduce((sum,party)=>sum + party.votes, 0);
+					const thresholdVotes = totalVotes * (thresholdPercent / 100);
+					const passedParties = validParties.filter(party=>party.votes >= thresholdVotes);
+					const failedParties = validParties.filter(party=>party.votes < thresholdVotes);
+
+					if (passedParties.length === 0) {
+						alert(this.translate('partiesBelowThreshold'));
+						return;
+					}
+
+					const quota = passedParties.reduce((sum,party)=>sum + party.votes, 0) / totalSeats;
+					let hareResults = passedParties.map(party=>{
+						const fullSeats = Math.floor(party.votes / quota);
+						return {
+							...party,
+							hareSeats: fullSeats,
+							remainder: party.votes - (fullSeats * quota)
+						};
+					}
+					);
+
+					let allocatedSeats = hareResults.reduce((sum,party)=>sum + party.hareSeats, 0);
+					const remainingSeats = totalSeats - allocatedSeats;
+
+					hareResults.sort((a,b)=>b.remainder - a.remainder);
+					for (let i = 0; i < remainingSeats; i++) {
+						if (hareResults[i])
+							hareResults[i].hareSeats++;
+					}
+
+					let sainteLagueResults = passedParties.map(party=>({
+						...party,
+						slSeats: 0
+					}));
+					const steps = [];
+
+					for (let i = 1; i <= totalSeats; i++) {
+						let maxQuotient = -1;
+						let winnerIndex = -1;
+						let roundQuotients = [];
+
+						sainteLagueResults.forEach((party,index)=>{
+							const divisor = 2 * party.slSeats + 1;
+							const quotient = party.votes / divisor;
+
+							roundQuotients.push({
+								name: party.name,
+								quotient: quotient,
+								divisor: divisor
+							});
+
+							if (quotient > maxQuotient) {
+								maxQuotient = quotient;
+								winnerIndex = index;
+							}
+						}
+						);
+
+						if (winnerIndex !== -1) {
+							sainteLagueResults[winnerIndex].slSeats++;
+							steps.push({
+								round: i,
+								winner: sainteLagueResults[winnerIndex].name,
+								winningQuotient: maxQuotient,
+								quotients: roundQuotients
+							});
+						}
+					}
+
+					const finalResults = validParties.map(party=>{
+						const hare = hareResults.find(h=>h.id === party.id);
+						const sainteLague = sainteLagueResults.find(s=>s.id === party.id);
+						return {
+							...party,
+							passedThreshold: party.votes >= thresholdVotes,
+							hareSeats: hare ? hare.hareSeats : 0,
+							slSeats: sainteLague ? sainteLague.slSeats : 0,
+							hareRemainder: hare ? hare.remainder : 0
+						};
+					}
+					);
+
+					this.state.results = {
+						totalVotes,
+						thresholdVotes,
+						thresholdPercent,
+						totalSeats,
+						quota,
+						finalResults,
+						slSteps: steps
+					};
+
+					this.renderResults();
+					this.showSection('resultsSection');
+				}
+
+				renderResults() {
+					if (!this.state.results)
+						return;
+
+					const {finalResults, totalVotes, thresholdVotes, thresholdPercent, quota} = this.state.results;
+					const passed = finalResults.filter(result=>result.passedThreshold);
+					const failed = finalResults.filter(result=>!result.passedThreshold);
+
+					let hareHtml = `
+					<p class="info-text">${this.translate('quotaLabel')}: ${quota.toLocaleString(undefined, {
+						maximumFractionDigits: 2
+					})}</p>
+					<p class="info-text">${this.translate('totalVotesLabel')}: ${totalVotes.toLocaleString()}</p>
+					<p class="info-text">${this.translate('thresholdVotesLabel')} (${thresholdPercent}%): ${thresholdVotes.toLocaleString(undefined, {
+						maximumFractionDigits: 0
+					})}</p>
+					<table>
+						<thead>
+							<tr>
+								<th>${this.translate('partyColumn')}</th>
+								<th>${this.translate('votesColumn')}</th>
+								<th>${this.translate('seatsColumn')}</th>
+								<th>${this.translate('remainderColumn')}</th>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+
+					passed.sort((a,b)=>b.hareSeats - a.hareSeats).forEach(result=>{
+						hareHtml += `
+						<tr>
+							<td>${escapeHtml(result.name)}</td>
+							<td>${result.votes.toLocaleString()}</td>
+							<td><strong>${result.hareSeats}</strong></td>
+							<td>${result.hareRemainder.toLocaleString(undefined, {
+							maximumFractionDigits: 0
+						})}</td>
+						</tr>
+					`;
+					}
+					);
+
+					hareHtml += '</tbody></table>';
+					if (failed.length > 0) {
+						hareHtml += `<p class="info-text" style="margin-top:0.5rem; font-style:italic;">${this.translate('partiesBelowThreshold')}: ${failed.map(party=>escapeHtml(party.name)).join(', ')}</p>`;
+					}
+					this.elements.hareResults.innerHTML = hareHtml;
+
+					let sainteLagueHtml = `
+					<p class="info-text">${this.translate('divisorsText')}</p>
+					<p class="info-text spacer">&nbsp;</p>
+					<p class="info-text spacer">&nbsp;</p>
+					<table>
+						<thead>
+							<tr>
+								<th>${this.translate('partyColumn')}</th>
+								<th>${this.translate('votesColumn')}</th>
+								<th>${this.translate('seatsColumn')}</th>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+
+					passed.sort((a,b)=>b.slSeats - a.slSeats).forEach(result=>{
+						sainteLagueHtml += `
+						<tr>
+							<td>${escapeHtml(result.name)}</td>
+							<td>${result.votes.toLocaleString()}</td>
+							<td><strong>${result.slSeats}</strong></td>
+						</tr>
+					`;
+					}
+					);
+					sainteLagueHtml += '</tbody></table>';
+					this.elements.sainteLagueResults.innerHTML = sainteLagueHtml;
+
+					let comparisonHtml = `
+					<table>
+						<thead>
+							<tr>
+								<th>${this.translate('partyColumn')}</th>
+								<th>Hare</th>
+								<th>Sainte-Laguë</th>
+								<th>${this.translate('differenceColumn')}</th>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+
+					finalResults.sort((a,b)=>b.votes - a.votes).forEach(result=>{
+						const diff = result.slSeats - result.hareSeats;
+						const diffClass = diff > 0 ? 'diff-positive' : (diff < 0 ? 'diff-negative' : 'diff-neutral');
+						const diffText = diff > 0 ? `+${diff}` : diff;
+
+						comparisonHtml += `
+						<tr>
+							<td>${escapeHtml(result.name)} ${!result.passedThreshold ? '( < ' + thresholdPercent + '%)' : ''}</td>
+							<td>${result.hareSeats}</td>
+							<td>${result.slSeats}</td>
+							<td class="${diffClass}">${diffText}</td>
+						</tr>
+					`;
+					}
+					);
+					comparisonHtml += '</tbody></table>';
+					this.elements.comparisonResults.innerHTML = comparisonHtml;
+				}
+
+				renderViz() {
+					const steps = this.state.results.slSteps;
+					const container = this.elements.vizSteps;
+					container.innerHTML = '';
+
+					if (!steps || steps.length === 0)
+						return;
+
+					let html = `
+					<table>
+						<thead>
+							<tr>
+								<th>${this.translate('roundColumn')}</th>
+								<th>${this.translate('winnerColumn')}</th>
+								<th>${this.translate('quotientColumn')}</th>
+								<th>${this.translate('divisorColumn')}</th>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+
+					steps.forEach(step=>{
+						html += `
+						<tr>
+							<td>${this.formatString('seatAllocated', {
+							n: step.round
+						})}</td>
+							<td><strong>${escapeHtml(step.winner)}</strong></td>
+							<td>${step.winningQuotient.toLocaleString(undefined, {
+							maximumFractionDigits: 2
+						})}</td>
+							<td>${step.quotients.find(quotient=>quotient.name === step.winner).divisor}</td>
+						</tr>
+					`;
+					}
+					);
+
+					html += '</tbody></table>';
+					html += `<h3 style="margin-top:2rem">${this.translate('quotientDetail')}</h3>`;
+
+					steps.forEach(step=>{
+						html += `<div class="viz-step">
+						<h4>${this.formatString('seatAllocated', {
+							n: step.round
+						})} - ${this.translate('winnerPrefix')}${escapeHtml(step.winner)}</h4>
+						<table>
+							<tr>
+								${step.quotients.map(quotient=>`<th>${escapeHtml(quotient.name)} (/${quotient.divisor})</th>`).join('')}
+							</tr>
+							<tr>
+								${step.quotients.map(quotient=>{
+							const isWinner = quotient.name === step.winner;
+							return `<td class="${isWinner ? 'viz-row-highlight' : ''}" style="${isWinner ? 'font-weight:bold' : ''}">${quotient.quotient.toLocaleString(undefined, {
+								maximumFractionDigits: 2
+							})}</td>`;
+						}
+						).join('')}
+							</tr>
+						</table>
+					</div>`;
+					}
+					);
+
+					container.innerHTML = html;
+				}
+
+				exportToCsv() {
+					if (!this.state.results) return;
+					const { finalResults } = this.state.results;
+
+					let csv = 'Party,Votes,Share (%),Passed Threshold?,Hare Seats,Sainte-Laguë Seats,Difference\n';
+					const totalVotes = finalResults.reduce((sum, party) => sum + party.votes, 0);
+
+					finalResults.forEach(result => {
+						const share = (result.votes / totalVotes) * 100;
+						const diff = result.slSeats - result.hareSeats;
+						const line = [
+							`"${result.name.replace(/"/g, '""')}"`,
+							result.votes,
+							share.toFixed(2),
+							result.passedThreshold ? 'Yes' : 'No',
+							result.hareSeats,
+							result.slSeats,
+							diff
+						].join(',');
+						csv += line + '\n';
+					});
+
+					const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+					const url = URL.createObjectURL(blob);
+					const link = document.createElement('a');
+					link.href = url;
+					const timestamp = new Date().toISOString().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+					link.download = `apportionment_results_${timestamp}.csv`;
+					link.style.visibility = 'hidden';
+					document.body.appendChild(link);
+					link.click();
+					document.body.removeChild(link);
+				}
+			}
+
+			new ApportionmentCalc();
 		</script>
 	</body>
 </html>
