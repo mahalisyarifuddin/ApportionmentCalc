@@ -42,5 +42,22 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 - **Penelitian**: Mempelajari sifat matematis dari rumus alokasi.
 - **Diskusi Kebijakan**: Mengevaluasi reformasi sistem pemilu.
 
+## Memahami Metode
+
+### Kuota Hare
+- Menghitung kuota: Total Suara Sah ÷ Total Kursi = Kuota
+- Setiap partai mendapat satu kursi untuk setiap kuota penuh
+- Sisa kursi diberikan kepada partai dengan sisa suara terbesar
+- Cenderung menguntungkan partai-partai kecil
+
+### Sainte Laguë
+- Menggunakan bilangan pembagi ganjil: 1, 3, 5, 7, 9...
+- Kursi dialokasikan satu per satu kepada partai dengan hasil bagi tertinggi
+- Rumus: Suara ÷ (2 × Kursi Saat Ini + 1)
+- Cenderung menguntungkan partai-partai besar
+
+## Privasi & Data
+Semua perhitungan terjadi secara lokal di peramban Anda. Tidak ada data yang dikirim ke server mana pun. Alat ini sepenuhnya offline setelah dimuat.
+
 ## Lisensi
 Lisensi MIT. Lihat LICENSE untuk detailnya.
