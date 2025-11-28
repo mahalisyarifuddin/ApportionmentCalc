@@ -60,8 +60,8 @@ The calculator takes vote counts for multiple political parties and a total numb
 ## Favorability Analysis
 A statistical simulation of ~380,000 electoral scenarios confirmed the bias tendencies of each method:
 
-- **Small Parties**: Hare Quota provided a more favorable outcome in **5.53%** of cases, compared to 3.85% for Sainte-Laguë.
-- **Large Parties**: Sainte-Laguë provided a more favorable outcome in **38.16%** of cases, compared to 3.80% for Hare Quota.
+- **Small Parties**: Hare Quota provided a more favorable outcome in **9.64%** of cases, compared to 1.78% for Sainte-Laguë.
+- **Large Parties**: Sainte-Laguë provided a more favorable outcome in **29.66%** of cases, compared to 3.85% for Hare Quota.
 
 This data supports the general consensus that Hare Quota is friendlier to smaller parties, while Sainte-Laguë significantly benefits larger parties.
 

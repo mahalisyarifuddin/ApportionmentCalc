@@ -37,8 +37,8 @@ def calculate_hare(party_votes, total_valid_votes, total_seats):
     remainders.sort(key=lambda x: x[0], reverse=True)
 
     for i in range(remaining_seats):
-        if i < len(remainders):
-            idx = remainders[i][1]
+        if len(remainders) > 0:
+            idx = remainders[i % len(remainders)][1]
             seats[idx] += 1
 
     return seats
