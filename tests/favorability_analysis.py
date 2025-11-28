@@ -37,8 +37,8 @@ def calculate_hare(party_votes, total_valid_votes, total_seats):
     remainders.sort(key=lambda x: x[0], reverse=True)
 
     for i in range(remaining_seats):
-        if i < len(remainders):
-            idx = remainders[i][1]
+        if len(remainders) > 0:
+            idx = remainders[i % len(remainders)][1]
             seats[idx] += 1
 
     return seats
@@ -137,12 +137,23 @@ def run_simulation():
                             sl_seats_full[passed_idx] = sl_results_passed[idx]
 
                         # 4. Analyze Favorability
-                        sorted_indices = sorted(range(num_parties), key=lambda k: votes[k])
+                        # Classification based on vote share:
+                        # Small: < 10%
+                        # Medium: 10% - 25%
+                        # Large: > 25%
 
-                        third = num_parties // 3
-                        small_indices = sorted_indices[:third]
-                        medium_indices = sorted_indices[third:2*third]
-                        large_indices = sorted_indices[2*third:]
+                        small_indices = []
+                        medium_indices = []
+                        large_indices = []
+
+                        for idx in range(num_parties):
+                            share = votes[idx] / total_vote_count
+                            if share < 0.10:
+                                small_indices.append(idx)
+                            elif share <= 0.25:
+                                medium_indices.append(idx)
+                            else:
+                                large_indices.append(idx)
 
                         party_categories = {
                             "small": small_indices,

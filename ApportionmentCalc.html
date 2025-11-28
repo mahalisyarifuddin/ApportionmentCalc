@@ -631,8 +631,8 @@
 					let allocated = hare.reduce((sum,party)=>sum + party.hareSeats, 0);
 					hare.sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes);
 					for (let i = 0; i < totalSeats - allocated; i++)
-						if (hare[i])
-							hare[i].hareSeats++;
+						if (hare[i % hare.length])
+							hare[i % hare.length].hareSeats++;
 
 					let sainteLague = passed.map(party=>({
 						...party,
