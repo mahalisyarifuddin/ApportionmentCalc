@@ -614,6 +614,9 @@
 						return alert(this.string('alertParties'));
 
 					const totalVotes = valid.reduce((sum,party)=>sum + party.votes, 0);
+					if (totalVotes === 0)
+						return alert(this.string('alertParties'));
+
 					const thresholdVotes = totalVotes * thresholdPercent / 100;
 					const passed = valid.filter(party=>party.votes >= thresholdVotes);
 					if (!passed.length)
