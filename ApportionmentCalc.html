@@ -272,8 +272,32 @@
 			.info {
 				font-size: .9rem;
 				opacity: .8;
-				margin-top: .4rem;
-				margin-bottom: .4rem
+				line-height: 1.6
+			}
+
+			#subtitle {
+				margin-bottom: 1.5rem;
+				opacity: .8
+			}
+
+			#addParty {
+				margin-bottom: 1rem
+			}
+
+			.common-stats {
+				margin-top: 1rem;
+				padding: 1rem;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 4px
+			}
+
+			.info-italic {
+				font-style: italic
+			}
+
+			.step-header {
+				margin-top: 2rem
 			}
 
 			@media(max-width: 768px) {
@@ -308,7 +332,7 @@
 				</select>
 			</div>
 			<h1 id="title"></h1>
-			<p id="subtitle" style="margin-bottom:1.5rem;opacity:.8"></p>
+			<p id="subtitle"></p>
 			<div id="input">
 				<div class="row">
 					<div class="group">
@@ -321,7 +345,7 @@
 					</div>
 				</div>
 				<div class="party-list" id="partyList"></div>
-				<button id="addParty" class="secondary" style="margin-bottom:1rem"></button>
+				<button id="addParty" class="secondary"></button>
 				<button id="calculate" class="primary"></button>
 			</div>
 			<div id="results" class="hidden">
@@ -330,7 +354,7 @@
 					<button id="showSteps" class="secondary"></button>
 					<button id="export" class="success"></button>
 				</div>
-				<div id="commonStats" style="margin-top:1rem;padding:1rem;background:var(--surface);border:1px solid var(--border);border-radius:4px"></div>
+				<div id="commonStats" class="common-stats"></div>
 				<div class="results-grid">
 					<div>
 						<h2 id="hareTitle"></h2>
@@ -554,28 +578,14 @@
 				}
 
 				createPartyRow(party) {
-					return node('div', {
-						className: 'party-row'
-					}, [node('input', {
-						type: 'text',
-						placeholder: this.text('partyPlaceholder'),
-						value: party.name,
-						onchange: event=>{
-							party.name = event.target.value;
-						}
-					}), node('input', {
-						type: 'number',
-						placeholder: this.text('votesPlaceholder'),
-						value: party.votes || '',
-						min: '0',
-						onchange: event=>{
-							event.target.value = party.votes = Math.round(parseFloat(event.target.value)) || 0;
-						}
-					}), node('button', {
-						className: 'danger',
-						textContent: '×',
-						onclick: ()=>this.removeParty(party.id)
-					})]);
+					const el = document.createElement('div');
+					el.className = 'party-row';
+					el.innerHTML = `<input type="text" placeholder="${this.text('partyPlaceholder')}" value="${party.name}"><input type="number" placeholder="${this.text('votesPlaceholder')}" value="${party.votes || ''}" min="0"><button class="danger">×</button>`;
+					const [nameInput,votesInput,deleteBtn] = el.children;
+					nameInput.onchange = e=>party.name = e.target.value;
+					votesInput.onchange = e=>e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
+					deleteBtn.onclick = ()=>this.removeParty(party.id);
+					return el;
 				}
 
 				calculate() {
@@ -672,9 +682,9 @@
 					const failed = results.filter(result=>!result.passed);
 					const row = (result,seats,extra='')=>`<tr><td>${escape(result.name)}</td><td>${this.format(result.votes)}</td><td><strong>${seats}</strong></td>${extra}</tr>`;
 
-					dom.commonStats.innerHTML = `<p class="info">${this.text('totalVotes')}: ${this.format(total)}</p><p class="info">${this.text('thresholdVotes')} (${this.format(threshold)}%): ${this.format(thresholdVotes, {
+					dom.commonStats.innerHTML = `<div class="info">${this.text('totalVotes')}: ${this.format(total)}<br>${this.text('thresholdVotes')} (${this.format(threshold)}%): ${this.format(thresholdVotes, {
 						maximumFractionDigits: 0
-					})}</p>${failed.length ? `<p class="info" style="font-style:italic">${this.text('belowThreshold')}: ${failed.map(result=>escape(result.name)).join(', ')}</p>` : ''}`;
+					})}${failed.length ? `<br><span class="info-italic">${this.text('belowThreshold')}: ${failed.map(result=>escape(result.name)).join(', ')}</span>` : ''}</div>`;
 					dom.hareResults.innerHTML = `<p class="info">${this.text('quota')}: ${this.format(quota)}</p><table><thead><tr><th>${this.text('party')}</th><th>${this.text('votes')}</th><th>${this.text('seatsColumn')}</th><th>${this.text('remainder')}</th></tr></thead><tbody>${[...passed].sort((a,b)=>b.hareSeats - a.hareSeats).map(result=>row(result, result.hareSeats, `<td>${this.format(result.remainder, {
 						maximumFractionDigits: 0
 					})}</td>`)).join('')}</tbody></table>`;
@@ -694,7 +704,7 @@
 						n: step.round
 					})}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.winnerQuotient, {
 						maximumFractionDigits: 2
-					})}</td><td>${step.quotients.find(quotient=>quotient.id === step.winnerId).divisor}</td></tr>`).join('')}</tbody></table><h3 style="margin-top:2rem">${this.text('quotientDetail')}</h3>${steps.map(step=>`<div class="step"><h4>${this.template('seatAllocated', {
+					})}</td><td>${step.quotients.find(quotient=>quotient.id === step.winnerId).divisor}</td></tr>`).join('')}</tbody></table><h3 class="step-header">${this.text('quotientDetail')}</h3>${steps.map(step=>`<div class="step"><h4>${this.template('seatAllocated', {
 						n: step.round
 					})} - ${this.text('winnerPrefix')}${escape(step.winner)}</h4><table><tr>${step.quotients.map(quotient=>`<th>${escape(quotient.name)} (/${quotient.divisor})</th>`).join('')}</tr><tr>${step.quotients.map(quotient=>`<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, {
 						maximumFractionDigits: 2
