@@ -627,7 +627,7 @@
 						const quotients = sainteLague.map((party,j)=>{
 							const divisor = 2 * party.lagueSeats + 1;
 							const quotient = party.votes / divisor;
-							if (quotient > max) {
+							if (quotient > max || (quotient === max && party.votes > sainteLague[winnerIndex].votes)) {
 								max = quotient;
 								winnerIndex = j;
 							}
