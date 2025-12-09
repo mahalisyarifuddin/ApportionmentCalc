@@ -755,7 +755,6 @@
 							const lines = text.split(/\r?\n/).filter(line => line.trim());
 							if (lines.length < 1) throw new Error('No data');
 
-							// Simple CSV parser that handles quotes
 							const parseLine = (line) => {
 								const result = [];
 								let current = '';
@@ -781,39 +780,42 @@
 							};
 
 							const firstRow = parseLine(lines[0]);
-							const lowerFirst = firstRow.map(c => c.toLowerCase());
-
-							let nameIndex = lowerFirst.findIndex(h => ['party', 'partai', 'name', 'nama'].some(k => h.includes(k)));
-							let votesIndex = lowerFirst.findIndex(h => ['vote', 'suara'].some(k => h.includes(k)));
-							let startRow = 1;
-
-							// Fallback: Headerless detection
-							if (nameIndex === -1 || votesIndex === -1) {
-								// Check if first row looks like data (contains number)
-								const numericCols = firstRow.map(c => /^\d+$/.test(c.replace(/[.,]/g, '').trim()));
-								if (numericCols.some(isNum => isNum)) {
-									// Assume the numeric column is votes
-									votesIndex = numericCols.findIndex(isNum => isNum);
-									// Assume the first non-numeric column is name, or just the other column
-									nameIndex = numericCols.findIndex((isNum, idx) => !isNum && idx !== votesIndex);
-									if (nameIndex === -1 && firstRow.length === 2) {
-										nameIndex = votesIndex === 0 ? 1 : 0;
-									}
-									if (votesIndex !== -1 && nameIndex !== -1) {
-										startRow = 0; // Include first row
-									}
+							const strategies = [
+								(row) => {
+									const lower = row.map(c => c.toLowerCase());
+									return {
+										name: lower.findIndex(h => ['party', 'partai', 'name', 'nama'].some(k => h.includes(k))),
+										votes: lower.findIndex(h => ['vote', 'suara'].some(k => h.includes(k))),
+										start: 1
+									};
+								},
+								(row) => {
+									const numeric = row.map(c => /^\d+$/.test(c.replace(/[.,]/g, '').trim()));
+									const v = numeric.findIndex(Boolean);
+									const n = numeric.findIndex((val, i) => !val && i !== v);
+									return {
+										name: n !== -1 ? n : (row.length === 2 ? (v === 0 ? 1 : 0) : -1),
+										votes: v,
+										start: 0
+									};
 								}
-							}
+							];
 
-							if (nameIndex === -1 || votesIndex === -1) throw new Error('Invalid columns');
+							const config = strategies.reduce((found, strategy) => {
+								if (found.name !== -1 && found.votes !== -1) return found;
+								const result = strategy(firstRow);
+								return (result.name !== -1 && result.votes !== -1) ? result : found;
+							}, { name: -1, votes: -1, start: 1 });
+
+							if (config.name === -1 || config.votes === -1) throw new Error('Invalid columns');
 
 							const newParties = [];
-							for (let i = startRow; i < lines.length; i++) {
+							for (let i = config.start; i < lines.length; i++) {
 								const columns = parseLine(lines[i]);
-								if (columns.length <= Math.max(nameIndex, votesIndex)) continue;
+								if (columns.length <= Math.max(config.name, config.votes)) continue;
 
-								const name = columns[nameIndex].replace(/^"|"$/g, '');
-								const votesStr = columns[votesIndex].replace(/,/g, '').replace(/\./g, '');
+								const name = columns[config.name].replace(/^"|"$/g, '');
+								const votesStr = columns[config.votes].replace(/,/g, '').replace(/\./g, '');
 								const votes = parseInt(votesStr.replace(/[^0-9]/g, '')) || 0;
 
 								if (name) {
@@ -828,7 +830,7 @@
 							if (newParties.length) {
 								this.parties = newParties;
 								this.renderParties();
-								dom.importFile.value = ''; // Reset
+								dom.importFile.value = '';
 							} else {
 								alert(this.text('alertImport'));
 							}
