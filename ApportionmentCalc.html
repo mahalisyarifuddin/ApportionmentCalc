@@ -755,29 +755,8 @@
 							const lines = text.split(/\r?\n/).filter(line => line.trim());
 							if (lines.length < 1) throw new Error('No data');
 
-							const parseLine = (line) => {
-								const result = [];
-								let current = '';
-								let inQuote = false;
-								for (let i = 0; i < line.length; i++) {
-									const char = line[i];
-									if (char === '"') {
-										if (inQuote && line[i + 1] === '"') {
-											current += '"';
-											i++;
-										} else {
-											inQuote = !inQuote;
-										}
-									} else if (char === delimiter && !inQuote) {
-										result.push(current.trim());
-										current = '';
-									} else {
-										current += char;
-									}
-								}
-								result.push(current.trim());
-								return result;
-							};
+							const parseLine = (line) => line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
+								.map(c => c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 
 							const firstRow = parseLine(lines[0]);
 							const strategies = [
@@ -801,11 +780,8 @@
 								}
 							];
 
-							const config = strategies.reduce((found, strategy) => {
-								if (found.name !== -1 && found.votes !== -1) return found;
-								const result = strategy(firstRow);
-								return (result.name !== -1 && result.votes !== -1) ? result : found;
-							}, { name: -1, votes: -1, start: 1 });
+							const config = strategies.map(s => s(firstRow)).find(res => res.name !== -1 && res.votes !== -1)
+								|| { name: -1, votes: -1, start: 1 };
 
 							if (config.name === -1 || config.votes === -1) throw new Error('Invalid columns');
 
@@ -814,7 +790,7 @@
 								const columns = parseLine(lines[i]);
 								if (columns.length <= Math.max(config.name, config.votes)) continue;
 
-								const name = columns[config.name].replace(/^"|"$/g, '');
+								const name = columns[config.name]; // Already unquoted by parseLine
 								const votesStr = columns[config.votes].replace(/,/g, '').replace(/\./g, '');
 								const votes = parseInt(votesStr.replace(/[^0-9]/g, '')) || 0;
 
@@ -827,13 +803,11 @@
 								}
 							}
 
-							if (newParties.length) {
+							newParties.length ? (() => {
 								this.parties = newParties;
 								this.renderParties();
 								dom.importFile.value = '';
-							} else {
-								alert(this.text('alertImport'));
-							}
+							})() : alert(this.text('alertImport'));
 						} catch (error) {
 							console.error(error);
 							alert(this.text('alertImport'));
