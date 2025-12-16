@@ -606,6 +606,7 @@
 					if (!passed.length)
 						return alert(this.text('belowThreshold'));
 
+					// Calculate quota based on total valid votes (including those below threshold)
 					const quota = total / seats;
 					const hare = passed.map(party=>{
 						const hareSeats = Math.floor((party.votes * seats) / total);
