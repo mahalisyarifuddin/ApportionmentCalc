@@ -489,9 +489,7 @@
 				return element;
 			}
 			;
-			const escape = value=>node('span', {
-				textContent: value
-			}).innerHTML;
+			const escape = text=>text.replace(/[&<>"']/g, m=>({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'}[m]));
 			const dom = Object.fromEntries([...document.querySelectorAll('[id]')].map(element=>[element.id, element]));
 
 			class ApportionmentCalc {
