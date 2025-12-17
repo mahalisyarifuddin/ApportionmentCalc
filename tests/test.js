@@ -10,13 +10,20 @@ describe('ApportionmentCalc', function () {
 
   before(async () => {
     browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  });
+
+  after(async () => {
+    await browser.close();
+  });
+
+  beforeEach(async () => {
     page = await browser.newPage();
     const filePath = path.resolve(__dirname, '../ApportionmentCalc.html');
     await page.goto(`file://${filePath}`, { waitUntil: 'networkidle0' });
   });
 
-  after(async () => {
-    await browser.close();
+  afterEach(async () => {
+    await page.close();
   });
 
   it('should handle tie-breaking in Hare Quota correctly', async () => {
@@ -84,10 +91,6 @@ describe('ApportionmentCalc', function () {
       await element.type(value);
     };
 
-    // Use existing party row, just change the votes
-    await page.click('#edit'); // Go back to the input screen
-    await page.waitForSelector('#input:not(.hidden)');
-
     // Change the votes of the first party to a decimal number
     await clearAndType('.party-row:nth-child(1) input[type="number"]', '7000.6');
 
@@ -101,5 +104,29 @@ describe('ApportionmentCalc', function () {
     });
 
     expect(roundedVotes).to.equal('7001');
+  });
+
+  it('should escape HTML in party names', async () => {
+    const clearAndType = async (selector, value) => {
+        const element = await page.$(selector);
+        await element.click({ clickCount: 3 });
+        await element.press('Backspace');
+        await element.type(value);
+    };
+
+    // Change the name of the first party to something with HTML
+    await clearAndType('.party-row:nth-child(1) input[type="text"]', '<b>Bold Party</b> & "Quotes"');
+
+    await page.click('#calculate');
+    await page.waitForSelector('#results:not(.hidden)');
+
+    // check the innerHTML of the first cell in Hare results
+    const firstCellHTML = await page.evaluate(() => {
+        return document.querySelector('#hare table tbody tr:nth-child(1) td').innerHTML;
+    });
+
+    // The innerHTML should contain the escaped entities, not the raw HTML tags
+    expect(firstCellHTML).to.include('&lt;b&gt;Bold Party&lt;/b&gt;');
+    expect(firstCellHTML).to.include('&amp; "Quotes"'); // Changed this line to expect escaped quotes
   });
 });
