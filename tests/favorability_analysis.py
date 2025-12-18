@@ -87,7 +87,7 @@ def run_simulation():
     thresholds = [0, 3, 4, 5] # 0%, 3%, 4%, and 5%
     vote_distributions = ['uniform', 'exponential', 'power-law']
 
-    simulations_per_config = 2000 # Increased from 500
+    simulations_per_config = 1282 # Adjusted to ~1 million total scenarios (780 configs)
 
     total_scenarios = 0
     # Analysis buckets
@@ -152,9 +152,9 @@ def run_simulation():
 
                         # 4. Analyze Favorability
                         # Classification based on vote share:
-                        # Small: < 10%
-                        # Medium: 10% - 25%
-                        # Large: > 25%
+                        # Small: < 5%
+                        # Medium: 5% - 15%
+                        # Large: > 15%
 
                         small_indices = []
                         medium_indices = []
@@ -162,9 +162,9 @@ def run_simulation():
 
                         for idx in range(num_parties):
                             share = votes[idx] / total_vote_count
-                            if share < 0.10:
+                            if share < 0.05:
                                 small_indices.append(idx)
-                            elif share <= 0.25:
+                            elif share <= 0.15:
                                 medium_indices.append(idx)
                             else:
                                 large_indices.append(idx)
@@ -201,7 +201,7 @@ def run_simulation():
         sl_perc = (favorability_counts[category]['sl'] / cat_total) * 100
         neutral_perc = (favorability_counts[category]['neutral'] / cat_total) * 100
 
-        print(f"\n--- {category.capitalize()} Parties (<10%, 10-25%, >25%) ---")
+        print(f"\n--- {category.capitalize()} Parties (<5%, 5-15%, >15%) ---")
         print(f"Hare Quota favored: {favorability_counts[category]['hare']} times ({hare_perc:.2f}%)")
         print(f"Sainte-Laguë favored: {favorability_counts[category]['sl']} times ({sl_perc:.2f}%)")
         print(f"Neutral outcome:    {favorability_counts[category]['neutral']} times ({neutral_perc:.2f}%)")
