@@ -87,7 +87,7 @@
 
 			button {
 				cursor: pointer;
-				transition: background .2s
+				transition: background .1s
 			}
 
 			.primary {
@@ -497,7 +497,8 @@
 				return element;
 			}
 			;
-			const escape = text=>text.replace(/[&<>"']/g, m=>({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'}[m]));
+			const escapes = {'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'};
+			const escape = text=>text.replace(/[&<>"']/g, m=>escapes[m]);
 			const dom = Object.fromEntries([...document.querySelectorAll('[id]')].map(element=>[element.id, element]));
 
 			class ApportionmentCalc {
@@ -731,11 +732,11 @@
 						n: step.round
 					})}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.winnerQuotient, {
 						maximumFractionDigits: 2
-					})}</td><td>${step.winnerDivisor}</td></tr>`).join('')}</tbody></table><h3 class="step-header">${this.string('quotientDetail')}</h3>${warning}${showDetails.map(step=>`<div class="step"><h4>${this.template('seatAllocated', {
+					})}</td><td>${step.winnerDivisor}</td></tr>`).join('')}</tbody></table><h3 class="step-header">${this.string('quotientDetail')}</h3>${warning}${showDetails.map(step=>step.quotients ? `<div class="step"><h4>${this.template('seatAllocated', {
 						n: step.round
 					})} - ${this.string('winnerPrefix')}${escape(step.winner)}</h4><table><tr>${step.quotients.map(quotient=>`<th>${escape(quotient.name)} (/${quotient.divisor})</th>`).join('')}</tr><tr>${step.quotients.map(quotient=>`<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, {
 						maximumFractionDigits: 2
-					})}</td>`).join('')}</tr></table></div>`).join('')}${warning}`;
+					})}</td>`).join('')}</tr></table></div>` : '').join('')}${warning}`;
 				}
 
 				exportData() {
