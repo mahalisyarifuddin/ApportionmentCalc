@@ -24,13 +24,6 @@ def calculate_hare(party_votes, total_valid_votes, total_seats):
         remainders.append((rem, i))
 
     allocated_seats = sum(seats)
-
-    # It is possible that allocated_seats < total_seats (likely)
-    # It is also possible (though rarer with standard Hare) that allocated_seats > total_seats if we used a weird quota,
-    # but here quota = Total / Seats, so sum(votes) / quota = Seats.
-    # sum(floor(votes/quota)) <= sum(votes/quota) = Seats.
-    # So we usually have remaining seats.
-
     remaining_seats = total_seats - allocated_seats
 
     # Sort by remainder descending
@@ -70,6 +63,23 @@ def calculate_sainte_lague(party_votes, total_seats):
 
     return seats
 
+def calculate_gallagher_index(votes, seats, total_votes, total_seats):
+    """
+    Calculates the Gallagher Index (disproportionality).
+    Lower is better (more proportional).
+    """
+    if total_votes == 0 or total_seats == 0:
+        return 0
+
+    sum_squares = 0
+    for v, s in zip(votes, seats):
+        vote_percent = (v / total_votes) * 100
+        seat_percent = (s / total_seats) * 100
+        diff = vote_percent - seat_percent
+        sum_squares += diff ** 2
+
+    return math.sqrt(0.5 * sum_squares)
+
 def run_simulation():
     # Simulation Parameters
     party_counts = range(3, 16) # 3 to 15 parties
@@ -77,7 +87,7 @@ def run_simulation():
     thresholds = [0, 3, 4, 5] # 0%, 3%, 4%, and 5%
     vote_distributions = ['uniform', 'exponential', 'power-law']
 
-    simulations_per_config = 500
+    simulations_per_config = 2000 # Increased from 500
 
     total_scenarios = 0
     # Analysis buckets
@@ -86,23 +96,21 @@ def run_simulation():
         'medium': {'hare': 0, 'sl': 0, 'neutral': 0},
         'large': {'hare': 0, 'sl': 0, 'neutral': 0}
     }
-    total_scenarios = 0
 
-    header = f"{'Parties':<8} | {'Seats':<6} | {'Thresh%':<7} | {'Dist':<11} | {'Category':<9} | {'Hare Seats':<10} | {'SL Seats':<10} | {'Diff':<10}"
-    print(header)
-    print("-" * len(header))
+    gallagher_stats = {
+        'hare': [],
+        'sl': []
+    }
+
+    print(f"Running Monte Carlo simulation with {simulations_per_config} runs per config...")
+
+    # We will skip printing every single config line to avoid huge output,
+    # but we will print summary stats.
 
     for num_parties in party_counts:
         for num_seats in seat_counts:
             for threshold_pct in thresholds:
                 for dist_type in vote_distributions:
-
-                    # Accumulators for this specific configuration
-                    totals = {
-                        'small': {'hare': 0, 'sl': 0},
-                        'medium': {'hare': 0, 'sl': 0},
-                        'large': {'hare': 0, 'sl': 0}
-                    }
 
                     for _ in range(simulations_per_config):
                         # 1. Generate Votes
@@ -125,9 +133,7 @@ def run_simulation():
                         passed_votes = [votes[i] for i in passed_indices]
 
                         # 3. Calculate Allocations
-                        # Corrected Hare Logic: Pass total_vote_count as the basis for quota
                         hare_results_passed = calculate_hare(passed_votes, total_vote_count, num_seats)
-
                         sl_results_passed = calculate_sainte_lague(passed_votes, num_seats)
 
                         hare_seats_full = [0] * num_parties
@@ -135,6 +141,14 @@ def run_simulation():
                         for idx, passed_idx in enumerate(passed_indices):
                             hare_seats_full[passed_idx] = hare_results_passed[idx]
                             sl_seats_full[passed_idx] = sl_results_passed[idx]
+
+                        # Calculate Gallagher Index for this scenario (among passed parties or all? usually all but ignored if 0)
+                        # Here we consider the outcome. Parties below threshold got 0 seats.
+                        g_hare = calculate_gallagher_index(votes, hare_seats_full, total_vote_count, num_seats)
+                        g_sl = calculate_gallagher_index(votes, sl_seats_full, total_vote_count, num_seats)
+
+                        gallagher_stats['hare'].append(g_hare)
+                        gallagher_stats['sl'].append(g_sl)
 
                         # 4. Analyze Favorability
                         # Classification based on vote share:
@@ -167,9 +181,6 @@ def run_simulation():
                             hare_total = sum(hare_seats_full[i] for i in indices)
                             sl_total = sum(sl_seats_full[i] for i in indices)
 
-                            totals[category]['hare'] += hare_total
-                            totals[category]['sl'] += sl_total
-
                             if hare_total > sl_total:
                                 favorability_counts[category]['hare'] += 1
                             elif sl_total > hare_total:
@@ -179,14 +190,6 @@ def run_simulation():
 
                         total_scenarios += 1
 
-                    # Print stats for this config
-                    for category in ['small', 'medium', 'large']:
-                        h_seats = totals[category]['hare']
-                        s_seats = totals[category]['sl']
-                        diff = h_seats - s_seats
-                        print(f"{num_parties:<8} | {num_seats:<6} | {threshold_pct:<7} | {dist_type:<11} | {category:<9} | {h_seats:<10} | {s_seats:<10} | {diff:<10}")
-
-    print("-" * len(header))
     print("Summary:")
     print(f"Total valid scenarios analyzed: {total_scenarios}")
 
@@ -198,10 +201,22 @@ def run_simulation():
         sl_perc = (favorability_counts[category]['sl'] / cat_total) * 100
         neutral_perc = (favorability_counts[category]['neutral'] / cat_total) * 100
 
-        print(f"\n--- {category.capitalize()} Parties ---")
+        print(f"\n--- {category.capitalize()} Parties (<10%, 10-25%, >25%) ---")
         print(f"Hare Quota favored: {favorability_counts[category]['hare']} times ({hare_perc:.2f}%)")
         print(f"Sainte-Laguë favored: {favorability_counts[category]['sl']} times ({sl_perc:.2f}%)")
         print(f"Neutral outcome:    {favorability_counts[category]['neutral']} times ({neutral_perc:.2f}%)")
+
+    avg_g_hare = sum(gallagher_stats['hare']) / len(gallagher_stats['hare'])
+    avg_g_sl = sum(gallagher_stats['sl']) / len(gallagher_stats['sl'])
+
+    print(f"\n--- Gallagher Index (Disproportionality) ---")
+    print(f"Average Hare Index: {avg_g_hare:.4f}")
+    print(f"Average Sainte-Laguë Index: {avg_g_sl:.4f}")
+    if avg_g_sl < avg_g_hare:
+        print("Sainte-Laguë is on average more proportional.")
+    else:
+        print("Hare is on average more proportional.")
+
 
     print("\nCONCLUSION:")
     if favorability_counts['small']['hare'] > favorability_counts['small']['sl']:
