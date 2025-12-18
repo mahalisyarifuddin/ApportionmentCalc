@@ -82,12 +82,12 @@ def calculate_gallagher_index(votes, seats, total_votes, total_seats):
 
 def run_simulation():
     # Simulation Parameters
-    party_counts = range(3, 16) # 3 to 15 parties
-    seat_counts = [10, 50, 100, 250, 560] # Various parliament sizes
+    party_counts = range(2, 51) # 2 to 50 parties
+    seat_counts = range(20, 581, 20) # 20 to 580 seats in increments of 20
     thresholds = [x * 0.5 for x in range(9)] # 0% to 4% in 0.5% increments
     vote_distributions = ['uniform', 'exponential', 'power-law']
 
-    simulations_per_config = 570 # Adjusted to ~1 million total scenarios (1755 configs)
+    simulations_per_config = 26 # Adjusted to ~1 million total scenarios (38367 configs)
 
     total_scenarios = 0
     # Analysis buckets

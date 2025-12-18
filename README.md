@@ -60,9 +60,9 @@ The calculator takes vote counts for multiple political parties and a total numb
 ## Favorability Analysis
 A statistical simulation of **~1 million** electoral scenarios confirmed the bias tendencies of each method. Parties were classified by vote share: **Small** (<5%), **Medium** (5-15%), and **Large** (>15%).
 
-- **Small Parties**: Hare Quota provided a more favorable outcome in **25.73%** of cases, compared to 4.01% for Sainte-Laguë.
-- **Large Parties**: Sainte-Laguë provided a more favorable outcome in **26.53%** of cases, compared to 5.88% for Hare Quota.
-- **Proportionality**: On average, the Hare Quota method resulted in a slightly lower Gallagher Index (2.34 vs 2.49), indicating it is marginally more proportional across the simulated scenarios.
+- **Small Parties**: Hare Quota provided a more favorable outcome in **57.02%** of cases, compared to 4.51% for Sainte-Laguë.
+- **Large Parties**: Sainte-Laguë provided a more favorable outcome in **54.50%** of cases, compared to 6.45% for Hare Quota.
+- **Proportionality**: On average, the Hare Quota method resulted in a slightly lower Gallagher Index (4.21 vs 4.64), indicating it is marginally more proportional across the simulated scenarios.
 
 This data supports the general consensus that Hare Quota is friendlier to smaller parties, while Sainte-Laguë significantly benefits larger parties.
 

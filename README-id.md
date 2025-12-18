@@ -59,9 +59,9 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 ## Analisis Tingkat Keuntungan
 Simulasi statistik terhadap **~1 juta** skenario pemilu mengonfirmasi kecenderungan bias dari masing-masing metode. Partai diklasifikasikan berdasarkan persentase suara: **Kecil** (<5%), **Menengah** (5-15%), dan **Besar** (>15%).
 
-- **Partai Kecil**: Kuota Hare memberikan hasil yang lebih menguntungkan dalam **25,73%** kasus, dibandingkan dengan 4,01% untuk Sainte-Laguë.
-- **Partai Besar**: Sainte-Laguë memberikan hasil yang lebih menguntungkan dalam **26,53%** kasus, dibandingkan dengan 5,88% untuk Kuota Hare.
-- **Proporsionalitas**: Rata-rata, metode Kuota Hare menghasilkan Indeks Gallagher yang sedikit lebih rendah (2,34 vs 2,49), yang menunjukkan bahwa metode ini sedikit lebih proporsional di seluruh skenario yang disimulasikan.
+- **Partai Kecil**: Kuota Hare memberikan hasil yang lebih menguntungkan dalam **57,02%** kasus, dibandingkan dengan 4,51% untuk Sainte-Laguë.
+- **Partai Besar**: Sainte-Laguë memberikan hasil yang lebih menguntungkan dalam **54,50%** kasus, dibandingkan dengan 6,45% untuk Kuota Hare.
+- **Proporsionalitas**: Rata-rata, metode Kuota Hare menghasilkan Indeks Gallagher yang sedikit lebih rendah (4,21 vs 4,64), yang menunjukkan bahwa metode ini sedikit lebih proporsional di seluruh skenario yang disimulasikan.
 
 Data ini mendukung konsensus umum bahwa Kuota Hare lebih ramah terhadap partai-partai kecil, sementara Sainte-Laguë secara signifikan menguntungkan partai-partai besar.
 
