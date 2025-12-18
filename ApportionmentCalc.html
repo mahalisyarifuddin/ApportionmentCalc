@@ -432,7 +432,9 @@
 					import: 'Import CSV/TSV',
 					alertImport: 'Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.',
 					removeParty: 'Remove Party',
-					closeModal: 'Close Modal'
+					closeModal: 'Close Modal',
+					languageLabel: 'Language',
+					themeLabel: 'Theme'
 				},
 				id: {
 					title: 'ApportionmentCalc',
@@ -483,7 +485,9 @@
 					import: 'Impor CSV/TSV',
 					alertImport: 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".',
 					removeParty: 'Hapus Partai',
-					closeModal: 'Tutup Modal'
+					closeModal: 'Tutup Modal',
+					languageLabel: 'Bahasa',
+					themeLabel: 'Tema'
 				}
 			};
 
@@ -554,6 +558,8 @@
 					['title', 'subtitle', 'seatsLabel', 'thresholdLabel', 'add', 'calculate', 'edit', 'steps', 'export', 'import', 'hareTitle', 'sainteLagueTitle', 'compareTitle', 'modalTitle'].forEach(id=>dom[id].textContent = this.string(id));
 					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,index])=>dom.theme.options[index].textContent = this.string(key));
 					dom.close.setAttribute('aria-label', this.string('closeModal'));
+					dom.language.setAttribute('aria-label', this.string('languageLabel'));
+					dom.theme.setAttribute('aria-label', this.string('themeLabel'));
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
 				}
