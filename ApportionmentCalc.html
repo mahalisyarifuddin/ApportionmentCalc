@@ -430,7 +430,9 @@
 					yes: 'Yes',
 					no: 'No',
 					import: 'Import CSV/TSV',
-					alertImport: 'Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.'
+					alertImport: 'Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.',
+					removeParty: 'Remove Party',
+					closeModal: 'Close Modal'
 				},
 				id: {
 					title: 'ApportionmentCalc',
@@ -479,7 +481,9 @@
 					yes: 'Ya',
 					no: 'Tidak',
 					import: 'Impor CSV/TSV',
-					alertImport: 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".'
+					alertImport: 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".',
+					removeParty: 'Hapus Partai',
+					closeModal: 'Tutup Modal'
 				}
 			};
 
@@ -549,6 +553,7 @@
 					document.documentElement.lang = language;
 					['title', 'subtitle', 'seatsLabel', 'thresholdLabel', 'add', 'calculate', 'edit', 'steps', 'export', 'import', 'hareTitle', 'sainteLagueTitle', 'compareTitle', 'modalTitle'].forEach(id=>dom[id].textContent = this.string(id));
 					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,index])=>dom.theme.options[index].textContent = this.string(key));
+					dom.close.setAttribute('aria-label', this.string('closeModal'));
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
 				}
@@ -580,7 +585,7 @@
 					const row = node('div', {
 						className: 'party-row'
 					});
-					row.innerHTML = `<input type="text" placeholder="${this.string('partyPlaceholder')}"><input type="number" placeholder="${this.string('votesPlaceholder')}" min="0"><button class="danger">×</button>`;
+					row.innerHTML = `<input type="text" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')}"><input type="number" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')}"><button class="danger" aria-label="${this.string('removeParty')}">×</button>`;
 					const [name,votes,remove] = row.children;
 					name.value = party.name;
 					votes.value = party.votes || '';
