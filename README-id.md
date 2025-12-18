@@ -4,7 +4,7 @@
 *Electoral math, simplified.*
 
 ## Pengantar
-ApportionmentCalc adalah kalkulator berbasis peramban (browser) file tunggal untuk membandingkan dua metode alokasi kursi pemilu yang populer: **Sainte Laguë** dan **Kuota Hare**. Dirancang untuk pelajar, peneliti, pengamat pemilu, dan siapa saja yang ingin tahu tentang representasi proporsional, alat ini memvisualisasikan bagaimana metode yang berbeda dapat menghasilkan hasil yang berbeda dari jumlah suara yang sama.
+ApportionmentCalc adalah kalkulator berbasis peramban (browser) file tunggal untuk membandingkan dua metode alokasi kursi pemilu yang populer: **Sainte-Laguë** dan **Kuota Hare**. Dirancang untuk pelajar, peneliti, pengamat pemilu, dan siapa saja yang ingin tahu tentang representasi proporsional, alat ini memvisualisasikan bagaimana metode yang berbeda dapat menghasilkan hasil yang berbeda dari jumlah suara yang sama.
 
 Antarmuka tersedia dalam **Bahasa Inggris** dan **Bahasa Indonesia**, membuatnya sangat berguna untuk pendidikan kewarganegaraan dan analisis pemilu di Indonesia.
 
@@ -13,7 +13,7 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 
 1. **Ambang Batas Parlemen (Parliamentary Threshold)**: Menyaring partai yang tidak memenuhi persentase minimum suara sah nasional.
 2. **Metode Kuota Hare**: Menghitung BPP (Bilangan Pembagi Pemilih), mengalokasikan kursi berdasarkan kuota penuh, kemudian mendistribusikan kursi sisa ke partai dengan sisa suara terbesar.
-3. **Metode Sainte Laguë**: Menggunakan urutan pembagi (1, 3, 5, 7, 9...) untuk mengalokasikan kursi secara iteratif berdasarkan hasil bagi (quotient) tertinggi pada setiap langkah.
+3. **Metode Sainte-Laguë**: Menggunakan urutan pembagi (1, 3, 5, 7, 9...) untuk mengalokasikan kursi secara iteratif berdasarkan hasil bagi (quotient) tertinggi pada setiap langkah.
 4. **Tampilan Perbandingan**: Menampilkan hasil secara berdampingan dan menyoroti perbedaan antara kedua metode.
 
 ## Mulai Cepat
@@ -31,8 +31,8 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 - **Konfigurasi Ambang Batas**: Atur ambang batas parlemen (threshold) sesuai peraturan.
 - **Perbandingan Dua Metode**: Lihat hasil Kuota Hare dan Sainte Laguë secara berdampingan.
 - **Input Partai Dinamis**: Tambah atau hapus partai sesuai kebutuhan.
-- **Rincian Mendalam**: Lihat BPP, sisa suara, bilangan pembagi, dan alokasi langkah demi langkah.
-- **Visualisasi Sainte Laguë**: Lihat tabel langkah demi langkah bagaimana setiap kursi dimenangkan.
+- **Perbandingan Dua Metode**: Lihat hasil Kuota Hare dan Sainte-Laguë secara berdampingan.
+- **Visualisasi Sainte-Laguë**: Lihat tabel langkah demi langkah bagaimana setiap kursi dimenangkan.
 - **Impor/Ekspor CSV**: Impor data partai dari file CSV/TSV dan unduh hasil perhitungan untuk analisis lebih lanjut.
 - **File HTML Tunggal**: Tidak perlu instalasi, tidak ada dependensi, bekerja sepenuhnya offline.
 
@@ -50,7 +50,7 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 - Sisa kursi diberikan kepada partai dengan sisa suara terbesar
 - Cenderung menguntungkan partai-partai kecil
 
-### Sainte Laguë
+### Sainte-Laguë
 - Menggunakan bilangan pembagi ganjil: 1, 3, 5, 7, 9...
 - Kursi dialokasikan satu per satu kepada partai dengan hasil bagi tertinggi
 - Rumus: Suara ÷ (2 × Kursi Saat Ini + 1)
