@@ -516,13 +516,14 @@
 				return el
 			}
 			;
-			const esc = t=>t.replace(/[&<>"']/g, m=>({
+			const escapeMap = {
 				'&': '&amp;',
 				'<': '&lt;',
 				'>': '&gt;',
 				'"': '&quot;',
 				"'": '&#39;'
-			}[m]));
+			};
+			const esc = t=>t.replace(/[&<>"']/g, m=>escapeMap[m]);
 			const dom = Object.fromEntries([...document.querySelectorAll('[id]')].map(e=>[e.id, e]));
 
 			class ApportionmentCalc {
