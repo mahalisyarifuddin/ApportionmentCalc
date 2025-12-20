@@ -334,7 +334,7 @@
 
 				.row {
 					flex-direction: column;
-					gap: 0
+					gap: .5rem
 				}
 			}
 		</style>
@@ -367,8 +367,8 @@
 				</div>
 				<div class="party-list" id="list"></div>
 				<div class="row" style="margin-bottom:1rem">
-					<button id="add" class="secondary" style="margin-bottom:0"></button>
-					<button id="import" class="secondary" style="margin-bottom:0"></button>
+					<button id="add" class="secondary"></button>
+					<button id="import" class="secondary"></button>
 				</div>
 				<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
 				<span id="error" class="error hidden" aria-live="polite"></span>
@@ -775,9 +775,9 @@
 						maximumFractionDigits: 6
 					})}</td>`)).join('')}</tbody></table>`;
 					dom.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')}</p><table><thead><tr><th>${this.string('party')}</th><th>${this.string('votes')}</th><th>${this.string('seatsColumn')}</th></tr></thead><tbody>${[...passed].sort((a,b)=>b.sainteLagueSeats - a.sainteLagueSeats).map(r=>row(r, r.sainteLagueSeats)).join('')}</tbody></table>`;
-					dom.compare.innerHTML = `<table><thead><tr><th>${this.string('party')}</th><th>Hare</th><th>Sainte-Laguë</th><th>${this.string('diff')}</th></tr></thead><tbody>${[...results].sort((a,b)=>b.votes - a.votes).map(r=>{
+					dom.compare.innerHTML = `<table><thead><tr><th>${this.string('party')}</th><th>Hare</th><th>Sainte-Laguë</th><th>${this.string('diff')}</th></tr></thead><tbody>${[...passed].sort((a,b)=>b.votes - a.votes).map(r=>{
 						const diff = r.sainteLagueSeats - r.hareSeats;
-						return `<tr><td>${esc(r.name)}${r.passed ? '' : `( < ${this.format(threshold)}%)`}</td><td>${r.hareSeats}</td><td>${r.sainteLagueSeats}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>`;
+						return `<tr><td>${esc(r.name)}</td><td>${r.hareSeats}</td><td>${r.sainteLagueSeats}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>`;
 					}
 					).join('')}</tbody></table>`;
 				}
