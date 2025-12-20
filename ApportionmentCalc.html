@@ -233,36 +233,15 @@
 				font-weight: bold
 			}
 
-			#toast {
-				position: fixed;
-				bottom: 2rem;
-				left: 50%;
-				transform: translateX(-50%);
-				background: #323232;
-				color: #fff;
-				padding: 1rem 2rem;
-				border-radius: 4px;
-				z-index: 2000;
-				box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-				visibility: hidden;
-				opacity: 0;
-				transition: opacity .3s, visibility .3s;
-				border-left: 5px solid transparent;
-				display: flex;
-				align-items: center
+			.error {
+				color: #d32f2f;
+				font-size: .9rem;
+				margin-top: .5rem;
+				display: block
 			}
 
-			#toast.show {
-				visibility: visible;
-				opacity: 1
-			}
-
-			#toast.error {
-				border-left-color: var(--danger)
-			}
-
-			#toast.success {
-				border-left-color: var(--success)
+			.error.hidden {
+				display: none!important
 			}
 
 			#modal {
@@ -386,6 +365,7 @@
 					<button id="import" class="secondary" style="margin-bottom:0"></button>
 				</div>
 				<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
+				<span id="error" class="error hidden" aria-live="polite"></span>
 				<button id="calculate" class="primary"></button>
 			</div>
 			<div id="results" class="hidden">
@@ -418,7 +398,6 @@
 				<div id="modalSteps"></div>
 			</div>
 		</div>
-		<div id="toast" class="toast"></div>
 		<script>
 			const text = {
 				en: {
@@ -610,15 +589,9 @@
 					dom.modal.classList.toggle('hidden', !visible);
 					visible && this.renderSteps();
 				}
-				showToast(message, type = 'error') {
-					dom.toast.textContent = message;
-					dom.toast.className = `toast show ${type}`;
-					dom.toast.setAttribute('role', 'alert');
-					if (this.toastTimeout) clearTimeout(this.toastTimeout);
-					this.toastTimeout = setTimeout(()=>{
-						dom.toast.className = 'toast';
-						dom.toast.removeAttribute('role');
-					}, 3000);
+				showError(message) {
+					dom.error.textContent = message;
+					dom.error.classList.remove('hidden');
 				}
 				addParty() {
 					this.parties.push({
@@ -651,20 +624,21 @@
 				}
 
 				calculate() {
+					dom.error.classList.add('hidden');
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
-						return this.showToast(this.string('alertSeats'));
+						return this.showError(this.string('alertSeats'));
 
 					const valid = this.parties.filter(party=>party.name && party.votes >= 0);
 					const total = valid.reduce((sum,party)=>sum + party.votes, 0);
 					if (!valid.length || total === 0)
-						return this.showToast(this.string('alertParties'));
+						return this.showError(this.string('alertParties'));
 
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(party=>party.votes >= thresholdVotes - 1e-7);
 					if (!passed.length)
-						return this.showToast(this.string('belowThreshold'));
+						return this.showError(this.string('belowThreshold'));
 
 					const quota = total / seats;
 					const hare = passed.map(party=>{
@@ -885,7 +859,7 @@
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
-							this.showToast(this.string('alertImport'));
+							this.showError(this.string('alertImport'));
 						}
 					}
 					;

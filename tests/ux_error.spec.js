@@ -4,21 +4,19 @@ const fs = require('fs');
 const path = require('path');
 
 test.describe('ApportionmentCalc UX', () => {
-    test('should show toast on invalid seats input', async ({ page }) => {
+    test('should show inline error on invalid seats input', async ({ page }) => {
         const filePath = path.resolve(__dirname, '../ApportionmentCalc.html');
         await page.goto(`file://${filePath}`);
 
         // Set seats to 0
         await page.fill('#seats', '0');
 
-        // Note: We don't need dialog handler anymore as alert is replaced
-
         await page.click('#calculate');
 
-        // Expect toast to be visible and contain message
-        const toast = page.locator('#toast');
-        await expect(toast).toBeVisible();
-        await expect(toast).toHaveClass(/show/);
-        await expect(toast).toContainText('Total seats must be at least 1');
+        // Expect error to be visible and contain message
+        const error = page.locator('#error');
+        await expect(error).toBeVisible();
+        await expect(error).not.toHaveClass(/hidden/);
+        await expect(error).toContainText('Total seats must be at least 1');
     });
 });
