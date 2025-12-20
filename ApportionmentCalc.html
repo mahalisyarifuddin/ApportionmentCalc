@@ -236,12 +236,20 @@
 			.error {
 				color: #d32f2f;
 				font-size: .9rem;
-				margin-top: .5rem;
-				display: block
+				margin-top: 1rem;
+				margin-bottom: 1rem;
+				display: block;
+				font-weight: 500
 			}
 
 			.error.hidden {
 				display: none!important
+			}
+
+			.dimmed {
+				opacity: .5;
+				cursor: not-allowed;
+				pointer-events: none
 			}
 
 			#modal {
@@ -552,6 +560,10 @@
 					dom.modal.onclick = event=>event.target === dom.modal && this.toggleModal(false);
 					dom.language.onchange = event=>this.setLanguage(event.target.value);
 					dom.theme.onchange = event=>this.setTheme(event.target.value);
+
+					['seats', 'threshold'].forEach(id => {
+						dom[id].oninput = () => this.clearError();
+					});
 				}
 
 				string(key) {
@@ -592,8 +604,14 @@
 				showError(message) {
 					dom.error.textContent = message;
 					dom.error.classList.remove('hidden');
+					dom.calculate.classList.add('dimmed');
+				}
+				clearError() {
+					dom.error.classList.add('hidden');
+					dom.calculate.classList.remove('dimmed');
 				}
 				addParty() {
+					this.clearError();
 					this.parties.push({
 						id: this.nextIndex++,
 						name: '',
@@ -602,6 +620,7 @@
 					this.renderParties();
 				}
 				removeParty(id) {
+					this.clearError();
 					this.parties = this.parties.filter(party=>party.id !== id);
 					this.renderParties();
 				}
@@ -619,12 +638,14 @@
 					votes.value = party.votes || '';
 					name.onchange = event=>party.name = event.target.value;
 					votes.onchange = event=>event.target.value = party.votes = Math.round(parseFloat(event.target.value)) || 0;
+					name.oninput = () => this.clearError();
+					votes.oninput = () => this.clearError();
 					remove.onclick = ()=>this.removeParty(party.id);
 					return row;
 				}
 
 				calculate() {
-					dom.error.classList.add('hidden');
+					this.clearError();
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
@@ -856,6 +877,7 @@
 							if (!newParties.length)
 								throw new Error('No valid data');
 							this.parties = newParties;
+							this.clearError();
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
