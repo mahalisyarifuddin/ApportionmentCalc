@@ -233,6 +233,38 @@
 				font-weight: bold
 			}
 
+			#toast {
+				position: fixed;
+				bottom: 2rem;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: #fff;
+				padding: 1rem 2rem;
+				border-radius: 4px;
+				z-index: 2000;
+				box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+				visibility: hidden;
+				opacity: 0;
+				transition: opacity .3s, visibility .3s;
+				border-left: 5px solid transparent;
+				display: flex;
+				align-items: center
+			}
+
+			#toast.show {
+				visibility: visible;
+				opacity: 1
+			}
+
+			#toast.error {
+				border-left-color: var(--danger)
+			}
+
+			#toast.success {
+				border-left-color: var(--success)
+			}
+
 			#modal {
 				position: fixed;
 				inset: 0;
@@ -386,6 +418,7 @@
 				<div id="modalSteps"></div>
 			</div>
 		</div>
+		<div id="toast" class="toast"></div>
 		<script>
 			const text = {
 				en: {
@@ -577,6 +610,16 @@
 					dom.modal.classList.toggle('hidden', !visible);
 					visible && this.renderSteps();
 				}
+				showToast(message, type = 'error') {
+					dom.toast.textContent = message;
+					dom.toast.className = `toast show ${type}`;
+					dom.toast.setAttribute('role', 'alert');
+					if (this.toastTimeout) clearTimeout(this.toastTimeout);
+					this.toastTimeout = setTimeout(()=>{
+						dom.toast.className = 'toast';
+						dom.toast.removeAttribute('role');
+					}, 3000);
+				}
 				addParty() {
 					this.parties.push({
 						id: this.nextIndex++,
@@ -611,17 +654,17 @@
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
-						return alert(this.string('alertSeats'));
+						return this.showToast(this.string('alertSeats'));
 
 					const valid = this.parties.filter(party=>party.name && party.votes >= 0);
 					const total = valid.reduce((sum,party)=>sum + party.votes, 0);
 					if (!valid.length || total === 0)
-						return alert(this.string('alertParties'));
+						return this.showToast(this.string('alertParties'));
 
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(party=>party.votes >= thresholdVotes - 1e-7);
 					if (!passed.length)
-						return alert(this.string('belowThreshold'));
+						return this.showToast(this.string('belowThreshold'));
 
 					const quota = total / seats;
 					const hare = passed.map(party=>{
@@ -842,7 +885,7 @@
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
-							alert(this.string('alertImport'));
+							this.showToast(this.string('alertImport'));
 						}
 					}
 					;
