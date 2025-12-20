@@ -638,7 +638,6 @@
 					for (let i = 0; i < seats - allocated; i++)
 						hare[i % hare.length] && hare[i % hare.length].hareSeats++;
 
-					// Bolt Optimization: Use TypedArrays for Sainte-Laguë calculation (approx. 2x faster for large allocations)
 					const n = passed.length;
 					const votesArr = new Float64Array(n);
 					const seatsArr = new Uint32Array(n);
