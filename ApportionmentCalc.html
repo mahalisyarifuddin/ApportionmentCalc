@@ -233,6 +233,25 @@
 				font-weight: bold
 			}
 
+			.error {
+				color: #d32f2f;
+				font-size: .9rem;
+				margin-top: 1rem;
+				margin-bottom: 1rem;
+				display: block;
+				font-weight: 500
+			}
+
+			.error.hidden {
+				display: none!important
+			}
+
+			.dimmed {
+				opacity: .5;
+				cursor: not-allowed;
+				pointer-events: none
+			}
+
 			#modal {
 				position: fixed;
 				inset: 0;
@@ -354,6 +373,7 @@
 					<button id="import" class="secondary" style="margin-bottom:0"></button>
 				</div>
 				<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
+				<span id="error" class="error hidden" aria-live="polite"></span>
 				<button id="calculate" class="primary"></button>
 			</div>
 			<div id="results" class="hidden">
@@ -540,6 +560,10 @@
 					dom.modal.onclick = event=>event.target === dom.modal && this.toggleModal(false);
 					dom.language.onchange = event=>this.setLanguage(event.target.value);
 					dom.theme.onchange = event=>this.setTheme(event.target.value);
+
+					['seats', 'threshold'].forEach(id => {
+						dom[id].oninput = () => this.clearError();
+					});
 				}
 
 				string(key) {
@@ -577,7 +601,17 @@
 					dom.modal.classList.toggle('hidden', !visible);
 					visible && this.renderSteps();
 				}
+				showError(message) {
+					dom.error.textContent = message;
+					dom.error.classList.remove('hidden');
+					dom.calculate.classList.add('dimmed');
+				}
+				clearError() {
+					dom.error.classList.add('hidden');
+					dom.calculate.classList.remove('dimmed');
+				}
 				addParty() {
+					this.clearError();
 					this.parties.push({
 						id: this.nextIndex++,
 						name: '',
@@ -586,6 +620,7 @@
 					this.renderParties();
 				}
 				removeParty(id) {
+					this.clearError();
 					this.parties = this.parties.filter(party=>party.id !== id);
 					this.renderParties();
 				}
@@ -603,25 +638,28 @@
 					votes.value = party.votes || '';
 					name.onchange = event=>party.name = event.target.value;
 					votes.onchange = event=>event.target.value = party.votes = Math.round(parseFloat(event.target.value)) || 0;
+					name.oninput = () => this.clearError();
+					votes.oninput = () => this.clearError();
 					remove.onclick = ()=>this.removeParty(party.id);
 					return row;
 				}
 
 				calculate() {
+					this.clearError();
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
-						return alert(this.string('alertSeats'));
+						return this.showError(this.string('alertSeats'));
 
 					const valid = this.parties.filter(party=>party.name && party.votes >= 0);
 					const total = valid.reduce((sum,party)=>sum + party.votes, 0);
 					if (!valid.length || total === 0)
-						return alert(this.string('alertParties'));
+						return this.showError(this.string('alertParties'));
 
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(party=>party.votes >= thresholdVotes - 1e-7);
 					if (!passed.length)
-						return alert(this.string('belowThreshold'));
+						return this.showError(this.string('belowThreshold'));
 
 					const quota = total / seats;
 					const hare = passed.map(party=>{
@@ -839,10 +877,11 @@
 							if (!newParties.length)
 								throw new Error('No valid data');
 							this.parties = newParties;
+							this.clearError();
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
-							alert(this.string('alertImport'));
+							this.showError(this.string('alertImport'));
 						}
 					}
 					;
