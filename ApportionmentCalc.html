@@ -564,32 +564,23 @@
 					['seats', 'threshold'].forEach(id=>dom[id].oninput = ()=>this.clearError());
 
 					dom.list.addEventListener('click', e=>{
-						if (e.target.matches('.danger')) {
-							const row = e.target.closest('.party-row');
-							row && this.removeParty(Number(row.dataset.id));
-						}
+						const isRemove = e.target.matches('.danger');
+						const row = e.target.closest('.party-row');
+						isRemove && row && this.removeParty(Number(row.dataset.id));
 					}
 					);
 					dom.list.addEventListener('change', e=>{
 						const row = e.target.closest('.party-row');
-						if (!row)
-							return;
-						const party = this.parties.find(p=>p.id === Number(row.dataset.id));
-						if (!party)
-							return;
+						const party = row && this.parties.find(p=>p.id === Number(row.dataset.id));
 
-						if (e.target.type === 'text') {
-							party.name = e.target.value;
-						} else if (e.target.type === 'number') {
-							e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
-						}
+						party && (
+							e.target.type === 'text' ? (party.name = e.target.value) :
+							e.target.type === 'number' ? (e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0) :
+							null
+						);
 					}
 					);
-					dom.list.addEventListener('input', e=>{
-						if (e.target.matches('input'))
-							this.clearError();
-					}
-					);
+					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
 				}
 
 				string(key) {
