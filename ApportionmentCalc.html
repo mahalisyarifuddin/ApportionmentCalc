@@ -604,16 +604,20 @@
 				}
 				toggleModal(visible) {
 					dom.modal.classList.toggle('hidden', !visible);
-					if (visible) {
-						this.lastFocus = document.activeElement;
-						this.renderSteps();
-						dom.close.focus();
-						this.onEscape = e => e.key === 'Escape' && this.toggleModal(false);
-						window.addEventListener('keydown', this.onEscape);
-					} else {
-						window.removeEventListener('keydown', this.onEscape);
-						this.lastFocus?.focus();
-					}
+					visible ? this.openModal() : this.closeModal();
+				}
+
+				openModal() {
+					this.lastFocus = document.activeElement;
+					this.renderSteps();
+					dom.close.focus();
+					this.onEscape = e => e.key === 'Escape' && this.toggleModal(false);
+					window.addEventListener('keydown', this.onEscape);
+				}
+
+				closeModal() {
+					window.removeEventListener('keydown', this.onEscape);
+					this.lastFocus?.focus();
 				}
 				showError(msg) {
 					dom.error.textContent = msg;
