@@ -18,11 +18,11 @@ test.describe('ApportionmentCalc UX', () => {
         await expect(error).toBeVisible();
         await expect(error).toContainText('Total seats must be at least 1');
 
-        // Expect button to be dimmed
+        // Expect button to be disabled
         const button = page.locator('#calculate');
-        await expect(button).toHaveClass(/dimmed/);
-        await expect(button).toHaveCSS('opacity', '0.5');
-        await expect(button).toHaveCSS('pointer-events', 'none');
+        await expect(button).toBeDisabled();
+        // Implementation has opacity .6 for disabled buttons
+        await expect(button).toHaveCSS('opacity', '0.6');
     });
 
     test('should clear error and undim button on input change', async ({ page }) => {
@@ -34,13 +34,13 @@ test.describe('ApportionmentCalc UX', () => {
         const button = page.locator('#calculate');
 
         await expect(error).toBeVisible();
-        await expect(button).toHaveClass(/dimmed/);
+        await expect(button).toBeDisabled();
 
         // Change input
         await page.fill('#seats', '10');
 
         // Expect error to be hidden and button active
         await expect(error).toHaveClass(/hidden/);
-        await expect(button).not.toHaveClass(/dimmed/);
+        await expect(button).toBeEnabled();
     });
 });

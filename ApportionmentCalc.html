@@ -581,6 +581,31 @@
 					}
 					);
 					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
+
+					dom.list.addEventListener('keydown', e=>{
+						if (e.key !== 'Enter')
+							return;
+						const target = e.target;
+						const row = target.closest('.party-row');
+						if (!row)
+							return;
+
+						e.preventDefault();
+						const inputs = [...row.querySelectorAll('input')];
+						const index = inputs.indexOf(target);
+
+						if (index === 0) {
+							inputs[1]?.focus();
+						} else if (index === 1) {
+							if (row.nextElementSibling) {
+								row.nextElementSibling.querySelector('input')?.focus();
+							} else {
+								this.addParty();
+								// Wait for DOM update
+								setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0);
+							}
+						}
+					});
 				}
 
 				string(key) {
