@@ -587,11 +587,10 @@
 						e.key === 'Enter' && row && e.target.matches('input') && (
 							e.preventDefault(),
 							(()=>{
-								const index = [...row.querySelectorAll('input')].indexOf(e.target);
 								const next = row.nextElementSibling;
 								next
-									? next.querySelectorAll('input')[index]?.focus()
-									: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelectorAll('input')[index]?.focus(), 0))
+									? next.querySelector('input')?.focus()
+									: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
 							})()
 						)
 					});
