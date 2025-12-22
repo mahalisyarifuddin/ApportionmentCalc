@@ -584,13 +584,14 @@
 
 					dom.list.addEventListener('keydown', e=>{
 						const row = e.target.closest('.party-row');
-						e.key === 'Enter' && row && (
+						e.key === 'Enter' && row && e.target.matches('input') && (
 							e.preventDefault(),
 							(()=>{
-								const inputs = [...row.querySelectorAll('input')];
-								const index = inputs.indexOf(e.target);
-								index === 0 && inputs[1]?.focus();
-								index === 1 && (row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0)))
+								const index = [...row.querySelectorAll('input')].indexOf(e.target);
+								const next = row.nextElementSibling;
+								next
+									? next.querySelectorAll('input')[index]?.focus()
+									: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelectorAll('input')[index]?.focus(), 0))
 							})()
 						)
 					});
