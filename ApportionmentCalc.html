@@ -885,21 +885,18 @@
 								const lower = row.map(cell=>cell.toLowerCase());
 								const nameKeywords = ['party', 'partai', 'name', 'nama'];
 								const voteKeywords = ['vote', 'suara'];
-								let name = lower.findIndex(header=>nameKeywords.some(key=>header.includes(key)));
-								let votes = lower.findIndex(header=>voteKeywords.some(key=>header.includes(key)));
-								if (name !== -1 && name === votes) {
-									const altVotes = lower.findIndex((header,i)=>i !== name && voteKeywords.some(key=>header.includes(key)));
-									if (altVotes !== -1)
-										votes = altVotes;
-									else {
-										const altName = lower.findIndex((header,i)=>i !== votes && nameKeywords.some(key=>header.includes(key)));
-										if (altName !== -1)
-											name = altName
-									}
-								}
+								const find = (keywords, exclude = -1) => lower.findIndex((h,i)=>i !== exclude && keywords.some(k=>h.includes(k)));
+
+								const n1 = find(nameKeywords);
+								const v1 = find(voteKeywords);
+								const conflict = n1 !== -1 && n1 === v1;
+
+								const v2 = conflict ? find(voteKeywords, n1) : -1;
+								const n2 = (conflict && v2 === -1) ? find(nameKeywords, v1) : -1;
+
 								return {
-									name,
-									votes,
+									name: n2 !== -1 ? n2 : n1,
+									votes: v2 !== -1 ? v2 : v1,
 									start: 1
 								};
 							}
