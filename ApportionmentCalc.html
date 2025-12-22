@@ -581,6 +581,19 @@
 					}
 					);
 					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
+
+					dom.list.addEventListener('keydown', e=>{
+						const row = e.target.closest('.party-row');
+						e.key === 'Enter' && row && e.target.matches('input') && (
+							e.preventDefault(),
+							(()=>{
+								const next = row.nextElementSibling;
+								next
+									? next.querySelector('input')?.focus()
+									: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
+							})()
+						)
+					});
 				}
 
 				string(key) {
