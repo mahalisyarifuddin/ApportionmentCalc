@@ -363,6 +363,7 @@
 					</div>
 				</div>
 				<div class="party-list" id="list"></div>
+				<div id="liveTotal" class="info" style="margin-bottom: 0.5rem; text-align: right; font-weight: bold;"></div>
 				<div class="row" style="gap:0.5rem;margin-bottom:1rem">
 					<button id="add" class="secondary" style="flex:1"></button>
 					<button id="import" class="secondary" style="flex:1"></button>
@@ -578,9 +579,15 @@
 							e.target.type === 'number' ? (e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0) :
 							null
 						);
+						e.target.type === 'number' && this.updateLiveTotal();
 					}
 					);
-					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
+					dom.list.addEventListener('input', e=>{
+						if (e.target.matches('input')) {
+							this.clearError();
+							e.target.type === 'number' && this.updateLiveTotal();
+						}
+					});
 
 					dom.list.addEventListener('keydown', e=>{
 						const row = e.target.closest('.party-row');
@@ -678,7 +685,14 @@
 				}
 
 				renderParties() {
-					dom.list.replaceChildren(...this.parties.map(p=>this.createPartyRow(p)))
+					dom.list.replaceChildren(...this.parties.map(p=>this.createPartyRow(p)));
+					this.updateLiveTotal();
+				}
+
+				updateLiveTotal() {
+					const inputs = dom.list.querySelectorAll('input[type=number]');
+					const sum = Array.from(inputs).reduce((acc, input) => acc + (parseFloat(input.value) || 0), 0);
+					dom.liveTotal.textContent = `${this.string('votes')}: ${this.format(sum)}`;
 				}
 
 				createPartyRow(party) {
