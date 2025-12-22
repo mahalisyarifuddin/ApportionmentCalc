@@ -562,6 +562,25 @@
 					dom.language.onchange = e=>this.setLanguage(e.target.value);
 					dom.theme.onchange = e=>this.setTheme(e.target.value);
 					['seats', 'threshold'].forEach(id=>dom[id].oninput = ()=>this.clearError());
+
+					dom.list.addEventListener('click', e=>{
+						const isRemove = e.target.matches('.danger');
+						const row = e.target.closest('.party-row');
+						isRemove && row && this.removeParty(Number(row.dataset.id));
+					}
+					);
+					dom.list.addEventListener('change', e=>{
+						const row = e.target.closest('.party-row');
+						const party = row && this.parties.find(p=>p.id === Number(row.dataset.id));
+
+						party && (
+							e.target.type === 'text' ? (party.name = e.target.value) :
+							e.target.type === 'number' ? (e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0) :
+							null
+						);
+					}
+					);
+					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
 				}
 
 				string(key) {
@@ -653,15 +672,11 @@
 					const row = node('div', {
 						className: 'party-row'
 					});
+					row.dataset.id = party.id;
 					row.innerHTML = `<input type="text" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')}"><input type="number" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')}"><button class="danger" aria-label="${this.string('removeParty')}">×</button>`;
-					const [name,votes,remove] = row.children;
+					const [name,votes] = row.children;
 					name.value = party.name;
 					votes.value = party.votes || '';
-					name.onchange = e=>party.name = e.target.value;
-					votes.onchange = e=>e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
-					name.oninput = ()=>this.clearError();
-					votes.oninput = ()=>this.clearError();
-					remove.onclick = ()=>this.removeParty(party.id);
 					return row;
 				}
 
@@ -810,15 +825,14 @@
 					const warning = steps.length > limit ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.template('detailsLimited', {
 						n: limit
 					})}</p>` : '';
-					dom.modalSteps.innerHTML = `<table><thead><tr><th>${this.string('round')}</th><th>${this.string('winner')}</th><th>${this.string('quotient')}</th><th>${this.string('divisor')}</th></tr></thead><tbody>${steps.map(s=>`<tr><td>${this.template('seatAllocated', {
-						n: s.round
-					})}</td><td><strong>${esc(s.winner)}</strong></td><td>${this.format(s.winnerQuotient, {
+
+					const seatTemplate = this.string('seatAllocated');
+					const winnerPrefix = this.string('winnerPrefix');
+					const fmtOptions = {
 						maximumFractionDigits: 2
-					})}</td><td>${s.winnerDivisor}</td></tr>`).join('')}</tbody></table><h3 class="step-header">${this.string('quotientDetail')}</h3>${warning}${showDetails.map(s=>s.quotients ? `<div class="step"><h4>${this.template('seatAllocated', {
-						n: s.round
-					})} - ${this.string('winnerPrefix')}${esc(s.winner)}</h4><table><tr>${s.quotients.map(q=>`<th>${esc(q.name)} (/${q.divisor})</th>`).join('')}</tr><tr>${s.quotients.map(q=>`<td class="${q.id === s.winnerId ? 'highlight' : ''}">${this.format(q.quotient, {
-						maximumFractionDigits: 2
-					})}</td>`).join('')}</tr></table></div>` : '').join('')}${warning}`;
+					};
+
+					dom.modalSteps.innerHTML = `<table><thead><tr><th>${this.string('round')}</th><th>${this.string('winner')}</th><th>${this.string('quotient')}</th><th>${this.string('divisor')}</th></tr></thead><tbody>${steps.map(s=>`<tr><td>${seatTemplate.replace('{n}', s.round)}</td><td><strong>${esc(s.winner)}</strong></td><td>${this.format(s.winnerQuotient, fmtOptions)}</td><td>${s.winnerDivisor}</td></tr>`).join('')}</tbody></table><h3 class="step-header">${this.string('quotientDetail')}</h3>${warning}${showDetails.map(s=>s.quotients ? `<div class="step"><h4>${seatTemplate.replace('{n}', s.round)} - ${winnerPrefix}${esc(s.winner)}</h4><table><tr>${s.quotients.map(q=>`<th>${esc(q.name)} (/${q.divisor})</th>`).join('')}</tr><tr>${s.quotients.map(q=>`<td class="${q.id === s.winnerId ? 'highlight' : ''}">${this.format(q.quotient, fmtOptions)}</td>`).join('')}</tr></table></div>` : '').join('')}${warning}`;
 				}
 
 				exportData() {
