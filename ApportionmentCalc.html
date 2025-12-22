@@ -883,9 +883,23 @@
 							const firstRow = parse(lines[0]);
 							const strategies = [row=>{
 								const lower = row.map(cell=>cell.toLowerCase());
+								const nameKeywords = ['party', 'partai', 'name', 'nama'];
+								const voteKeywords = ['vote', 'suara'];
+								let name = lower.findIndex(header=>nameKeywords.some(key=>header.includes(key)));
+								let votes = lower.findIndex(header=>voteKeywords.some(key=>header.includes(key)));
+								if (name !== -1 && name === votes) {
+									const altVotes = lower.findIndex((header,i)=>i !== name && voteKeywords.some(key=>header.includes(key)));
+									if (altVotes !== -1)
+										votes = altVotes;
+									else {
+										const altName = lower.findIndex((header,i)=>i !== votes && nameKeywords.some(key=>header.includes(key)));
+										if (altName !== -1)
+											name = altName
+									}
+								}
 								return {
-									name: lower.findIndex(header=>['party', 'partai', 'name', 'nama'].some(key=>header.includes(key))),
-									votes: lower.findIndex(header=>['vote', 'suara'].some(key=>header.includes(key))),
+									name,
+									votes,
 									start: 1
 								};
 							}
