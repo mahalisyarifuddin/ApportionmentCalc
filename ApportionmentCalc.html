@@ -670,12 +670,21 @@
 						votes: 0
 					});
 					this.renderParties();
+					dom.list.lastElementChild?.querySelector('input')?.focus();
 				}
 
 				removeParty(id) {
 					this.clearError();
+					const idx = this.parties.findIndex(p => p.id === id);
 					this.parties = this.parties.filter(p=>p.id !== id);
 					this.renderParties();
+
+					const targetIdx = Math.min(idx, this.parties.length - 1);
+					if (targetIdx >= 0) {
+						dom.list.children[targetIdx]?.querySelector('.danger')?.focus();
+					} else if (this.parties.length === 0) {
+						dom.add.focus();
+					}
 				}
 
 				renderParties() {
