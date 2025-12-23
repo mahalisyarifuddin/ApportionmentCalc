@@ -586,9 +586,10 @@
 
 				handleKey(e) {
 					e.key === 'Escape' && !dom.modal.classList.contains('hidden') && this.toggleModal(false);
-
+					(e.ctrlKey || e.metaKey) && e.key === 'Enter' && this.calculate();
+					
 					const row = e.target.closest('.party-row');
-					e.key === 'Enter' && row && e.target.matches('input') && (
+					!e.ctrlKey && !e.metaKey && e.key === 'Enter' && row && e.target.matches('input') && (
 						e.preventDefault(),
 						(()=>{
 							const next = row.nextElementSibling;
