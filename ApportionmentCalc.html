@@ -562,6 +562,7 @@
 					dom.language.onchange = e=>this.setLanguage(e.target.value);
 					dom.theme.onchange = e=>this.setTheme(e.target.value);
 					['seats', 'threshold'].forEach(id=>dom[id].oninput = ()=>this.clearError());
+					document.onkeydown = e=>this.handleKey(e);
 
 					dom.list.addEventListener('click', e=>{
 						const isRemove = e.target.matches('.danger');
@@ -581,19 +582,21 @@
 					}
 					);
 					dom.list.addEventListener('input', e=>e.target.matches('input') && this.clearError());
+				}
 
-					dom.list.addEventListener('keydown', e=>{
-						const row = e.target.closest('.party-row');
-						e.key === 'Enter' && row && e.target.matches('input') && (
-							e.preventDefault(),
-							(()=>{
-								const next = row.nextElementSibling;
-								next
-									? next.querySelector('input')?.focus()
-									: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
-							})()
-						)
-					});
+				handleKey(e) {
+					e.key === 'Escape' && !dom.modal.classList.contains('hidden') && this.toggleModal(false);
+
+					const row = e.target.closest('.party-row');
+					e.key === 'Enter' && row && e.target.matches('input') && (
+						e.preventDefault(),
+						(()=>{
+							const next = row.nextElementSibling;
+							next
+								? next.querySelector('input')?.focus()
+								: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
+						})()
+					);
 				}
 
 				string(key) {
@@ -643,12 +646,9 @@
 					this.lastFocus = document.activeElement;
 					this.renderSteps();
 					dom.close.focus();
-					this.onEscape = e => e.key === 'Escape' && this.toggleModal(false);
-					window.addEventListener('keydown', this.onEscape);
 				}
 
 				closeModal() {
-					window.removeEventListener('keydown', this.onEscape);
 					this.lastFocus?.focus();
 				}
 				showError(msg) {
