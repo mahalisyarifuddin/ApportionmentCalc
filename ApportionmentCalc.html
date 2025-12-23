@@ -694,6 +694,87 @@
 					return row;
 				}
 
+				importData(file) {
+					if (!file)
+						return;
+					const reader = new FileReader();
+					reader.onload = e=>{
+						try {
+							const content = e.target.result;
+							const first = content.split('\n')[0] || '';
+							const delimiter = (first.match(/\t/g) || []).length > (first.match(/,/g) || []).length ? '\t' : ',';
+							const lines = content.split(/\r?\n/).filter(line=>line.trim());
+							if (lines.length < 1)
+								throw new Error('No data');
+
+							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell=>cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+							const firstRow = parse(lines[0]);
+							const strategies = [row=>{
+								const lower = row.map(cell=>cell.toLowerCase());
+								const nameKeywords = ['party', 'partai', 'name', 'nama'];
+								const voteKeywords = ['vote', 'suara'];
+								const find = (keywords, exclude = -1) => lower.findIndex((h,i)=>i !== exclude && keywords.some(k=>h.includes(k)));
+
+								const n1 = find(nameKeywords);
+								const v1 = find(voteKeywords);
+								const conflict = n1 !== -1 && n1 === v1;
+
+								const v2 = conflict ? find(voteKeywords, n1) : -1;
+								const n2 = (conflict && v2 === -1) ? find(nameKeywords, v1) : -1;
+
+								return {
+									name: n2 !== -1 ? n2 : n1,
+									votes: v2 !== -1 ? v2 : v1,
+									start: 1
+								};
+							}
+							, row=>{
+								const numeric = row.map(cell=>/^\d+$/.test(cell.replace(/[.,]/g, '').trim()));
+								const votes = numeric.findIndex(Boolean);
+								const name = numeric.findIndex((val,i)=>!val && i !== votes);
+								return {
+									name: name !== -1 ? name : (row.length === 2 ? (votes === 0 ? 1 : 0) : -1),
+									votes,
+									start: 0
+								};
+							}
+							];
+							const config = strategies.map(strategy=>strategy(firstRow)).find(result=>result.name !== -1 && result.votes !== -1) || {
+								name: -1,
+								votes: -1,
+								start: 1
+							};
+							if (config.name === -1 || config.votes === -1)
+								throw new Error('Invalid columns');
+
+							const newParties = [];
+							for (let i = config.start; i < lines.length; i++) {
+								const columns = parse(lines[i]);
+								if (columns.length <= Math.max(config.name, config.votes))
+									continue;
+								const name = columns[config.name];
+								const votes = parseInt(columns[config.votes].replace(/[^0-9]/g, '')) || 0;
+								if (name)
+									newParties.push({
+										id: this.nextIndex++,
+										name,
+										votes
+									});
+							}
+							if (!newParties.length)
+								throw new Error('No valid data');
+							this.parties = newParties;
+							this.clearError();
+							this.renderParties();
+							dom.file.value = '';
+						} catch {
+							this.showError(this.string('alertImport'))
+						}
+					}
+					;
+					reader.readAsText(file);
+				}
+
 				calculate() {
 					this.clearError();
 					const seats = parseInt(dom.seats.value);
@@ -865,87 +946,6 @@
 						})),
 						download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv`
 					}).click();
-				}
-
-				importData(file) {
-					if (!file)
-						return;
-					const reader = new FileReader();
-					reader.onload = e=>{
-						try {
-							const content = e.target.result;
-							const first = content.split('\n')[0] || '';
-							const delimiter = (first.match(/\t/g) || []).length > (first.match(/,/g) || []).length ? '\t' : ',';
-							const lines = content.split(/\r?\n/).filter(line=>line.trim());
-							if (lines.length < 1)
-								throw new Error('No data');
-
-							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell=>cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-							const firstRow = parse(lines[0]);
-							const strategies = [row=>{
-								const lower = row.map(cell=>cell.toLowerCase());
-								const nameKeywords = ['party', 'partai', 'name', 'nama'];
-								const voteKeywords = ['vote', 'suara'];
-								const find = (keywords, exclude = -1) => lower.findIndex((h,i)=>i !== exclude && keywords.some(k=>h.includes(k)));
-
-								const n1 = find(nameKeywords);
-								const v1 = find(voteKeywords);
-								const conflict = n1 !== -1 && n1 === v1;
-
-								const v2 = conflict ? find(voteKeywords, n1) : -1;
-								const n2 = (conflict && v2 === -1) ? find(nameKeywords, v1) : -1;
-
-								return {
-									name: n2 !== -1 ? n2 : n1,
-									votes: v2 !== -1 ? v2 : v1,
-									start: 1
-								};
-							}
-							, row=>{
-								const numeric = row.map(cell=>/^\d+$/.test(cell.replace(/[.,]/g, '').trim()));
-								const votes = numeric.findIndex(Boolean);
-								const name = numeric.findIndex((val,i)=>!val && i !== votes);
-								return {
-									name: name !== -1 ? name : (row.length === 2 ? (votes === 0 ? 1 : 0) : -1),
-									votes,
-									start: 0
-								};
-							}
-							];
-							const config = strategies.map(strategy=>strategy(firstRow)).find(result=>result.name !== -1 && result.votes !== -1) || {
-								name: -1,
-								votes: -1,
-								start: 1
-							};
-							if (config.name === -1 || config.votes === -1)
-								throw new Error('Invalid columns');
-
-							const newParties = [];
-							for (let i = config.start; i < lines.length; i++) {
-								const columns = parse(lines[i]);
-								if (columns.length <= Math.max(config.name, config.votes))
-									continue;
-								const name = columns[config.name];
-								const votes = parseInt(columns[config.votes].replace(/[^0-9]/g, '')) || 0;
-								if (name)
-									newParties.push({
-										id: this.nextIndex++,
-										name,
-										votes
-									});
-							}
-							if (!newParties.length)
-								throw new Error('No valid data');
-							this.parties = newParties;
-							this.clearError();
-							this.renderParties();
-							dom.file.value = '';
-						} catch {
-							this.showError(this.string('alertImport'))
-						}
-					}
-					;
-					reader.readAsText(file);
 				}
 			}
 
