@@ -530,6 +530,7 @@
 			};
 			const esc = t=>t.replace(/[&<>"']/g, m=>escapeMap[m]);
 			const dom = Object.fromEntries([...document.querySelectorAll('[id]')].map(e=>[e.id, e]));
+			const STEPS_LIMIT = 50;
 
 			class ApportionmentCalc {
 				constructor() {
@@ -593,7 +594,7 @@
 				handleKey(e) {
 					e.key === 'Escape' && !dom.modal.classList.contains('hidden') && this.toggleModal(false);
 					(e.ctrlKey || e.metaKey) && e.key === 'Enter' && this.calculate();
-					
+
 					const row = e.target.closest('.party-row');
 					!e.ctrlKey && !e.metaKey && e.key === 'Enter' && row && e.target.matches('input') && (
 						e.preventDefault(),
@@ -844,7 +845,6 @@
 					}
 
 					const stepList = [];
-					const limit = 50;
 
 					for (let i = 1; i <= seats; i++) {
 						let max = -1
@@ -857,7 +857,7 @@
 							}
 						}
 
-						const quotients = i <= limit ? [] : null;
+						const quotients = i <= STEPS_LIMIT ? [] : null;
 						if (quotients) {
 							for (let j = 0; j < n; j++) {
 								quotients.push({
@@ -939,10 +939,9 @@
 					const {steps} = this.data;
 					if (!steps?.length)
 						return;
-					const limit = 50;
-					const showDetails = steps.slice(0, limit);
-					const warning = steps.length > limit ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.template('detailsLimited', {
-						n: limit
+					const showDetails = steps.slice(0, STEPS_LIMIT);
+					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.template('detailsLimited', {
+						n: STEPS_LIMIT
 					})}</p>` : '';
 
 					const seatTemplate = this.string('seatAllocated');
