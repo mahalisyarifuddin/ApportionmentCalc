@@ -365,6 +365,7 @@
 				<div class="party-list" id="list"></div>
 				<div class="row" style="gap:0.5rem;margin-bottom:1rem">
 					<button id="add" class="secondary" style="flex:1"></button>
+					<button id="clear" class="secondary" style="flex:1"></button>
 					<button id="import" class="secondary" style="flex:1"></button>
 				</div>
 				<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
@@ -451,6 +452,8 @@
 					no: 'No',
 					import: 'Import CSV/TSV',
 					alertImport: 'Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.',
+					clear: 'Clear All',
+					clearConfirm: 'Are you sure you want to clear all parties?',
 					removeParty: 'Remove Party',
 					closeModal: 'Close Modal',
 					languageLabel: 'Language',
@@ -504,6 +507,8 @@
 					no: 'Tidak',
 					import: 'Impor CSV/TSV',
 					alertImport: 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".',
+					clear: 'Hapus Semua',
+					clearConfirm: 'Apakah Anda yakin ingin menghapus semua partai?',
 					removeParty: 'Hapus Partai',
 					closeModal: 'Tutup Modal',
 					languageLabel: 'Bahasa',
@@ -551,6 +556,7 @@
 
 				bind() {
 					dom.add.onclick = ()=>this.addParty();
+					dom.clear.onclick = ()=>this.clearAll();
 					dom.calculate.onclick = ()=>this.calculate();
 					dom.edit.onclick = ()=>this.show('input');
 					dom.steps.onclick = ()=>this.toggleModal(true);
@@ -626,7 +632,7 @@
 					this.language = lang;
 					dom.language.value = lang;
 					document.documentElement.lang = lang;
-					['title', 'subtitle', 'seatsLabel', 'thresholdLabel', 'add', 'calculate', 'edit', 'steps', 'export', 'import', 'hareTitle', 'sainteLagueTitle', 'compareTitle', 'modalTitle'].forEach(id=>dom[id].textContent = this.string(id));
+					['title', 'subtitle', 'seatsLabel', 'thresholdLabel', 'add', 'clear', 'calculate', 'edit', 'steps', 'export', 'import', 'hareTitle', 'sainteLagueTitle', 'compareTitle', 'modalTitle'].forEach(id=>dom[id].textContent = this.string(id));
 					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,i])=>dom.theme.options[i].textContent = this.string(key));
 					dom.close.setAttribute('aria-label', this.string('closeModal'));
 					dom.language.setAttribute('aria-label', this.string('languageLabel'));
@@ -671,6 +677,15 @@
 					});
 					this.renderParties();
 					dom.list.lastElementChild?.querySelector('input')?.focus();
+				}
+
+				clearAll() {
+					if (confirm(this.string('clearConfirm'))) {
+						this.parties = [];
+						this.renderParties();
+						this.addParty();
+						this.clearError();
+					}
 				}
 
 				removeParty(id) {
