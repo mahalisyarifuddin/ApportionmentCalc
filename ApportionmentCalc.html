@@ -832,61 +832,41 @@
 					for (let i = 0; i < seats - allocated; i++)
 						hare[i % hare.length] && hare[i % hare.length].hareSeats++;
 
-					const n = passed.length;
-					const votesArr = new Float64Array(n);
-					const seatsArr = new Uint32Array(n);
-					const divisorsArr = new Float64Array(n);
-					const quotientsArr = new Float64Array(n);
-
-					for (let i = 0; i < n; i++) {
-						votesArr[i] = passed[i].votes;
-						divisorsArr[i] = 1;
-						quotientsArr[i] = passed[i].votes;
-					}
-
+					const work = passed.map(p=>({
+						...p,
+						slSeats: 0,
+						divisor: 1,
+						quotient: p.votes
+					}));
 					const stepList = [];
 
 					for (let i = 1; i <= seats; i++) {
-						let max = -1
-						  , winner = -1;
-						for (let j = 0; j < n; j++) {
-							const q = quotientsArr[j];
-							if (q > max || (q === max && votesArr[j] > votesArr[winner])) {
-								max = q;
-								winner = j
-							}
-						}
+						const winner = work.reduce((w,p)=>p.quotient > w.quotient || (p.quotient === w.quotient && p.votes > w.votes) ? p : w);
 
-						const quotients = i <= STEPS_LIMIT ? [] : null;
-						if (quotients) {
-							for (let j = 0; j < n; j++) {
-								quotients.push({
-									id: passed[j].id,
-									name: passed[j].name,
-									quotient: quotientsArr[j],
-									divisor: divisorsArr[j]
-								});
-							}
-						}
+						stepList.push({
+							round: i,
+							winner: winner.name,
+							winnerId: winner.id,
+							winnerQuotient: winner.quotient,
+							winnerDivisor: winner.divisor,
+							quotients: i <= STEPS_LIMIT ? work.map(p=>({
+								id: p.id,
+								name: p.name,
+								quotient: p.quotient,
+								divisor: p.divisor
+							})) : null
+						});
 
-						if (winner !== -1) {
-							stepList.push({
-								round: i,
-								winner: passed[winner].name,
-								winnerId: passed[winner].id,
-								winnerQuotient: max,
-								winnerDivisor: divisorsArr[winner],
-								quotients
-							});
-							seatsArr[winner]++;
-							divisorsArr[winner] += 2;
-							quotientsArr[winner] = votesArr[winner] / divisorsArr[winner];
-						}
+						winner.slSeats++;
+						winner.divisor += 2;
+						winner.quotient = winner.votes / winner.divisor;
 					}
 
-					const sainteLague = passed.map((p,i)=>({
-						...p,
-						sainteLagueSeats: seatsArr[i]
+					const sainteLague = work.map(p=>({
+						id: p.id,
+						name: p.name,
+						votes: p.votes,
+						sainteLagueSeats: p.slSeats
 					}));
 
 					this.data = {
