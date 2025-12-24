@@ -591,19 +591,24 @@
 				}
 
 				handleKey(e) {
-					e.key === 'Escape' && !dom.modal.classList.contains('hidden') && this.toggleModal(false);
-					(e.ctrlKey || e.metaKey) && e.key === 'Enter' && this.calculate();
-					
+					if (e.key === 'Escape' && !dom.modal.classList.contains('hidden')) {
+						this.toggleModal(false);
+					}
+					if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+						this.calculate();
+					}
+
 					const row = e.target.closest('.party-row');
-					!e.ctrlKey && !e.metaKey && e.key === 'Enter' && row && e.target.matches('input') && (
-						e.preventDefault(),
-						(()=>{
-							const next = row.nextElementSibling;
-							next
-								? next.querySelector('input')?.focus()
-								: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
-						})()
-					);
+					if (!e.ctrlKey && !e.metaKey && e.key === 'Enter' && row && e.target.matches('input')) {
+						e.preventDefault();
+						const next = row.nextElementSibling;
+						if (next) {
+							next.querySelector('input')?.focus();
+						} else {
+							this.addParty();
+							setTimeout(() => dom.list.lastElementChild.querySelector('input')?.focus(), 0);
+						}
+					}
 				}
 
 				string(key) {
