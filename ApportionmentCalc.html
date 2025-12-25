@@ -604,7 +604,7 @@
 					this.language = language;
 					dom.language.value = language;
 					document.documentElement.lang = language;
-					['title', 'subtitle', 'seatsLabel', 'thresholdLabel', 'add', 'clear', 'calculate', 'edit', 'steps', 'export', 'import', 'hareTitle', 'sainteLagueTitle', 'compareTitle', 'modalTitle'].forEach(id=>dom[id].textContent = this.string(id));
+					Object.keys(text.en).forEach(k=>dom[k] && !['INPUT', 'SELECT'].includes(dom[k].tagName) && (dom[k].textContent = this.string(k)));
 					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,i])=>dom.theme.options[i].textContent = this.string(key));
 					dom.close.setAttribute('aria-label', this.string('closeModal'));
 					dom.language.setAttribute('aria-label', this.string('languageLabel'));
