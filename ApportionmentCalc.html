@@ -540,12 +540,10 @@
 						votes
 					}));
 					this.nextIndex = 6;
-					this.language = navigator.language?.startsWith('id') ? 'id' : 'en';
 					this.data = null;
 					this.bind();
-					this.renderParties();
 					this.setTheme('auto');
-					this.setLanguage(this.language);
+					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
 				}
 
 				bind() {
@@ -811,13 +809,6 @@
 						winner.quotient = winner.votes / winner.divisor;
 					}
 
-					const sainteLague = work.map(p=>({
-						id: p.id,
-						name: p.name,
-						votes: p.votes,
-						sainteLagueSeats: p.slSeats
-					}));
-
 					this.data = {
 						total,
 						thresholdVotes,
@@ -827,12 +818,12 @@
 						steps: stepList,
 						results: valid.map(p=>{
 							const hareResult = hare.find(x=>x.id === p.id);
-							const slResult = sainteLague.find(x=>x.id === p.id);
+							const slResult = work.find(x=>x.id === p.id);
 							return {
 								...p,
 								passed: p.votes >= thresholdVotes - 1e-7,
 								hareSeats: hareResult?.hareSeats ?? 0,
-								sainteLagueSeats: slResult?.sainteLagueSeats ?? 0,
+								sainteLagueSeats: slResult?.slSeats ?? 0,
 								remainder: hareResult?.remainder ?? 0
 							};
 						}
