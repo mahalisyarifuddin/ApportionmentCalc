@@ -630,17 +630,7 @@
 				}
 				toggleModal(visible) {
 					dom.modal.classList.toggle('hidden', !visible);
-					visible ? this.openModal() : this.closeModal();
-				}
-
-				openModal() {
-					this.lastFocus = document.activeElement;
-					this.renderSteps();
-					dom.close.focus();
-				}
-
-				closeModal() {
-					this.lastFocus?.focus();
+					visible ? (this.lastFocus = document.activeElement, this.renderSteps(), dom.close.focus()) : this.lastFocus?.focus();
 				}
 				showError(msg) {
 					dom.error.textContent = msg;
