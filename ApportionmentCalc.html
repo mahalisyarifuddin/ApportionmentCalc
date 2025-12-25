@@ -660,63 +660,43 @@
 				}
 
 				importData(file) {
-					if (!file)
-						return;
+					if (!file) return;
 					const reader = new FileReader();
-					reader.onload = event=>{
+					reader.onload = e=>{
 						try {
-							const content = event.target.result;
-							const delimiter = (content.split('\n')[0].match(/\t/g) || []).length > (content.split('\n')[0].match(/,/g) || []).length ? '\t' : ',';
-							const lines = content.split(/\r?\n/).filter(line=>line.trim());
-							if (!lines.length)
-								throw new Error('No data');
-
-							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+							const lines = e.target.result.split(/\r?\n/).filter(l=>l.trim());
+							if (!lines.length) throw new Error();
+							const delim = (lines[0].match(/\t/g) || []).length > (lines[0].match(/,/g) || []).length ? '\t' : ',';
+							const parse = l=>l.split(new RegExp(`\\${delim}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+							const row0 = parse(lines[0]);
 							const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
-							const detect = row=>{
-								const f = (k,x)=>row.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
-								const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
-								let [n,v] = keys.map(k=>f(k, -1));
-								if (n === v && n !== -1) {
-									const alt = f(keys[1], n);
-									alt !== -1 ? v = alt : n = f(keys[0], n);
-								}
-								if (n !== -1 && v !== -1)
-									return {
-										name: n,
-										votes: v,
-										start: 1
-									};
-								v = row.findIndex(isNum);
-								n = row.findIndex((c,i)=>i !== v && !isNum(c));
-								return {
-									name: n !== -1 ? n : (row.length === 2 && v !== -1 ? 1 - v : -1),
-									votes: v,
-									start: v !== -1 ? 0 : 1
-								};
-							}
-							;
-							const config = detect(parse(lines[0]));
-							if (config.name === -1 || config.votes === -1)
-								throw new Error('Invalid columns');
-
-							const newParties = lines.slice(config.start).reduce((acc,line)=>{
+							const find = (k,x)=>row0.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
+							const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
+							let [n,v] = [find(keys[0]), find(keys[1])];
+							(n === v && n !== -1) && (
+								find(keys[1], n) !== -1 ? v = find(keys[1], n) :
+								find(keys[0], n) !== -1 && (n = find(keys[0], n))
+							);
+							let start = 1;
+							(n === -1 || v === -1) && (
+								v = row0.findIndex(isNum),
+								n = row0.findIndex((c,i)=>i !== v && !isNum(c)),
+								(n === -1 && row0.length === 2 && v !== -1) && (n = 1 - v),
+								start = v !== -1 ? 0 : 1
+							);
+							if (n === -1 || v === -1) throw new Error();
+							const newParties = lines.slice(start).reduce((acc,line)=>{
 								const cols = parse(line);
-								if (cols.length > Math.max(config.name, config.votes)) {
-									const name = cols[config.name];
-									const votes = parseInt(cols[config.votes].replace(/\D/g, '')) || 0;
-									name && acc.push({
-										id: this.nextIndex++,
-										name,
-										votes
-									});
-								}
+								const name = cols.length > Math.max(n, v) && cols[n];
+								const votes = name && (parseInt(cols[v].replace(/\D/g, '')) || 0);
+								name && acc.push({
+									id: this.nextIndex++,
+									name,
+									votes
+								});
 								return acc;
-							}
-							, []);
-
-							if (!newParties.length)
-								throw new Error('No valid data');
+							}, []);
+							if (!newParties.length) throw new Error();
 							this.parties = newParties;
 							this.toggleError();
 							this.renderParties();
@@ -724,8 +704,7 @@
 						} catch {
 							this.toggleError(this.string('alertImport'));
 						}
-					}
-					;
+					};
 					reader.readAsText(file);
 				}
 
