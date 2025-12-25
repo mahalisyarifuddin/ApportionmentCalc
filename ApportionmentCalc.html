@@ -553,7 +553,7 @@
 					dom.modal.onclick = event=>event.target === dom.modal && this.toggleModal(false);
 					dom.language.onchange = event=>this.setLanguage(event.target.value);
 					dom.theme.onchange = event=>this.setTheme(event.target.value);
-					['seats', 'threshold'].forEach(id=>dom[id].oninput = ()=>this.clearError());
+					dom.input.addEventListener('input', ()=>this.toggleError());
 					document.onkeydown = event=>this.handleKey(event);
 					dom.list.addEventListener('click', event=>{
 						const row = event.target.closest('.party-row');
@@ -566,7 +566,6 @@
 						party && (event.target.type === 'text' ? party.name = event.target.value : event.target.type === 'number' && (event.target.value = party.votes = Math.round(parseFloat(event.target.value)) || 0));
 					}
 					);
-					dom.list.addEventListener('input', event=>event.target.matches('input') && this.clearError());
 				}
 
 				handleKey(event) {
@@ -624,19 +623,14 @@
 					dom.close.focus()) : this.lastFocus?.focus();
 				}
 
-				showError(message) {
-					dom.error.textContent = message;
-					dom.error.classList.remove('hidden');
-					dom.calculate.disabled = true;
-				}
-
-				clearError() {
-					dom.error.classList.add('hidden');
-					dom.calculate.disabled = false;
+				toggleError(message) {
+					dom.error.textContent = message || '';
+					dom.error.classList.toggle('hidden', !message);
+					dom.calculate.disabled = !!message;
 				}
 
 				addParty() {
-					this.clearError();
+					this.toggleError();
 					this.parties.push({
 						id: this.nextIndex++,
 						name: '',
@@ -652,11 +646,11 @@
 					this.parties = [];
 					this.renderParties();
 					this.addParty();
-					this.clearError();
+					this.toggleError();
 				}
 
 				removeParty(id) {
-					this.clearError();
+					this.toggleError();
 					const index = this.parties.findIndex(p=>p.id === id);
 					this.parties = this.parties.filter(p=>p.id !== id);
 					this.renderParties();
@@ -736,11 +730,11 @@
 							if (!newParties.length)
 								throw new Error('No valid data');
 							this.parties = newParties;
-							this.clearError();
+							this.toggleError();
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
-							this.showError(this.string('alertImport'));
+							this.toggleError(this.string('alertImport'));
 						}
 					}
 					;
@@ -748,21 +742,21 @@
 				}
 
 				calculate() {
-					this.clearError();
+					this.toggleError();
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
-						return this.showError(this.string('alertSeats'));
+						return this.toggleError(this.string('alertSeats'));
 
 					const valid = this.parties.filter(p=>p.name && p.votes >= 0);
 					const total = valid.reduce((sum,p)=>sum + p.votes, 0);
 					if (!valid.length || total === 0)
-						return this.showError(this.string('alertParties'));
+						return this.toggleError(this.string('alertParties'));
 
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(p=>p.votes >= thresholdVotes - 1e-7);
 					if (!passed.length)
-						return this.showError(this.string('belowThreshold'));
+						return this.toggleError(this.string('belowThreshold'));
 
 					const quota = total / seats;
 					const hare = passed.map(p=>{
