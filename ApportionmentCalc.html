@@ -689,30 +689,29 @@
 							const firstRow = parse(lines[0]);
 
 							const detect = row=>{
-								const lower = row.map(cell=>cell.toLowerCase());
-								const find = (keywords,exclude=-1)=>lower.findIndex((cell,i)=>i !== exclude && keywords.some(word=>cell.includes(word)));
+								const find = (k,x)=>row.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
 								const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
-								let[nameIndex,voteIndex] = [find(keys[0]), find(keys[1])];
-								if (nameIndex !== -1 && nameIndex === voteIndex) {
-									const alternate = find(keys[1], nameIndex);
-									alternate !== -1 ? voteIndex = alternate : nameIndex = find(keys[0], voteIndex);
+								let[n,v] = keys.map(k=>find(k, -1));
+
+								if (n !== -1 && n === v) {
+									const alt = find(keys[1], n);
+									alt !== -1 ? v = alt : n = find(keys[0], v);
 								}
-								if (nameIndex !== -1 && voteIndex !== -1)
+								if (n !== -1 && v !== -1)
 									return {
-										name: nameIndex,
-										votes: voteIndex,
+										name: n,
+										votes: v,
 										start: 1
 									};
-								const isNumber = cell=>/^\d+$/.test(cell.replace(/[.,]/g, '').trim());
-								voteIndex = row.findIndex(isNumber);
-								nameIndex = row.findIndex((cell,i)=>i !== voteIndex && !isNumber(cell));
-								if (voteIndex !== -1)
-									return {
-										name: nameIndex !== -1 ? nameIndex : (row.length === 2 ? 1 - voteIndex : -1),
-										votes: voteIndex,
-										start: 0
-									};
-								return {
+
+								const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
+								v = row.findIndex(isNum);
+								n = row.findIndex((c,i)=>i !== v && !isNum(c));
+								return v !== -1 ? {
+									name: n !== -1 ? n : (row.length === 2 ? 1 - v : -1),
+									votes: v,
+									start: 0
+								} : {
 									name: -1,
 									votes: -1,
 									start: 1
