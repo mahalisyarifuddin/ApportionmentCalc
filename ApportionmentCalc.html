@@ -404,59 +404,116 @@
 		</div>
 		<script>
 			const text = {
-				title: ['ApportionmentCalc', 'ApportionmentCalc'],
-				subtitle: ['Electoral seat allocation calculator: Sainte-Laguë vs Hare Quota', 'Kalkulator alokasi kursi pemilu: Sainte-Laguë vs Kuota Hare'],
-				autoTheme: ['Auto Theme', 'Tema Otomatis'],
-				lightTheme: ['Light', 'Terang'],
-				darkTheme: ['Dark', 'Gelap'],
-				seatsLabel: ['Total Seats', 'Jumlah Kursi'],
-				thresholdLabel: ['Electoral Threshold (%)', 'Ambang Batas Parlemen (%)'],
-				add: ['+ Add Party', '+ Tambah Partai'],
-				calculate: ['Calculate Allocation', 'Hitung Alokasi'],
-				edit: ['Edit Inputs', 'Ubah Input'],
-				steps: ['Show Sainte-Laguë Steps', 'Tampilkan Langkah Sainte-Laguë'],
-				export: ['Export to CSV', 'Ekspor ke CSV'],
-				hareTitle: ['Hare Quota Method', 'Metode Kuota Hare'],
-				sainteLagueTitle: ['Sainte-Laguë Method', 'Metode Sainte-Laguë'],
-				compareTitle: ['Results Comparison', 'Perbandingan Hasil'],
-				modalTitle: ['Sainte-Laguë Step-by-Step', 'Langkah-langkah Sainte-Laguë'],
-				party: ['Party', 'Partai'],
-				votes: ['Votes', 'Suara'],
-				seatsColumn: ['Seats', 'Kursi'],
-				remainder: ['Remainder', 'Sisa'],
-				diff: ['Diff', 'Selisih'],
-				quota: ['Quota', 'BPP (Bilangan Pembagi Pemilih)'],
-				totalVotes: ['Total Valid Votes', 'Total Suara Sah'],
-				thresholdVotes: ['Threshold Votes', 'Suara Ambang Batas'],
-				belowThreshold: ['Parties below threshold', 'Partai di bawah ambang batas'],
-				partyPlaceholder: ['Party Name', 'Nama Partai'],
-				votesPlaceholder: ['Votes', 'Jumlah Suara'],
-				alertSeats: ['Total seats must be at least 1.', 'Jumlah kursi harus minimal 1.'],
-				alertParties: ['Please add at least one party with votes.', 'Harap tambahkan setidaknya satu partai dengan suara.'],
-				round: ['Round', 'Putaran'],
-				winner: ['Winner', 'Pemenang'],
-				quotient: ['Quotient', 'Bilangan'],
-				divisor: ['Divisor', 'Pembagi'],
-				seatAllocated: ['Seat #{n}', 'Kursi ke-{n}'],
-				divisorsText: ['Divisors: 1, 3, 5, 7...', 'Pembagi: 1, 3, 5, 7...'],
-				quotientDetail: ['Quotient Detail', 'Rincian Bilangan'],
-				detailsLimited: ['Showing details for the first {n} rounds only.', 'Menampilkan rincian untuk {n} putaran pertama saja.'],
-				winnerPrefix: ['Winner: ', 'Pemenang: '],
-				share: ['Share (%)', 'Persentase (%)'],
-				passedHeader: ['Passed Threshold?', 'Lolos Ambang Batas?'],
-				hareSeatsHeader: ['Hare Seats', 'Kursi Hare'],
-				sainteLagueSeatsHeader: ['Sainte-Laguë Seats', 'Kursi Sainte-Laguë'],
-				differenceHeader: ['Difference', 'Selisih'],
-				yes: ['Yes', 'Ya'],
-				no: ['No', 'Tidak'],
-				import: ['Import CSV/TSV', 'Impor CSV/TSV'],
-				alertImport: ['Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.', 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".'],
-				clear: ['Clear All', 'Hapus Semua'],
-				clearConfirm: ['Are you sure you want to clear all parties?', 'Apakah Anda yakin ingin menghapus semua partai?'],
-				removeParty: ['Remove Party', 'Hapus Partai'],
-				closeModal: ['Close Modal', 'Tutup Modal'],
-				languageLabel: ['Language', 'Bahasa'],
-				themeLabel: ['Theme', 'Tema']
+				en: {
+					title: 'ApportionmentCalc',
+					subtitle: 'Electoral seat allocation calculator: Sainte-Laguë vs Hare Quota',
+					autoTheme: 'Auto Theme',
+					lightTheme: 'Light',
+					darkTheme: 'Dark',
+					seatsLabel: 'Total Seats',
+					thresholdLabel: 'Electoral Threshold (%)',
+					add: '+ Add Party',
+					calculate: 'Calculate Allocation',
+					edit: 'Edit Inputs',
+					steps: 'Show Sainte-Laguë Steps',
+					export: 'Export to CSV',
+					hareTitle: 'Hare Quota Method',
+					sainteLagueTitle: 'Sainte-Laguë Method',
+					compareTitle: 'Results Comparison',
+					modalTitle: 'Sainte-Laguë Step-by-Step',
+					party: 'Party',
+					votes: 'Votes',
+					seatsColumn: 'Seats',
+					remainder: 'Remainder',
+					diff: 'Diff',
+					quota: 'Quota',
+					totalVotes: 'Total Valid Votes',
+					thresholdVotes: 'Threshold Votes',
+					belowThreshold: 'Parties below threshold',
+					partyPlaceholder: 'Party Name',
+					votesPlaceholder: 'Votes',
+					alertSeats: 'Total seats must be at least 1.',
+					alertParties: 'Please add at least one party with votes.',
+					round: 'Round',
+					winner: 'Winner',
+					quotient: 'Quotient',
+					divisor: 'Divisor',
+					seatAllocated: 'Seat #{n}',
+					divisorsText: 'Divisors: 1, 3, 5, 7...',
+					quotientDetail: 'Quotient Detail',
+					detailsLimited: 'Showing details for the first {n} rounds only.',
+					winnerPrefix: 'Winner: ',
+					share: 'Share (%)',
+					passedHeader: 'Passed Threshold?',
+					hareSeatsHeader: 'Hare Seats',
+					sainteLagueSeatsHeader: 'Sainte-Laguë Seats',
+					differenceHeader: 'Difference',
+					yes: 'Yes',
+					no: 'No',
+					import: 'Import CSV/TSV',
+					alertImport: 'Error importing file. Please ensure it is a valid CSV/TSV with "Party" and "Votes" columns.',
+					clear: 'Clear All',
+					clearConfirm: 'Are you sure you want to clear all parties?',
+					removeParty: 'Remove Party',
+					closeModal: 'Close Modal',
+					languageLabel: 'Language',
+					themeLabel: 'Theme'
+				},
+				id: {
+					title: 'ApportionmentCalc',
+					subtitle: 'Kalkulator alokasi kursi pemilu: Sainte-Laguë vs Kuota Hare',
+					autoTheme: 'Tema Otomatis',
+					lightTheme: 'Terang',
+					darkTheme: 'Gelap',
+					seatsLabel: 'Jumlah Kursi',
+					thresholdLabel: 'Ambang Batas Parlemen (%)',
+					add: '+ Tambah Partai',
+					calculate: 'Hitung Alokasi',
+					edit: 'Ubah Input',
+					steps: 'Tampilkan Langkah Sainte-Laguë',
+					export: 'Ekspor ke CSV',
+					hareTitle: 'Metode Kuota Hare',
+					sainteLagueTitle: 'Metode Sainte-Laguë',
+					compareTitle: 'Perbandingan Hasil',
+					modalTitle: 'Langkah-langkah Sainte-Laguë',
+					party: 'Partai',
+					votes: 'Suara',
+					seatsColumn: 'Kursi',
+					remainder: 'Sisa',
+					diff: 'Selisih',
+					quota: 'BPP (Bilangan Pembagi Pemilih)',
+					totalVotes: 'Total Suara Sah',
+					thresholdVotes: 'Suara Ambang Batas',
+					belowThreshold: 'Partai di bawah ambang batas',
+					partyPlaceholder: 'Nama Partai',
+					votesPlaceholder: 'Jumlah Suara',
+					alertSeats: 'Jumlah kursi harus minimal 1.',
+					alertParties: 'Harap tambahkan setidaknya satu partai dengan suara.',
+					round: 'Putaran',
+					winner: 'Pemenang',
+					quotient: 'Bilangan',
+					divisor: 'Pembagi',
+					seatAllocated: 'Kursi ke-{n}',
+					divisorsText: 'Pembagi: 1, 3, 5, 7...',
+					quotientDetail: 'Rincian Bilangan',
+					detailsLimited: 'Menampilkan rincian untuk {n} putaran pertama saja.',
+					winnerPrefix: 'Pemenang: ',
+					share: 'Persentase (%)',
+					passedHeader: 'Lolos Ambang Batas?',
+					hareSeatsHeader: 'Kursi Hare',
+					sainteLagueSeatsHeader: 'Kursi Sainte-Laguë',
+					differenceHeader: 'Selisih',
+					yes: 'Ya',
+					no: 'Tidak',
+					import: 'Impor CSV/TSV',
+					alertImport: 'Gagal mengimpor file. Pastikan format CSV/TSV valid dengan kolom "Partai" dan "Suara".',
+					clear: 'Hapus Semua',
+					clearConfirm: 'Apakah Anda yakin ingin menghapus semua partai?',
+					removeParty: 'Hapus Partai',
+					closeModal: 'Tutup Modal',
+					languageLabel: 'Bahasa',
+					themeLabel: 'Tema'
+				}
 			};
 
 			const escape = t=>t.replace(/[&<>"']/g, c=>'&#'+c.charCodeAt(0)+';');
@@ -524,13 +581,10 @@
 				}
 
 				string(key) {
-					return text[key]?.[this.language === 'id' ? 1 : 0] ?? key;
+					return text[this.language]?.[key] ?? key;
 				}
 				format(value, options={}) {
 					return value.toLocaleString(this.language === 'id' ? 'id-ID' : 'en-US', options);
-				}
-				template(key, values) {
-					return Object.entries(values ?? {}).reduce((result,[k,v])=>result.replace(`{${k}}`, v), this.string(key));
 				}
 
 				table(headers, body) {
@@ -546,7 +600,7 @@
 					this.language = language;
 					dom.language.value = language;
 					document.documentElement.lang = language;
-					Object.keys(text).forEach(k=>dom[k] && !['INPUT', 'SELECT'].includes(dom[k].tagName) && (dom[k].textContent = this.string(k)));
+					Object.keys(text.en).forEach(k=>dom[k] && !['INPUT', 'SELECT'].includes(dom[k].tagName) && (dom[k].textContent = this.string(k)));
 					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,i])=>dom.theme.options[i].textContent = this.string(key));
 					dom.close.setAttribute('aria-label', this.string('closeModal'));
 					dom.language.setAttribute('aria-label', this.string('languageLabel'));
@@ -785,9 +839,7 @@
 					if (!steps?.length)
 						return;
 					const details = steps.slice(0, STEPS_LIMIT);
-					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.template('detailsLimited', {
-						n: STEPS_LIMIT
-					})}</p>` : '';
+					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 					const seatTemplate = this.string('seatAllocated');
 					const winnerPrefix = this.string('winnerPrefix');
 					const formatOptions = {
