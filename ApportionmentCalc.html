@@ -679,35 +679,25 @@
 							const firstRow = parse(lines[0]);
 
 							const detect = row=>{
-								const find = (k,x)=>row.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
+								const f = (k,x)=>row.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
 								const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
-								let[n,v] = keys.map(k=>find(k, -1));
+								let [n,v] = keys.map(k=>f(k, -1));
 
 								if (n !== -1 && n === v) {
-									const alt = find(keys[1], n);
-									alt !== -1 ? v = alt : n = find(keys[0], v);
+									const alt = f(keys[1], n);
+									alt !== -1 ? v = alt : n = f(keys[0], n);
 								}
-								if (n !== -1 && v !== -1)
-									return {
-										name: n,
-										votes: v,
-										start: 1
-									};
+								if (n !== -1 && v !== -1) return {name: n, votes: v, start: 1};
 
 								const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
 								v = row.findIndex(isNum);
 								n = row.findIndex((c,i)=>i !== v && !isNum(c));
-								return v !== -1 ? {
-									name: n !== -1 ? n : (row.length === 2 ? 1 - v : -1),
+								return {
+									name: n !== -1 ? n : (row.length === 2 && v !== -1 ? 1 - v : -1),
 									votes: v,
-									start: 0
-								} : {
-									name: -1,
-									votes: -1,
-									start: 1
+									start: v !== -1 ? 0 : 1
 								};
-							}
-							;
+							};
 
 							const config = detect(firstRow);
 							if (config.name === -1 || config.votes === -1)
