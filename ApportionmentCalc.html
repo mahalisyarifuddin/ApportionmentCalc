@@ -672,28 +672,23 @@
 							const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
 							const find = (k,x)=>row0.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
 							const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
-							let [n,v] = [find(keys[0]), find(keys[1])];
-							(n === v && n !== -1) && (
-								find(keys[1], n) !== -1 ? v = find(keys[1], n) :
-								find(keys[0], n) !== -1 && (n = find(keys[0], n))
-							);
+							let n = find(keys[0]), v = find(keys[1]);
+							if (n !== -1 && n === v) {
+								let k = find(keys[1], n);
+								k !== -1 ? v = k : (k = find(keys[0], n)) !== -1 && (n = k);
+							}
 							let start = 1;
-							(n === -1 || v === -1) && (
-								v = row0.findIndex(isNum),
-								n = row0.findIndex((c,i)=>i !== v && !isNum(c)),
-								(n === -1 && row0.length === 2 && v !== -1) && (n = 1 - v),
-								start = v !== -1 ? 0 : 1
-							);
+							if (n === -1 || v === -1) {
+								v = row0.findIndex(isNum);
+								n = row0.findIndex((c,i)=>i !== v && !isNum(c));
+								if (n === -1 && row0.length === 2 && v !== -1) n = 1 - v;
+								start = v !== -1 ? 0 : 1;
+							}
 							if (n === -1 || v === -1) throw new Error();
 							const newParties = lines.slice(start).reduce((acc,line)=>{
 								const cols = parse(line);
-								const name = cols.length > Math.max(n, v) && cols[n];
-								const votes = name && (parseInt(cols[v].replace(/\D/g, '')) || 0);
-								name && acc.push({
-									id: this.nextIndex++,
-									name,
-									votes
-								});
+								const name = cols[n], votes = parseInt((cols[v]||'').replace(/\D/g, '')) || 0;
+								if (name && cols.length > Math.max(n, v)) acc.push({id: this.nextIndex++, name, votes});
 								return acc;
 							}, []);
 							if (!newParties.length) throw new Error();
