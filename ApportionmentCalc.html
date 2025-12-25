@@ -586,9 +586,6 @@
 				format(value, options={}) {
 					return value.toLocaleString(this.language === 'id' ? 'id-ID' : 'en-US', options);
 				}
-				template(key, values) {
-					return Object.entries(values ?? {}).reduce((result,[k,v])=>result.replace(`{${k}}`, v), this.string(key));
-				}
 
 				table(headers, body) {
 					return `<table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`;
@@ -842,9 +839,7 @@
 					if (!steps?.length)
 						return;
 					const details = steps.slice(0, STEPS_LIMIT);
-					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.template('detailsLimited', {
-						n: STEPS_LIMIT
-					})}</p>` : '';
+					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 					const seatTemplate = this.string('seatAllocated');
 					const winnerPrefix = this.string('winnerPrefix');
 					const formatOptions = {
