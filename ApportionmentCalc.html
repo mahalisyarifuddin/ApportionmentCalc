@@ -798,15 +798,15 @@
 					const {results, total, thresholdVotes, threshold, quota} = this.data;
 					const passed = results.filter(r=>r.passed);
 					const failed = results.filter(r=>!r.passed);
-					const row = (r,seats,extra='')=>`<tr><td>${escape(r.name)}</td><td>${this.format(r.votes)}</td><td><strong>${seats}</strong></td>${extra}</tr>`;
+					const row = (r,seats,extra='')=>`<tr><td>${escape(r.name)}</td><td>${this.format(r.votes)}</td><td>${this.format(r.votes/total*100, {maximumFractionDigits:2})}%</td><td><strong>${seats}</strong></td>${extra}</tr>`;
 
 					dom.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(total)}<br>${this.string('thresholdVotes')} (${this.format(threshold)}%): ${this.format(thresholdVotes, {
 						maximumFractionDigits: 0
 					})}${failed.length ? `<br><span class="italic">${this.string('belowThreshold')}: ${failed.map(r=>`${escape(r.name)} (${this.format(r.votes)})`).join(', ')}</span>` : ''}</div>`;
-					dom.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)}</p>${this.table(['party', 'votes', 'seatsColumn', 'remainder'].map(k=>this.string(k)), [...passed].sort((a,b)=>b.hareSeats - a.hareSeats).map(r=>row(r, r.hareSeats, `<td>${this.format(r.remainder, {
+					dom.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)}</p>${this.table(['party', 'votes', 'share', 'seatsColumn', 'remainder'].map(k=>this.string(k)), [...passed].sort((a,b)=>b.hareSeats - a.hareSeats).map(r=>row(r, r.hareSeats, `<td>${this.format(r.remainder, {
 						maximumFractionDigits: 6
 					})}</td>`)).join(''))}`;
-					dom.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')}</p>${this.table(['party', 'votes', 'seatsColumn'].map(k=>this.string(k)), [...passed].sort((a,b)=>b.sainteLagueSeats - a.sainteLagueSeats).map(r=>row(r, r.sainteLagueSeats)).join(''))}`;
+					dom.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')}</p>${this.table(['party', 'votes', 'share', 'seatsColumn'].map(k=>this.string(k)), [...passed].sort((a,b)=>b.sainteLagueSeats - a.sainteLagueSeats).map(r=>row(r, r.sainteLagueSeats)).join(''))}`;
 					dom.compare.innerHTML = this.table([this.string('party'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...passed].sort((a,b)=>b.votes - a.votes).map(r=>{
 						const diff = r.sainteLagueSeats - r.hareSeats;
 						return `<tr><td>${escape(r.name)}</td><td>${r.hareSeats}</td><td>${r.sainteLagueSeats}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>`;
