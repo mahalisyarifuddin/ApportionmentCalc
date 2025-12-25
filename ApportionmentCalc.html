@@ -597,14 +597,14 @@
 				}
 
 				setLanguage(language) {
-					this.language = language;
-					dom.language.value = language;
-					document.documentElement.lang = language;
-					Object.keys(text.en).forEach(k=>dom[k] && !['INPUT', 'SELECT'].includes(dom[k].tagName) && (dom[k].textContent = this.string(k)));
-					[['autoTheme', 0], ['lightTheme', 1], ['darkTheme', 2]].forEach(([key,i])=>dom.theme.options[i].textContent = this.string(key));
-					dom.close.setAttribute('aria-label', this.string('closeModal'));
-					dom.language.setAttribute('aria-label', this.string('languageLabel'));
-					dom.theme.setAttribute('aria-label', this.string('themeLabel'));
+					this.language = dom.language.value = document.documentElement.lang = language;
+					Object.keys(text.en).forEach(k=>dom[k] && !dom[k].matches('input,select') && (dom[k].textContent = this.string(k)));
+					[...dom.theme.options].forEach(o=>o.textContent = this.string(o.value + 'Theme'));
+					['close:closeModal', 'language:languageLabel', 'theme:themeLabel'].forEach(s=>{
+						const [id,key] = s.split(':');
+						dom[id].setAttribute('aria-label', this.string(key));
+					}
+					);
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
 				}
@@ -666,27 +666,27 @@
 					reader.onload = event=>{
 						try {
 							const content = event.target.result;
-							const first = content.split('\n')[0] || '';
-							const delimiter = (first.match(/\t/g) || []).length > (first.match(/,/g) || []).length ? '\t' : ',';
+							const delimiter = (content.split('\n')[0].match(/\t/g) || []).length > (content.split('\n')[0].match(/,/g) || []).length ? '\t' : ',';
 							const lines = content.split(/\r?\n/).filter(line=>line.trim());
-							if (lines.length < 1)
+							if (!lines.length)
 								throw new Error('No data');
 
-							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell=>cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-							const firstRow = parse(lines[0]);
-
+							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+							const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
 							const detect = row=>{
 								const f = (k,x)=>row.findIndex((c,i)=>i !== x && k.some(w=>c.toLowerCase().includes(w)));
 								const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
 								let [n,v] = keys.map(k=>f(k, -1));
-
-								if (n !== -1 && n === v) {
+								if (n === v && n !== -1) {
 									const alt = f(keys[1], n);
 									alt !== -1 ? v = alt : n = f(keys[0], n);
 								}
-								if (n !== -1 && v !== -1) return {name: n, votes: v, start: 1};
-
-								const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
+								if (n !== -1 && v !== -1)
+									return {
+										name: n,
+										votes: v,
+										start: 1
+									};
 								v = row.findIndex(isNum);
 								n = row.findIndex((c,i)=>i !== v && !isNum(c));
 								return {
@@ -694,26 +694,27 @@
 									votes: v,
 									start: v !== -1 ? 0 : 1
 								};
-							};
-
-							const config = detect(firstRow);
+							}
+							;
+							const config = detect(parse(lines[0]));
 							if (config.name === -1 || config.votes === -1)
 								throw new Error('Invalid columns');
 
-							const newParties = [];
-							for (let i = config.start; i < lines.length; i++) {
-								const columns = parse(lines[i]);
-								if (columns.length <= Math.max(config.name, config.votes))
-									continue;
-								const name = columns[config.name];
-								const votes = parseInt(columns[config.votes].replace(/[^0-9]/g, '')) || 0;
-								if (name)
-									newParties.push({
+							const newParties = lines.slice(config.start).reduce((acc,line)=>{
+								const cols = parse(line);
+								if (cols.length > Math.max(config.name, config.votes)) {
+									const name = cols[config.name];
+									const votes = parseInt(cols[config.votes].replace(/\D/g, '')) || 0;
+									name && acc.push({
 										id: this.nextIndex++,
 										name,
 										votes
 									});
+								}
+								return acc;
 							}
+							, []);
+
 							if (!newParties.length)
 								throw new Error('No valid data');
 							this.parties = newParties;
