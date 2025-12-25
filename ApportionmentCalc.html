@@ -597,12 +597,9 @@
 					const row = e.target.closest('.party-row');
 					!e.ctrlKey && !e.metaKey && e.key === 'Enter' && row && e.target.matches('input') && (
 						e.preventDefault(),
-						(()=>{
-							const next = row.nextElementSibling;
-							next
-								? next.querySelector('input')?.focus()
-								: (this.addParty(), setTimeout(()=>dom.list.lastElementChild.querySelector('input')?.focus(), 0))
-						})()
+						row.nextElementSibling
+							? row.nextElementSibling.querySelector('input')?.focus()
+							: this.addParty()
 					);
 				}
 
