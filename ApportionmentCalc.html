@@ -726,41 +726,40 @@
 
 							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell=>cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 							const firstRow = parse(lines[0]);
-							const strategies = [row=>{
-								const lower = row.map(cell=>cell.toLowerCase());
-								const nameKeywords = ['party', 'partai', 'name', 'nama'];
-								const voteKeywords = ['vote', 'suara'];
-								const find = (keywords, exclude = -1) => lower.findIndex((h,i)=>i !== exclude && keywords.some(k=>h.includes(k)));
+							const detect = row=>{
+								const lower = row.map(c=>c.toLowerCase());
+								const find = (k,x=-1)=>lower.findIndex((c,i)=>i !== x && k.some(w=>c.includes(w)));
+								const keys = [['party', 'partai', 'name', 'nama'], ['vote', 'suara']];
+								let [n,v] = [find(keys[0]), find(keys[1])];
 
-								const n1 = find(nameKeywords);
-								const v1 = find(voteKeywords);
-								const conflict = n1 !== -1 && n1 === v1;
+								if (n !== -1 && n === v) {
+									const v2 = find(keys[1], n);
+									v2 !== -1 ? (v = v2) : (n = find(keys[0], v));
+								}
+								if (n !== -1 && v !== -1)
+									return {
+										name: n,
+										votes: v,
+										start: 1
+									};
 
-								const v2 = conflict ? find(voteKeywords, n1) : -1;
-								const n2 = (conflict && v2 === -1) ? find(nameKeywords, v1) : -1;
-
+								const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
+								v = row.findIndex(isNum);
+								n = row.findIndex((c,i)=>i !== v && !isNum(c));
+								if (v !== -1)
+									return {
+										name: n !== -1 ? n : (row.length === 2 ? 1 - v : -1),
+										votes: v,
+										start: 0
+									};
 								return {
-									name: n2 !== -1 ? n2 : n1,
-									votes: v2 !== -1 ? v2 : v1,
+									name: -1,
+									votes: -1,
 									start: 1
-								};
+								}
 							}
-							, row=>{
-								const numeric = row.map(cell=>/^\d+$/.test(cell.replace(/[.,]/g, '').trim()));
-								const votes = numeric.findIndex(Boolean);
-								const name = numeric.findIndex((val,i)=>!val && i !== votes);
-								return {
-									name: name !== -1 ? name : (row.length === 2 ? (votes === 0 ? 1 : 0) : -1),
-									votes,
-									start: 0
-								};
-							}
-							];
-							const config = strategies.map(strategy=>strategy(firstRow)).find(result=>result.name !== -1 && result.votes !== -1) || {
-								name: -1,
-								votes: -1,
-								start: 1
-							};
+							;
+							const config = detect(firstRow);
 							if (config.name === -1 || config.votes === -1)
 								throw new Error('Invalid columns');
 
