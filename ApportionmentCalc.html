@@ -515,12 +515,6 @@
 					themeLabel: 'Tema'
 				}
 			};
-			const node = (tag,props,children)=>{
-				const el = Object.assign(document.createElement(tag), props);
-				children && el.append(...[children].flat());
-				return el
-			}
-			;
 			const escapeMap = {
 				'&': '&amp;',
 				'<': '&lt;',
@@ -693,19 +687,11 @@
 				}
 
 				renderParties() {
-					dom.list.replaceChildren(...this.parties.map(p=>this.createPartyRow(p)))
+					dom.list.innerHTML = this.parties.map(p=>this.createPartyRow(p)).join('');
 				}
 
-				createPartyRow(party) {
-					const row = node('div', {
-						className: 'party-row'
-					});
-					row.dataset.id = party.id;
-					row.innerHTML = `<input type="text" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')}"><input type="number" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')}"><button class="danger" aria-label="${this.string('removeParty')}">×</button>`;
-					const [name,votes] = row.children;
-					name.value = party.name;
-					votes.value = party.votes || '';
-					return row;
+				createPartyRow(p) {
+					return `<div class="party-row" data-id="${p.id}"><input type="text" value="${esc(p.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')}"><input type="number" value="${p.votes || ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')}"><button class="danger" aria-label="${this.string('removeParty')}">×</button></div>`;
 				}
 
 				importData(file) {
@@ -931,12 +917,10 @@
 						minimumFractionDigits: 2,
 						maximumFractionDigits: 2
 					})}",${r.passed ? this.string('yes') : this.string('no')},${r.hareSeats},${r.sainteLagueSeats},${r.sainteLagueSeats - r.hareSeats}`).join('\n');
-					node('a', {
-						href: URL.createObjectURL(new Blob([csv],{
-							type: 'text/csv'
-						})),
-						download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv`
-					}).click();
+					const a = document.createElement('a');
+					a.href = URL.createObjectURL(new Blob([csv],{type: 'text/csv'}));
+					a.download = `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv`;
+					a.click();
 				}
 			}
 
