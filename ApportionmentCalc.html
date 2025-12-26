@@ -555,11 +555,10 @@
 					dom.theme.onchange = event=>this.setTheme(event.target.value);
 					dom.input.addEventListener('input', ()=>this.toggleError());
 					document.onkeydown = event=>this.handleKey(event);
-					dom.list.addEventListener('click', event=>{
-						const row = event.target.closest('.party-row');
-						event.target.matches('.danger') && row && this.removeParty(Number(row.dataset.id));
-					}
-					);
+					dom.list.addEventListener('click', e=>{
+						const row = e.target.closest('.party-row');
+						e.target.matches('.danger') && row && this.removeParty(+row.dataset.id);
+					});
 					dom.list.addEventListener('change', event=>{
 						const row = event.target.closest('.party-row');
 						const party = row && this.parties.find(p=>p.id === Number(row.dataset.id));
@@ -600,11 +599,9 @@
 					this.language = dom.language.value = document.documentElement.lang = language;
 					Object.keys(text.en).forEach(k=>dom[k] && !dom[k].matches('input,select') && (dom[k].textContent = this.string(k)));
 					[...dom.theme.options].forEach(o=>o.textContent = this.string(o.value + 'Theme'));
-					['close:closeModal', 'language:languageLabel', 'theme:themeLabel'].forEach(s=>{
-						const [id,key] = s.split(':');
-						dom[id].setAttribute('aria-label', this.string(key));
-					}
-					);
+					dom.close.setAttribute('aria-label', this.string('closeModal'));
+					dom.language.setAttribute('aria-label', this.string('languageLabel'));
+					dom.theme.setAttribute('aria-label', this.string('themeLabel'));
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
 				}
@@ -732,8 +729,7 @@
 					);
 					let allocated = hare.reduce((sum,p)=>sum + p.hareSeats, 0);
 					hare.sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes);
-					for (let i = 0; i < seats - allocated; i++)
-						hare[i % hare.length] && hare[i % hare.length].hareSeats++;
+					for (let i = 0; i < seats - allocated; i++) hare[i].hareSeats++;
 
 					const work = passed.map(p=>({
 						...p,
@@ -751,12 +747,7 @@
 							winnerId: winner.id,
 							winnerQuotient: winner.quotient,
 							winnerDivisor: winner.divisor,
-							quotients: i <= STEPS_LIMIT ? work.map(p=>({
-								id: p.id,
-								name: p.name,
-								quotient: p.quotient,
-								divisor: p.divisor
-							})) : null
+							quotients: i <= STEPS_LIMIT ? work.map(({id,name,quotient,divisor})=>({id,name,quotient,divisor})) : null
 						});
 						winner.slSeats++;
 						winner.divisor += 2;
