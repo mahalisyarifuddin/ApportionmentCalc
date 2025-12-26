@@ -33,6 +33,7 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 - **Input Partai Dinamis**: Tambah atau hapus partai sesuai kebutuhan.
 - **Perbandingan Dua Metode**: Lihat hasil Kuota Hare dan Sainte-Laguë secara berdampingan.
 - **Visualisasi Sainte-Laguë**: Lihat tabel langkah demi langkah bagaimana setiap kursi dimenangkan.
+- **Simpan Otomatis**: Data Anda disimpan secara otomatis ke penyimpanan lokal browser Anda sehingga Anda dapat melanjutkan pekerjaan Anda nanti.
 - **Impor/Ekspor CSV**: Impor data partai dari file CSV/TSV dan unduh hasil perhitungan untuk analisis lebih lanjut.
 - **File HTML Tunggal**: Tidak perlu instalasi, tidak ada dependensi, bekerja sepenuhnya offline.
 
@@ -66,7 +67,7 @@ Simulasi statistik terhadap **~1 juta** skenario pemilu mengonfirmasi kecenderun
 Data ini mendukung konsensus umum bahwa Kuota Hare lebih ramah terhadap partai-partai kecil, sementara Sainte-Laguë secara signifikan menguntungkan partai-partai besar.
 
 ## Privasi & Data
-Semua perhitungan terjadi secara lokal di peramban Anda. Tidak ada data yang dikirim ke server mana pun. Alat ini sepenuhnya offline setelah dimuat.
+Semua perhitungan terjadi secara lokal di peramban Anda. Tidak ada data yang dikirim ke server mana pun. Alat ini sepenuhnya offline setelah dimuat. Data Anda disimpan secara otomatis ke penyimpanan lokal browser Anda sehingga Anda dapat melanjutkan pekerjaan Anda nanti.
 
 ## Lisensi
 Lisensi MIT. Lihat LICENSE untuk detailnya.

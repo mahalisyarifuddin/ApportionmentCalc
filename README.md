@@ -33,6 +33,7 @@ The calculator takes vote counts for multiple political parties and a total numb
 - **Dynamic party input**: Add or remove as many parties as needed.
 - **Detailed breakdown**: View Quota, remainders, quotients, and detailed allocation steps.
 - **Visualizations**: Step-by-step table showing how each seat is awarded in the Sainte-Laguë method.
+- **Auto-save**: Your data is saved automatically to your browser's local storage so you can pick up where you left off.
 - **CSV Import/Export**: Import party data from CSV/TSV files and download results for further analysis.
 - **Single HTML file**: No installation, no dependencies, works completely offline.
 - **Responsive design**: Works on desktop, tablet, and mobile devices.
@@ -67,7 +68,7 @@ A statistical simulation of **~1 million** electoral scenarios confirmed the bia
 This data supports the general consensus that Hare Quota is friendlier to smaller parties, while Sainte-Laguë significantly benefits larger parties.
 
 ## Privacy & Data
-All calculations happen locally in your browser. No data is sent to any server. The tool is completely offline once loaded.
+All calculations happen locally in your browser. No data is sent to any server. The tool is completely offline once loaded. Your data is saved automatically to your browser's local storage so you can pick up where you left off.
 
 ## License
 MIT License. See LICENSE for details.

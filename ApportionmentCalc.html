@@ -536,8 +536,7 @@
 					this.nextIndex = 6;
 					this.data = null;
 					this.bind();
-					this.setTheme('auto');
-					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
+					this.loadState();
 				}
 
 				bind() {
@@ -555,6 +554,7 @@
 					on(dom.language, 'onchange', e=>this.setLanguage(e.target.value));
 					on(dom.theme, 'onchange', e=>this.setTheme(e.target.value));
 					dom.input.addEventListener('input', ()=>this.toggleError());
+					dom.input.addEventListener('change', ()=>this.saveState());
 					document.onkeydown = e=>this.handleKey(e);
 					dom.list.addEventListener('click', e=>{
 						const row = e.target.closest('.party-row');
@@ -572,6 +572,35 @@
 							e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
 					}
 					);
+				}
+
+				loadState() {
+					let saved = {};
+					try {
+						saved = JSON.parse(localStorage.getItem('ac_state')) || {};
+					} catch {}
+					if (saved.parties) {
+						this.parties = saved.parties;
+						this.nextIndex = (Math.max(...this.parties.map(p=>p.id), 0) || 0) + 1;
+					}
+					if (saved.seats)
+						dom.seats.value = saved.seats;
+					if (saved.threshold)
+						dom.threshold.value = saved.threshold;
+					this.setTheme(saved.theme || 'auto');
+					this.setLanguage(saved.language || (navigator.language?.startsWith('id') ? 'id' : 'en'));
+				}
+
+				saveState() {
+					try {
+						localStorage.setItem('ac_state', JSON.stringify({
+							parties: this.parties,
+							seats: dom.seats.value,
+							threshold: dom.threshold.value,
+							theme: dom.theme.value,
+							language: this.language
+						}));
+					} catch {}
 				}
 
 				handleKey(event) {
@@ -599,6 +628,7 @@
 				setTheme(theme) {
 					document.documentElement.className = theme === 'auto' ? '' : theme;
 					dom.theme.value = theme;
+					this.saveState();
 				}
 
 				setLanguage(language) {
@@ -610,6 +640,7 @@
 					dom.theme.setAttribute('aria-label', this.string('themeLabel'));
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
+					this.saveState();
 				}
 
 				show(section) {
@@ -638,6 +669,7 @@
 					});
 					this.renderParties();
 					dom.list.lastElementChild?.querySelector('input')?.focus();
+					this.saveState();
 				}
 
 				clearAll() {
@@ -647,6 +679,7 @@
 					this.renderParties();
 					this.addParty();
 					this.toggleError();
+					this.saveState();
 				}
 
 				removeParty(id) {
@@ -656,6 +689,7 @@
 					this.renderParties();
 					const target = Math.min(index, this.parties.length - 1);
 					target >= 0 ? dom.list.children[target]?.querySelector('.danger')?.focus() : dom.add.focus();
+					this.saveState();
 				}
 
 				renderParties() {
@@ -706,6 +740,7 @@
 							this.parties = newParties;
 							this.toggleError();
 							this.renderParties();
+							this.saveState();
 							dom.file.value = '';
 						} catch {
 							this.toggleError(this.string('alertImport'));
