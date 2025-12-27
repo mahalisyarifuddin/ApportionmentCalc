@@ -318,6 +318,41 @@
 				margin-top: 2rem
 			}
 
+			.chart-row {
+				display: grid;
+				grid-template-columns: 140px 1fr 50px;
+				gap: 10px;
+				align-items: center;
+				margin-bottom: 6px;
+				font-size: .9rem
+			}
+
+			.bar-bg {
+				background: var(--dim);
+				height: 24px;
+				border-radius: 4px;
+				overflow: hidden
+			}
+
+			.bar-fill {
+				background: var(--primary);
+				height: 100%;
+				transition: width .5s ease-out;
+				min-width: 2px
+			}
+
+			.chart-val {
+				text-align: right;
+				font-weight: 700
+			}
+
+			.chart-name {
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				text-align: right
+			}
+
 			@media(max-width: 768px) {
 				.results-grid {
 					grid-template-columns:1fr
@@ -389,6 +424,10 @@
 						<div id="sainteLague"></div>
 					</div>
 				</div>
+				<div class="visuals stats" style="margin-top:2rem">
+					<h2 id="visualsTitle"></h2>
+					<div id="chart"></div>
+				</div>
 				<div class="comparison">
 					<h2 id="compareTitle"></h2>
 					<div id="compare"></div>
@@ -457,7 +496,8 @@
 					removeParty: 'Remove Party',
 					closeModal: 'Close Modal',
 					languageLabel: 'Language',
-					themeLabel: 'Theme'
+					themeLabel: 'Theme',
+					visualsTitle: 'Seat Distribution (Sainte-Laguë)'
 				},
 				id: {
 					title: 'ApportionmentCalc',
@@ -512,7 +552,8 @@
 					removeParty: 'Hapus Partai',
 					closeModal: 'Tutup Modal',
 					languageLabel: 'Bahasa',
-					themeLabel: 'Tema'
+					themeLabel: 'Tema',
+					visualsTitle: 'Distribusi Kursi (Sainte-Laguë)'
 				}
 			};
 
@@ -814,6 +855,8 @@
 						return `<tr><td>${escape(r.name)}</td><td>${r.hareSeats}</td><td>${r.sainteLagueSeats}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>`;
 					}
 					).join(''));
+					const maxSeats = Math.max(...passed.map(r=>r.sainteLagueSeats), 1);
+					dom.chart.innerHTML = [...passed].sort((a,b)=>b.sainteLagueSeats - a.sainteLagueSeats).map(r=>`<div class="chart-row"><div class="chart-name" title="${escape(r.name)}">${escape(r.name)}</div><div class="bar-bg" title="${r.sainteLagueSeats} seats"><div class="bar-fill" style="width:${r.sainteLagueSeats / maxSeats * 100}%"></div></div><div class="chart-val">${r.sainteLagueSeats}</div></div>`).join('');
 				}
 
 				renderSteps() {
