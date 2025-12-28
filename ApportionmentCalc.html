@@ -533,11 +533,35 @@
 						name,
 						votes
 					}));
-					this.nextIndex = 6;
+					let theme = 'auto';
+					let language = navigator.language?.startsWith('id') ? 'id' : 'en';
+					try {
+						const saved = JSON.parse(localStorage.getItem('apportionment_state'));
+						if (saved) {
+							this.parties = saved.parties || this.parties;
+							if (saved.seats) dom.seats.value = saved.seats;
+							if (saved.threshold) dom.threshold.value = saved.threshold;
+							theme = saved.theme || theme;
+							language = saved.language || language;
+						}
+					} catch {}
+					this.nextIndex = (this.parties.length ? Math.max(...this.parties.map(p=>p.id)) : 0) + 1;
 					this.data = null;
 					this.bind();
-					this.setTheme('auto');
-					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
+					this.setTheme(theme);
+					this.setLanguage(language);
+				}
+
+				saveState() {
+					try {
+						localStorage.setItem('apportionment_state', JSON.stringify({
+							parties: this.parties,
+							seats: dom.seats.value,
+							threshold: dom.threshold.value,
+							theme: dom.theme.value,
+							language: dom.language.value
+						}));
+					} catch {}
 				}
 
 				bind() {
@@ -554,7 +578,11 @@
 					on(dom.modal, 'onclick', e=>e.target === dom.modal && this.toggleModal(false));
 					on(dom.language, 'onchange', e=>this.setLanguage(e.target.value));
 					on(dom.theme, 'onchange', e=>this.setTheme(e.target.value));
-					dom.input.addEventListener('input', ()=>this.toggleError());
+					dom.input.addEventListener('input', ()=>{
+						this.toggleError();
+						this.saveState();
+					});
+					dom.input.addEventListener('change', ()=>this.saveState());
 					document.onkeydown = e=>this.handleKey(e);
 					dom.list.addEventListener('click', e=>{
 						const row = e.target.closest('.party-row');
@@ -599,6 +627,7 @@
 				setTheme(theme) {
 					document.documentElement.className = theme === 'auto' ? '' : theme;
 					dom.theme.value = theme;
+					this.saveState();
 				}
 
 				setLanguage(language) {
@@ -610,6 +639,7 @@
 					dom.theme.setAttribute('aria-label', this.string('themeLabel'));
 					this.renderParties();
 					!dom.results.classList.contains('hidden') && this.data && this.renderResults();
+					this.saveState();
 				}
 
 				show(section) {
@@ -638,6 +668,7 @@
 					});
 					this.renderParties();
 					dom.list.lastElementChild?.querySelector('input')?.focus();
+					this.saveState();
 				}
 
 				clearAll() {
@@ -647,6 +678,7 @@
 					this.renderParties();
 					this.addParty();
 					this.toggleError();
+					this.saveState();
 				}
 
 				removeParty(id) {
@@ -656,6 +688,7 @@
 					this.renderParties();
 					const target = Math.min(index, this.parties.length - 1);
 					target >= 0 ? dom.list.children[target]?.querySelector('.danger')?.focus() : dom.add.focus();
+					this.saveState();
 				}
 
 				renderParties() {
@@ -707,6 +740,7 @@
 							this.toggleError();
 							this.renderParties();
 							dom.file.value = '';
+							this.saveState();
 						} catch {
 							this.toggleError(this.string('alertImport'));
 						}
