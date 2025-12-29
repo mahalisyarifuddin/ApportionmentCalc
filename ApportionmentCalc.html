@@ -536,8 +536,37 @@
 					this.nextIndex = 6;
 					this.data = null;
 					this.bind();
-					this.setTheme('auto');
-					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
+					this.loadState();
+					if (!localStorage.getItem('apportionment_state')) {
+						this.setTheme('auto');
+						this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
+					}
+				}
+
+				saveState() {
+					localStorage.setItem('apportionment_state', JSON.stringify({
+						parties: this.parties,
+						seats: dom.seats.value,
+						threshold: dom.threshold.value,
+						theme: this.theme,
+						language: this.language
+					}));
+				}
+
+				loadState() {
+					try {
+						const state = JSON.parse(localStorage.getItem('apportionment_state'));
+						if (!state) return;
+						if (state.parties) this.parties = state.parties;
+						if (state.seats) dom.seats.value = state.seats;
+						if (state.threshold) dom.threshold.value = state.threshold;
+						if (state.theme) this.setTheme(state.theme);
+						if (state.language) this.setLanguage(state.language);
+						this.nextIndex = this.parties.length ? Math.max(...this.parties.map(p=>p.id)) + 1 : 1;
+						this.renderParties();
+					} catch (e) {
+						console.error('Failed to load state', e);
+					}
 				}
 
 				bind() {
@@ -554,7 +583,10 @@
 					on(dom.modal, 'onclick', e=>e.target === dom.modal && this.toggleModal(false));
 					on(dom.language, 'onchange', e=>this.setLanguage(e.target.value));
 					on(dom.theme, 'onchange', e=>this.setTheme(e.target.value));
-					dom.input.addEventListener('input', ()=>this.toggleError());
+					dom.input.addEventListener('input', ()=>{
+						this.toggleError();
+						this.saveState();
+					});
 					document.onkeydown = e=>this.handleKey(e);
 					dom.list.addEventListener('click', e=>{
 						const row = e.target.closest('.party-row');
@@ -570,6 +602,7 @@
 							party.name = e.target.value;
 						else if (e.target.type === 'number')
 							e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
+						this.saveState();
 					}
 					);
 				}
@@ -598,11 +631,13 @@
 
 				setTheme(theme) {
 					document.documentElement.className = theme === 'auto' ? '' : theme;
-					dom.theme.value = theme;
+					this.theme = dom.theme.value = theme;
+					this.saveState();
 				}
 
 				setLanguage(language) {
 					this.language = dom.language.value = document.documentElement.lang = language;
+					this.saveState();
 					Object.keys(text.en).forEach(key=>dom[key] && !dom[key].matches('input,select') && (dom[key].textContent = this.string(key)));
 					[...dom.theme.options].forEach(option=>option.textContent = this.string(option.value + 'Theme'));
 					dom.close.setAttribute('aria-label', this.string('closeModal'));
@@ -636,6 +671,7 @@
 						name: '',
 						votes: 0
 					});
+					this.saveState();
 					this.renderParties();
 					dom.list.lastElementChild?.querySelector('input')?.focus();
 				}
@@ -647,12 +683,14 @@
 					this.renderParties();
 					this.addParty();
 					this.toggleError();
+					this.saveState();
 				}
 
 				removeParty(id) {
 					this.toggleError();
 					const index = this.parties.findIndex(p=>p.id === id);
 					this.parties = this.parties.filter(p=>p.id !== id);
+					this.saveState();
 					this.renderParties();
 					const target = Math.min(index, this.parties.length - 1);
 					target >= 0 ? dom.list.children[target]?.querySelector('.danger')?.focus() : dom.add.focus();
@@ -705,6 +743,7 @@
 								throw new Error();
 							this.parties = newParties;
 							this.toggleError();
+							this.saveState();
 							this.renderParties();
 							dom.file.value = '';
 						} catch {
