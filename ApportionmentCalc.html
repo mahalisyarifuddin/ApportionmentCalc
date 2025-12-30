@@ -20,7 +20,6 @@
 			@media(prefers-color-scheme: dark) {
 				:root:not(.light) {
 					--primary: #a5c8ff;
-					--onprimary: #00315f;
 					--bg: #101319;
 					--surface: #0b0e14;
 					--text: #e0e2ea;
@@ -33,7 +32,6 @@
 
 			:root.dark {
 				--primary: #a5c8ff;
-				--onprimary: #00315f;
 				--bg: #101319;
 				--surface: #0b0e14;
 				--text: #e0e2ea;
@@ -214,7 +212,7 @@
 
 			th {
 				background: var(--primary);
-				color: #fff
+				color: var(--surface)
 			}
 
 			.comparison {
