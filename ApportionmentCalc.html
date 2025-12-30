@@ -6,33 +6,41 @@
 		<title>ApportionmentCalc</title>
 		<style>
 			:root {
-				--primary: #0070ea;
-				--hover: #005bc0;
+				--primary: #005dac;
+				--hover: #004080;
 				--bg: #f9f9ff;
-				--surface: #fff;
-				--text: #414754;
-				--border: #c1c6d7;
-				--dim: #d7d9e5;
-				--success: #28a745;
-				--danger: #dc3545
+				--surface: #ffffff;
+				--text: #181c21;
+				--border: #717783;
+				--dim: #e0e2ec;
+				--success: #0b6b1d;
+				--danger: #ba1a1a
 			}
 
 			@media(prefers-color-scheme: dark) {
 				:root:not(.light) {
-					--bg:#10131b;
-					--surface: #181c23;
-					--text: #c1c6d7;
-					--border: #414754;
-					--dim: #10131b
+					--primary: #a5c8ff;
+					--onprimary: #00315f;
+					--bg: #101319;
+					--surface: #0b0e14;
+					--text: #e0e2ea;
+					--border: #8b919e;
+					--dim: #44474f;
+					--success: #82db7e;
+					--danger: #ffb4ab
 				}
 			}
 
 			:root.dark {
-				--bg: #10131b;
-				--surface: #181c23;
-				--text: #c1c6d7;
-				--border: #414754;
-				--dim: #10131b
+				--primary: #a5c8ff;
+				--onprimary: #00315f;
+				--bg: #101319;
+				--surface: #0b0e14;
+				--text: #e0e2ea;
+				--border: #8b919e;
+				--dim: #44474f;
+				--success: #82db7e;
+				--danger: #ffb4ab
 			}
 
 			* {
@@ -106,8 +114,8 @@
 
 			.primary {
 				background: var(--primary);
-				color: #fff;
-				border: 0
+				border: none;
+				color: var(--surface)
 			}
 
 			.primary:hover:not(:disabled) {
@@ -119,7 +127,7 @@
 			}
 
 			.danger,.success {
-				color: #fff;
+				color: var(--surface);
 				border: 0
 			}
 
