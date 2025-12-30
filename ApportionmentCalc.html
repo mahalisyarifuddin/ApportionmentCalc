@@ -6,39 +6,33 @@
 		<title>ApportionmentCalc</title>
 		<style>
 			:root {
-				--primary: #005dac;
+				--primary: #1976d2;
 				--hover: #004080;
 				--bg: #f9f9ff;
 				--surface: #ffffff;
 				--text: #181c21;
 				--border: #717783;
 				--dim: #e0e2ec;
-				--success: #0b6b1d;
-				--danger: #ba1a1a
+				--success: #2e8534;
+				--danger: #93000a
 			}
 
 			@media(prefers-color-scheme: dark) {
 				:root:not(.light) {
-					--primary: #a5c8ff;
 					--bg: #101319;
 					--surface: #0b0e14;
 					--text: #e0e2ea;
 					--border: #8b919e;
-					--dim: #44474f;
-					--success: #82db7e;
-					--danger: #ffb4ab
+					--dim: #44474f
 				}
 			}
 
 			:root.dark {
-				--primary: #a5c8ff;
 				--bg: #101319;
 				--surface: #0b0e14;
 				--text: #e0e2ea;
 				--border: #8b919e;
-				--dim: #44474f;
-				--success: #82db7e;
-				--danger: #ffb4ab
+				--dim: #44474f
 			}
 
 			* {
@@ -113,7 +107,7 @@
 			.primary {
 				background: var(--primary);
 				border: none;
-				color: var(--surface)
+				color: #ffffff
 			}
 
 			.primary:hover:not(:disabled) {
@@ -125,7 +119,7 @@
 			}
 
 			.danger,.success {
-				color: var(--surface);
+				color: #ffffff;
 				border: 0
 			}
 
@@ -212,7 +206,7 @@
 
 			th {
 				background: var(--primary);
-				color: var(--surface)
+				color: #ffffff
 			}
 
 			.comparison {
