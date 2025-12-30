@@ -672,9 +672,8 @@
 							const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 							const firstRow = parse(lines[0]);
 							const isNumeric = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
-							const match = (c,keys)=>keys.some(k=>c.toLowerCase().includes(k));
-							let nameIndex = firstRow.findIndex(c=>match(c, ['party', 'partai', 'name', 'nama']));
-							let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && match(c, ['vote', 'suara']));
+							let nameIndex = firstRow.findIndex(c=>/party|partai|name|nama/i.test(c));
+							let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && /vote|suara/i.test(c));
 							let start = 1;
 							if (nameIndex < 0 || voteIndex < 0) {
 								voteIndex = firstRow.findIndex(isNumeric);
