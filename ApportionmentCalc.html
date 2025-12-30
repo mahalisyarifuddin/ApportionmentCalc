@@ -541,27 +541,25 @@
 				}
 
 				bind() {
-					const on = (element,event,handler)=>element[event] = handler;
-					on(dom.add, 'onclick', ()=>this.addParty());
-					on(dom.clear, 'onclick', ()=>this.clearAll());
-					on(dom.calculate, 'onclick', ()=>this.calculate());
-					on(dom.edit, 'onclick', ()=>this.show('input'));
-					on(dom.steps, 'onclick', ()=>this.toggleModal(true));
-					on(dom.close, 'onclick', ()=>this.toggleModal(false));
-					on(dom.export, 'onclick', ()=>this.exportData());
-					on(dom.import, 'onclick', ()=>dom.file.click());
-					on(dom.file, 'onchange', e=>this.importData(e.target.files[0]));
-					on(dom.modal, 'onclick', e=>e.target === dom.modal && this.toggleModal(false));
-					on(dom.language, 'onchange', e=>this.setLanguage(e.target.value));
-					on(dom.theme, 'onchange', e=>this.setTheme(e.target.value));
-					dom.input.addEventListener('input', ()=>this.toggleError());
+					dom.add.onclick = ()=>this.addParty();
+					dom.clear.onclick = ()=>this.clearAll();
+					dom.calculate.onclick = ()=>this.calculate();
+					dom.edit.onclick = ()=>this.show('input');
+					dom.steps.onclick = ()=>this.toggleModal(true);
+					dom.close.onclick = ()=>this.toggleModal(false);
+					dom.export.onclick = ()=>this.exportData();
+					dom.import.onclick = ()=>dom.file.click();
+					dom.file.onchange = e=>this.importData(e.target.files[0]);
+					dom.modal.onclick = e=>e.target === dom.modal && this.toggleModal(false);
+					dom.language.onchange = e=>this.setLanguage(e.target.value);
+					dom.theme.onchange = e=>this.setTheme(e.target.value);
+					dom.input.oninput = ()=>this.toggleError();
 					document.onkeydown = e=>this.handleKey(e);
-					dom.list.addEventListener('click', e=>{
+					dom.list.onclick = e=>{
 						const row = e.target.closest('.party-row');
 						e.target.matches('.danger') && row && this.removeParty(+row.dataset.id);
-					}
-					);
-					dom.list.addEventListener('change', e=>{
+					};
+					dom.list.onchange = e=>{
 						const row = e.target.closest('.party-row');
 						const party = row && this.parties.find(p=>p.id === +row.dataset.id);
 						if (!party)
@@ -570,8 +568,7 @@
 							party.name = e.target.value;
 						else if (e.target.type === 'number')
 							e.target.value = party.votes = Math.round(parseFloat(e.target.value)) || 0;
-					}
-					);
+					};
 				}
 
 				handleKey(event) {
