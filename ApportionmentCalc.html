@@ -732,7 +732,7 @@
 						return {
 							...p,
 							hareSeats,
-							remainder: p.votes - hareSeats * quota
+							remainder: ((p.votes * seats) % total) / seats
 						};
 					}
 					);
