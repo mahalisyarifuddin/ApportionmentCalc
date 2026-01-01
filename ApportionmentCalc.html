@@ -566,7 +566,7 @@
 						const row = event.target.closest('.party-row');
 						const party = row && this.parties.find(p=>p.id === +row.dataset.id);
 						party && event.target.type === 'text' && (party.name = event.target.value);
-						party && event.target.type === 'number' && (event.target.value = party.votes = Math.round(parseFloat(event.target.value)) || 0);
+						party && event.target.type === 'number' && (event.target.value = party.votes = Math.max(0, Math.round(parseFloat(event.target.value)) || 0));
 					}
 					;
 				}
@@ -714,7 +714,10 @@
 				}
 
 				doCalculate(seats, threshold) {
-					const valid = this.parties.filter(p=>p.name && p.votes >= 0);
+					const valid = this.parties.filter(p=>p.votes >= 0 && (p.name || p.votes > 0)).map(p=>({
+						...p,
+						name: p.name || `${this.string('party')} ${p.id}`
+					}));
 					const total = valid.reduce((sum,p)=>sum + p.votes, 0);
 					return (!valid.length || total === 0) ? this.toggleError(this.string('alertParties')) : this.processCalculation(seats, threshold, valid, total);
 				}
