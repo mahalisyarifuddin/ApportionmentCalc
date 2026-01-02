@@ -698,7 +698,10 @@
 
 					const valid = this.parties.filter(p=>p.votes >= 0 && (p.name || p.votes > 0)).map(p=>({
 						...p,
-						name: p.name || `${this.string('party')} ${p.id}`
+						name: p.name || `${this.string('party')} ${p.id}`,
+						hareSeats: 0,
+						sainteLagueSeats: 0,
+						remainder: 0
 					}));
 					const total = valid.reduce((sum,p)=>sum + p.votes, 0);
 					if (total === 0) return this.toggleError(this.string('alertParties'));
@@ -708,38 +711,33 @@
 					if (!passed.length) return this.toggleError(this.string('belowThreshold'));
 
 					const quota = total / seats;
-					const hare = passed.map(p=>({
-						...p,
-						hareSeats: Math.floor((p.votes * seats) / total),
-						remainder: ((p.votes * seats) % total) / seats
-					}));
-					let allocated = hare.reduce((sum,p)=>sum + p.hareSeats, 0);
-					hare.sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes);
+					passed.forEach(p=>{
+						p.hareSeats = Math.floor((p.votes * seats) / total);
+						p.remainder = ((p.votes * seats) % total) / seats;
+						p.divisor = 1;
+						p.quotient = p.votes;
+					});
+					const hare = [...passed].sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes);
+					let allocated = passed.reduce((sum,p)=>sum + p.hareSeats, 0);
 					for (let i = 0; i < seats - allocated; i++) hare[i].hareSeats++;
 
-					const work = passed.map(p=>({
-						...p,
-						slSeats: 0,
-						divisor: 1,
-						quotient: p.votes
-					}));
 					const stepList = [];
 					for (let i = 1; i <= seats; i++) {
-						const winner = work.reduce((best,p)=>p.quotient > best.quotient || (p.quotient === best.quotient && p.votes > best.votes) ? p : best);
+						const winner = passed.reduce((best,p)=>p.quotient > best.quotient || (p.quotient === best.quotient && p.votes > best.votes) ? p : best);
 						stepList.push({
 							round: i,
 							winner: winner.name,
 							winnerId: winner.id,
 							winnerQuotient: winner.quotient,
 							winnerDivisor: winner.divisor,
-							quotients: i <= STEPS_LIMIT ? work.map(({id, name, quotient, divisor})=>({
+							quotients: i <= STEPS_LIMIT ? passed.map(({id, name, quotient, divisor})=>({
 								id,
 								name,
 								quotient,
 								divisor
 							})) : null
 						});
-						winner.slSeats++;
+						winner.sainteLagueSeats++;
 						winner.divisor += 2;
 						winner.quotient = winner.votes / winner.divisor;
 					}
@@ -750,17 +748,10 @@
 						seats,
 						quota,
 						steps: stepList,
-						results: valid.map(p=>{
-							const hareResult = hare.find(x=>x.id === p.id);
-							const slResult = work.find(x=>x.id === p.id);
-							return {
-								...p,
-								passed: p.votes >= thresholdVotes - 1e-7,
-								hareSeats: hareResult?.hareSeats ?? 0,
-								sainteLagueSeats: slResult?.slSeats ?? 0,
-								remainder: hareResult?.remainder ?? 0
-							};
-						})
+						results: valid.map(p=>({
+							...p,
+							passed: p.votes >= thresholdVotes - 1e-7
+						}))
 					};
 					this.renderResults();
 					this.show('results');
