@@ -531,9 +531,19 @@
 					}));
 					this.nextIndex = 6;
 					this.data = null;
+					this.debouncedCalculate = this.debounce(()=>this.calculate(), 300);
 					this.bind();
 					this.setTheme('auto');
 					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
+					this.calculate();
+				}
+
+				debounce(func, wait) {
+					let timeout;
+					return (...args)=>{
+						clearTimeout(timeout);
+						timeout = setTimeout(()=>func.apply(this, args), wait)
+					}
 				}
 
 				bind() {
@@ -551,17 +561,26 @@
 					dom.modal.onclick = e=>e.target === dom.modal && this.toggleModal(false);
 					dom.language.onchange = e=>this.setLanguage(e.target.value);
 					dom.theme.onchange = e=>this.setTheme(e.target.value);
-					dom.input.oninput = ()=>this.toggleError();
+					dom.input.addEventListener('input', ()=>{
+						this.toggleError();
+						this.debouncedCalculate();
+					});
 					document.onkeydown = e=>this.handleKey(e);
 					dom.list.onclick = e=>{
 						const row = e.target.closest('.party-row');
 						e.target.matches('.danger') && row && this.removeParty(+row.dataset.id)
 					}
 					;
+					dom.list.oninput = e=>{
+						const row = e.target.closest('.party-row')
+						  , party = row && this.parties.find(p=>p.id === +row.dataset.id);
+						party && (e.target.type === 'text' ? party.name = e.target.value : party.votes = Math.max(0, Math.round(+e.target.value) || 0))
+					}
+					;
 					dom.list.onchange = e=>{
 						const row = e.target.closest('.party-row')
 						  , party = row && this.parties.find(p=>p.id === +row.dataset.id);
-						party && (e.target.type === 'text' ? party.name = e.target.value : e.target.value = party.votes = Math.max(0, Math.round(+e.target.value) || 0))
+						party && (e.target.type === 'number') && (e.target.value = party.votes)
 					}
 					;
 				}
@@ -602,6 +621,11 @@
 					['input', 'results'].forEach(id=>dom[id].classList.toggle('hidden', id !== section))
 				}
 
+				toggleResults(visible) {
+					dom.results.classList.toggle('hidden', !visible);
+					dom.edit.classList.toggle('hidden', true); // Always hide edit button in live mode
+				}
+
 				toggleModal(visible) {
 					dom.modal.classList.toggle('hidden', !visible);
 					visible ? (this.lastFocus = document.activeElement,
@@ -640,6 +664,7 @@
 					this.renderParties();
 					const target = Math.min(index, this.parties.length - 1);
 					target >= 0 ? dom.list.children[target]?.querySelector('.danger')?.focus() : dom.add.focus();
+					this.calculate();
 				}
 
 				renderParties() {
@@ -685,6 +710,7 @@
 								this.toggleError();
 								this.renderParties();
 								dom.file.value = '';
+								this.calculate();
 							} catch {
 								this.toggleError(this.string('alertImport'))
 							}
@@ -697,7 +723,8 @@
 					const seats = parseInt(dom.seats.value)
 					  , threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
 					if (isNaN(seats) || seats < 1)
-						return this.toggleError(this.string('alertSeats'));
+						return (this.toggleError(this.string('alertSeats')),
+						this.toggleResults(false));
 					const valid = this.parties.filter(p=>p.votes >= 0 && (p.name || p.votes > 0)).map(p=>({
 						...p,
 						name: p.name || `${this.string('party')} ${p.id}`,
@@ -707,11 +734,13 @@
 					}));
 					const total = valid.reduce((sum,p)=>sum + p.votes, 0);
 					if (total === 0)
-						return this.toggleError(this.string('alertParties'));
+						return (this.toggleError(this.string('alertParties')),
+						this.toggleResults(false));
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(p=>p.votes >= thresholdVotes - 1e-7);
 					if (!passed.length)
-						return this.toggleError(this.string('belowThreshold'));
+						return (this.toggleError(this.string('belowThreshold')),
+						this.toggleResults(false));
 					const quota = total / seats;
 					passed.forEach(p=>{
 						p.hareSeats = Math.floor(p.votes * seats / total);
@@ -757,7 +786,7 @@
 						}))
 					};
 					this.renderResults();
-					this.show('results');
+					this.toggleResults(true);
 				}
 
 				renderResults() {
