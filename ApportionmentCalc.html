@@ -666,14 +666,13 @@
 								const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 								const firstRow = parse(lines[0]);
 								const isNumeric = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
+								let start = 1;
 								let nameIndex = firstRow.findIndex(c=>/party|partai|name|nama/i.test(c));
 								let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && /vote|suara/i.test(c));
-								let start = 1;
 								if (nameIndex < 0 || voteIndex < 0) {
 									start = 0;
 									voteIndex = firstRow.findIndex(isNumeric);
-									nameIndex = firstRow.findIndex(c=>!isNumeric(c));
-									if (voteIndex >= 0 && firstRow.length === 2) nameIndex = 1 - voteIndex;
+									nameIndex = voteIndex >= 0 && firstRow.length === 2 ? 1 - voteIndex : firstRow.findIndex(c=>!isNumeric(c));
 								}
 								if (nameIndex === -1 || voteIndex === -1) throw 0;
 								const newParties = lines.slice(start).map(line=>{
