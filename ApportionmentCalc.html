@@ -531,19 +531,10 @@
 					}));
 					this.nextIndex = 6;
 					this.data = null;
-					this.debouncedCalculate = this.debounce(()=>this.calculate(), 300);
 					this.bind();
 					this.setTheme('auto');
 					this.setLanguage(navigator.language?.startsWith('id') ? 'id' : 'en');
 					this.calculate();
-				}
-
-				debounce(func, wait) {
-					let timeout;
-					return (...args)=>{
-						clearTimeout(timeout);
-						timeout = setTimeout(()=>func.apply(this, args), wait)
-					}
 				}
 
 				bind() {
@@ -563,7 +554,7 @@
 					dom.theme.onchange = e=>this.setTheme(e.target.value);
 					dom.input.addEventListener('input', ()=>{
 						this.toggleError();
-						this.debouncedCalculate();
+						this.calculate();
 					});
 					document.onkeydown = e=>this.handleKey(e);
 					dom.list.onclick = e=>{
