@@ -1,0 +1,398 @@
+{
+  "total": 55500,
+  "thresholdVotes": 2220,
+  "threshold": 4,
+  "seats": 10,
+  "quota": 5550,
+  "steps": [
+    {
+      "round": 1,
+      "winner": "Apple Party",
+      "winnerId": 1,
+      "winnerQuotient": 25000,
+      "winnerDivisor": 1,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 25000,
+          "divisor": 1
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 15000,
+          "divisor": 1
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 9000,
+          "divisor": 1
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "winner": "Blueberry Party",
+      "winnerId": 2,
+      "winnerQuotient": 15000,
+      "winnerDivisor": 1,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 8333.333333333334,
+          "divisor": 3
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 15000,
+          "divisor": 1
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 9000,
+          "divisor": 1
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "winner": "Cherry Party",
+      "winnerId": 3,
+      "winnerQuotient": 9000,
+      "winnerDivisor": 1,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 8333.333333333334,
+          "divisor": 3
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 5000,
+          "divisor": 3
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 9000,
+          "divisor": 1
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "winner": "Apple Party",
+      "winnerId": 1,
+      "winnerQuotient": 8333.333333333334,
+      "winnerDivisor": 3,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 8333.333333333334,
+          "divisor": 3
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 5000,
+          "divisor": 3
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "winner": "Apple Party",
+      "winnerId": 1,
+      "winnerQuotient": 5000,
+      "winnerDivisor": 5,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 5000,
+          "divisor": 5
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 5000,
+          "divisor": 3
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "winner": "Blueberry Party",
+      "winnerId": 2,
+      "winnerQuotient": 5000,
+      "winnerDivisor": 3,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 3571.4285714285716,
+          "divisor": 7
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 5000,
+          "divisor": 3
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "winner": "Date Party",
+      "winnerId": 4,
+      "winnerQuotient": 5000,
+      "winnerDivisor": 1,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 3571.4285714285716,
+          "divisor": 7
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 3000,
+          "divisor": 5
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 5000,
+          "divisor": 1
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "winner": "Apple Party",
+      "winnerId": 1,
+      "winnerQuotient": 3571.4285714285716,
+      "winnerDivisor": 7,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 3571.4285714285716,
+          "divisor": 7
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 3000,
+          "divisor": 5
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 1666.6666666666667,
+          "divisor": 3
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "winner": "Blueberry Party",
+      "winnerId": 2,
+      "winnerQuotient": 3000,
+      "winnerDivisor": 5,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 2777.777777777778,
+          "divisor": 9
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 3000,
+          "divisor": 5
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 1666.6666666666667,
+          "divisor": 3
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "winner": "Cherry Party",
+      "winnerId": 3,
+      "winnerQuotient": 3000,
+      "winnerDivisor": 3,
+      "quotients": [
+        {
+          "id": 1,
+          "name": "Apple Party",
+          "quotient": 2777.777777777778,
+          "divisor": 9
+        },
+        {
+          "id": 2,
+          "name": "Blueberry Party",
+          "quotient": 2142.8571428571427,
+          "divisor": 7
+        },
+        {
+          "id": 3,
+          "name": "Cherry Party",
+          "quotient": 3000,
+          "divisor": 3
+        },
+        {
+          "id": 4,
+          "name": "Date Party",
+          "quotient": 1666.6666666666667,
+          "divisor": 3
+        }
+      ]
+    }
+  ],
+  "results": [
+    {
+      "id": 1,
+      "name": "Apple Party",
+      "votes": 25000,
+      "hareSeats": 4,
+      "remainder": 2800,
+      "slSeats": 4,
+      "divisor": 9,
+      "quotient": 2777.777777777778,
+      "passed": true,
+      "sainteLagueSeats": 4
+    },
+    {
+      "id": 2,
+      "name": "Blueberry Party",
+      "votes": 15000,
+      "hareSeats": 3,
+      "remainder": 3900,
+      "slSeats": 3,
+      "divisor": 7,
+      "quotient": 2142.8571428571427,
+      "passed": true,
+      "sainteLagueSeats": 3
+    },
+    {
+      "id": 3,
+      "name": "Cherry Party",
+      "votes": 9000,
+      "hareSeats": 2,
+      "remainder": 3450,
+      "slSeats": 2,
+      "divisor": 5,
+      "quotient": 1800,
+      "passed": true,
+      "sainteLagueSeats": 2
+    },
+    {
+      "id": 4,
+      "name": "Date Party",
+      "votes": 5000,
+      "hareSeats": 1,
+      "remainder": 5000,
+      "slSeats": 1,
+      "divisor": 3,
+      "quotient": 1666.6666666666667,
+      "passed": true,
+      "sainteLagueSeats": 1
+    },
+    {
+      "id": 5,
+      "name": "Elderberry Party",
+      "votes": 1500,
+      "passed": false,
+      "hareSeats": 0,
+      "sainteLagueSeats": 0,
+      "remainder": 0
+    }
+  ]
+}
