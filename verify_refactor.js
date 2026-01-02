@@ -20,9 +20,16 @@ const document = {
                 lastElementChild: null,
                 innerHTML: '',
                 focus: () => {},
-                setAttribute: () => {},
+                setAttribute: (attr, val) => {
+                    domElements[id].attributes = domElements[id].attributes || {};
+                    domElements[id].attributes[attr] = val;
+                },
                 matches: () => false,
-                options: [],
+                options: [ // Mock options for select
+                    { value: 'auto', textContent: '' },
+                    { value: 'light', textContent: '' },
+                    { value: 'dark', textContent: '' }
+                ],
                 click: () => {}
             };
         }
@@ -82,3 +89,31 @@ const resultsBefore = JSON.stringify(data, null, 2);
 fs.writeFileSync('results_before.json', resultsBefore);
 
 console.log('Results saved to results_before.json');
+
+// --- Test setLanguage Refactor ---
+console.log('Testing setLanguage...');
+
+// Set language to ID
+app.setLanguage('id');
+
+// Verify updates
+const addBtn = document.getElementById('add');
+// "add" key in id text is "+ Tambah Partai"
+if (addBtn.textContent !== '+ Tambah Partai') {
+    console.error(`FAILED: 'add' button text not updated. Expected '+ Tambah Partai', got '${addBtn.textContent}'`);
+    process.exit(1);
+}
+
+const themeSelect = document.getElementById('theme');
+if (themeSelect.options[0].textContent !== 'Tema Otomatis') {
+    console.error(`FAILED: theme option not updated. Expected 'Tema Otomatis', got '${themeSelect.options[0].textContent}'`);
+    process.exit(1);
+}
+
+const closeBtn = document.getElementById('close');
+if (closeBtn.attributes['aria-label'] !== 'Tutup Modal') {
+    console.error(`FAILED: close button aria-label not updated. Expected 'Tutup Modal', got '${closeBtn.attributes['aria-label']}'`);
+    process.exit(1);
+}
+
+console.log('setLanguage verification PASSED');

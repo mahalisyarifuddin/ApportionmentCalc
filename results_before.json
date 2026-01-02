@@ -342,57 +342,53 @@
       "name": "Apple Party",
       "votes": 25000,
       "hareSeats": 4,
+      "sainteLagueSeats": 4,
       "remainder": 2800,
-      "slSeats": 4,
       "divisor": 9,
       "quotient": 2777.777777777778,
-      "passed": true,
-      "sainteLagueSeats": 4
+      "passed": true
     },
     {
       "id": 2,
       "name": "Blueberry Party",
       "votes": 15000,
       "hareSeats": 3,
+      "sainteLagueSeats": 3,
       "remainder": 3900,
-      "slSeats": 3,
       "divisor": 7,
       "quotient": 2142.8571428571427,
-      "passed": true,
-      "sainteLagueSeats": 3
+      "passed": true
     },
     {
       "id": 3,
       "name": "Cherry Party",
       "votes": 9000,
       "hareSeats": 2,
+      "sainteLagueSeats": 2,
       "remainder": 3450,
-      "slSeats": 2,
       "divisor": 5,
       "quotient": 1800,
-      "passed": true,
-      "sainteLagueSeats": 2
+      "passed": true
     },
     {
       "id": 4,
       "name": "Date Party",
       "votes": 5000,
       "hareSeats": 1,
+      "sainteLagueSeats": 1,
       "remainder": 5000,
-      "slSeats": 1,
       "divisor": 3,
       "quotient": 1666.6666666666667,
-      "passed": true,
-      "sainteLagueSeats": 1
+      "passed": true
     },
     {
       "id": 5,
       "name": "Elderberry Party",
       "votes": 1500,
-      "passed": false,
       "hareSeats": 0,
       "sainteLagueSeats": 0,
-      "remainder": 0
+      "remainder": 0,
+      "passed": false
     }
   ]
 }
