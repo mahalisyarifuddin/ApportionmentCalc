@@ -658,33 +658,28 @@
 				importData(file) {
 					if (!file) return;
 					Object.assign(new FileReader(), {
-						onload: event=>{
+						onload: e=>{
 							try {
-								const lines = event.target.result.split(/\r?\n/).filter(line=>line.trim());
+								const lines = e.target.result.split(/\r?\n/).filter(l=>l.trim());
 								if (!lines.length) throw 0;
-								const delimiter = lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
-								const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-								const firstRow = parse(lines[0]);
-								const isNumeric = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
-								let start = 1;
-								let nameIndex = firstRow.findIndex(c=>/party|partai|name|nama/i.test(c));
-								let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && /vote|suara/i.test(c));
-								if (nameIndex < 0 || voteIndex < 0) {
+								const sep = lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
+								const parse = l=>l.split(new RegExp(`\\${sep}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+								const row = parse(lines[0]);
+								const find = r=>row.findIndex(c=>r.test(c));
+								let ni = find(/party|partai|name|nama/i), vi = find(/vote|suara/i), start = 1;
+								if (ni < 0 || vi < 0) {
 									start = 0;
-									voteIndex = firstRow.findIndex(isNumeric);
-									nameIndex = voteIndex >= 0 && firstRow.length === 2 ? 1 - voteIndex : firstRow.findIndex(c=>!isNumeric(c));
+									const isNum = c=>/^\d+$/.test(c.replace(/[.,]/g, '').trim());
+									vi = row.findIndex(isNum);
+									ni = vi >= 0 && row.length === 2 ? 1 - vi : row.findIndex(c=>!isNum(c));
 								}
-								if (nameIndex === -1 || voteIndex === -1) throw 0;
-								const newParties = lines.slice(start).map(line=>{
-									const c = parse(line);
-									return c.length > Math.max(nameIndex, voteIndex) && c[nameIndex] ? {
-										id: this.nextIndex++,
-										name: c[nameIndex],
-										votes: parseInt((c[voteIndex] || '').replace(/\D/g, '')) || 0
-									} : null;
+								if (ni < 0 || vi < 0) throw 0;
+								const parties = lines.slice(start).map(l=>{
+									const c = parse(l);
+									return c[ni] ? {id: this.nextIndex++, name: c[ni], votes: +((c[vi]||'').replace(/\D/g,''))||0} : null;
 								}).filter(p=>p);
-								if (!newParties.length) throw 0;
-								this.parties = newParties;
+								if (!parties.length) throw 0;
+								this.parties = parties;
 								this.toggleError();
 								this.renderParties();
 								dom.file.value = '';
