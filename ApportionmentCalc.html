@@ -670,23 +670,20 @@
 								let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && /vote|suara/i.test(c));
 								let start = 1;
 								if (nameIndex < 0 || voteIndex < 0) {
+									start = 0;
 									voteIndex = firstRow.findIndex(isNumeric);
 									nameIndex = firstRow.findIndex(c=>!isNumeric(c));
-									if (nameIndex < 0 && voteIndex >= 0 && firstRow.length === 2) nameIndex = 1 - voteIndex;
-									start = 0;
+									if (voteIndex >= 0 && firstRow.length === 2) nameIndex = 1 - voteIndex;
 								}
 								if (nameIndex === -1 || voteIndex === -1) throw 0;
-								const newParties = lines.slice(start).reduce((list,line)=>{
-									const columns = parse(line);
-									const name = columns[nameIndex];
-									const votes = parseInt((columns[voteIndex] || '').replace(/\D/g, '')) || 0;
-									if (name && columns.length > Math.max(nameIndex, voteIndex)) list.push({
+								const newParties = lines.slice(start).map(line=>{
+									const c = parse(line);
+									return c.length > Math.max(nameIndex, voteIndex) && c[nameIndex] ? {
 										id: this.nextIndex++,
-										name,
-										votes
-									});
-									return list;
-								}, []);
+										name: c[nameIndex],
+										votes: parseInt((c[voteIndex] || '').replace(/\D/g, '')) || 0
+									} : null;
+								}).filter(p=>p);
 								if (!newParties.length) throw 0;
 								this.parties = newParties;
 								this.toggleError();
