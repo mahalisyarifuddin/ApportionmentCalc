@@ -656,14 +656,12 @@
 				}
 
 				importData(file) {
-					file && new FileReader().constructor.prototype.readAsText.call(Object.assign(new FileReader(), {
+					if (!file) return;
+					Object.assign(new FileReader(), {
 						onload: event=>{
 							try {
 								const lines = event.target.result.split(/\r?\n/).filter(line=>line.trim());
-								!lines.length && (()=>{
-									throw new Error();
-								}
-								)();
+								if (!lines.length) throw 0;
 								const delimiter = lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
 								const parse = line=>line.split(new RegExp(`\\${delimiter}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(c=>c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 								const firstRow = parse(lines[0]);
@@ -671,30 +669,25 @@
 								let nameIndex = firstRow.findIndex(c=>/party|partai|name|nama/i.test(c));
 								let voteIndex = firstRow.findIndex((c,i)=>i !== nameIndex && /vote|suara/i.test(c));
 								let start = 1;
-								(nameIndex < 0 || voteIndex < 0) && (voteIndex = firstRow.findIndex(isNumeric),
-								nameIndex = firstRow.findIndex(c=>!isNumeric(c)),
-								nameIndex < 0 && voteIndex >= 0 && firstRow.length === 2 && (nameIndex = 1 - voteIndex),
-								start = 0);
-								(nameIndex === -1 || voteIndex === -1) && (()=>{
-									throw new Error();
+								if (nameIndex < 0 || voteIndex < 0) {
+									voteIndex = firstRow.findIndex(isNumeric);
+									nameIndex = firstRow.findIndex(c=>!isNumeric(c));
+									if (nameIndex < 0 && voteIndex >= 0 && firstRow.length === 2) nameIndex = 1 - voteIndex;
+									start = 0;
 								}
-								)();
+								if (nameIndex === -1 || voteIndex === -1) throw 0;
 								const newParties = lines.slice(start).reduce((list,line)=>{
 									const columns = parse(line);
 									const name = columns[nameIndex];
 									const votes = parseInt((columns[voteIndex] || '').replace(/\D/g, '')) || 0;
-									name && columns.length > Math.max(nameIndex, voteIndex) && list.push({
+									if (name && columns.length > Math.max(nameIndex, voteIndex)) list.push({
 										id: this.nextIndex++,
 										name,
 										votes
 									});
 									return list;
-								}
-								, []);
-								!newParties.length && (()=>{
-									throw new Error();
-								}
-								)();
+								}, []);
+								if (!newParties.length) throw 0;
 								this.parties = newParties;
 								this.toggleError();
 								this.renderParties();
@@ -703,7 +696,7 @@
 								this.toggleError(this.string('alertImport'));
 							}
 						}
-					}), file);
+					}).readAsText(file);
 				}
 
 				calculate() {
