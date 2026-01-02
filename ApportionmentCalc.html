@@ -710,25 +710,19 @@
 					this.toggleError();
 					const seats = parseInt(dom.seats.value);
 					const threshold = parseFloat(dom.threshold.value.replace(',', '.')) || 0;
-					return (isNaN(seats) || seats < 1) ? this.toggleError(this.string('alertSeats')) : this.doCalculate(seats, threshold);
-				}
+					if (isNaN(seats) || seats < 1) return this.toggleError(this.string('alertSeats'));
 
-				doCalculate(seats, threshold) {
 					const valid = this.parties.filter(p=>p.votes >= 0 && (p.name || p.votes > 0)).map(p=>({
 						...p,
 						name: p.name || `${this.string('party')} ${p.id}`
 					}));
 					const total = valid.reduce((sum,p)=>sum + p.votes, 0);
-					return (!valid.length || total === 0) ? this.toggleError(this.string('alertParties')) : this.processCalculation(seats, threshold, valid, total);
-				}
+					if (!valid.length || total === 0) return this.toggleError(this.string('alertParties'));
 
-				processCalculation(seats, threshold, valid, total) {
 					const thresholdVotes = total * threshold / 100;
 					const passed = valid.filter(p=>p.votes >= thresholdVotes - 1e-7);
-					return !passed.length ? this.toggleError(this.string('belowThreshold')) : this.finishCalculation(seats, threshold, valid, total, thresholdVotes, passed);
-				}
+					if (!passed.length) return this.toggleError(this.string('belowThreshold'));
 
-				finishCalculation(seats, threshold, valid, total, thresholdVotes, passed) {
 					const quota = total / seats;
 					const hare = passed.map(p=>{
 						const hareSeats = Math.floor((p.votes * seats) / total);
@@ -737,12 +731,11 @@
 							hareSeats,
 							remainder: ((p.votes * seats) % total) / seats
 						};
-					}
-					);
+					});
 					let allocated = hare.reduce((sum,p)=>sum + p.hareSeats, 0);
 					hare.sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes);
-					for (let i = 0; i < seats - allocated; i++)
-						hare[i].hareSeats++;
+					for (let i = 0; i < seats - allocated; i++) hare[i].hareSeats++;
+
 					const work = passed.map(p=>({
 						...p,
 						slSeats: 0,
@@ -786,18 +779,14 @@
 								sainteLagueSeats: slResult?.slSeats ?? 0,
 								remainder: hareResult?.remainder ?? 0
 							};
-						}
-						)
+						})
 					};
 					this.renderResults();
 					this.show('results');
 				}
 
 				renderResults() {
-					this.data && this.doRenderResults();
-				}
-
-				doRenderResults() {
+					if (!this.data) return;
 					const {results, total, thresholdVotes, threshold, quota} = this.data;
 					const passed = results.filter(r=>r.passed);
 					const failed = results.filter(r=>!r.passed);
@@ -821,11 +810,8 @@
 				}
 
 				renderSteps() {
-					const {steps} = this.data;
-					steps?.length && this.doRenderSteps(steps);
-				}
-
-				doRenderSteps(steps) {
+					const {steps} = this.data || {};
+					if (!steps?.length) return;
 					const details = steps.slice(0, STEPS_LIMIT);
 					const warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 					const seatTemplate = this.string('seatAllocated');
@@ -837,10 +823,7 @@
 				}
 
 				exportData() {
-					this.data && this.doExportData();
-				}
-
-				doExportData() {
+					if (!this.data) return;
 					const {results} = this.data;
 					const total = results.reduce((sum,p)=>sum + p.votes, 0);
 					const header = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
