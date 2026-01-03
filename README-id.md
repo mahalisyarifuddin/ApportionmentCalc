@@ -29,12 +29,13 @@ Kalkulator mengambil jumlah suara untuk beberapa partai politik dan total jumlah
 - **Dukungan Multi-bahasa**: Beralih antara Bahasa Inggris dan Bahasa Indonesia.
 - **Tema Gelap/Terang**: Beralih tema sesuai preferensi.
 - **Konfigurasi Ambang Batas**: Atur ambang batas parlemen (threshold) sesuai peraturan.
-- **Perbandingan Dua Metode**: Lihat hasil Kuota Hare dan Sainte Laguë secara berdampingan.
-- **Input Partai Dinamis**: Tambah atau hapus partai sesuai kebutuhan.
 - **Perbandingan Dua Metode**: Lihat hasil Kuota Hare dan Sainte-Laguë secara berdampingan.
+- **Input Partai Dinamis**: Tambah atau hapus partai sesuai kebutuhan.
+- **Rincian Mendalam**: Lihat Kuota, sisa suara, bilangan pembagi, dan langkah alokasi terperinci (dibatasi 50 putaran untuk tampilan rinci).
 - **Visualisasi Sainte-Laguë**: Lihat tabel langkah demi langkah bagaimana setiap kursi dimenangkan.
 - **Impor/Ekspor CSV**: Impor data partai dari file CSV/TSV dan unduh hasil perhitungan untuk analisis lebih lanjut.
 - **File HTML Tunggal**: Tidak perlu instalasi, tidak ada dependensi, bekerja sepenuhnya offline.
+- **Desain Responsif**: Bekerja dengan baik di desktop, tablet, dan perangkat seluler.
 
 ## Kasus Penggunaan
 - **Pendidikan Kewarganegaraan**: Mengajarkan siswa tentang sistem pemilu.
