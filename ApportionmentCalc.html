@@ -578,7 +578,11 @@
 					const row = event.target.closest('.party-row');
 					if (!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input')) {
 						event.preventDefault();
-						row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : this.addParty();
+						if (event.target.type === 'text') {
+							event.target.nextElementSibling?.focus();
+						} else {
+							row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : this.addParty();
+						}
 					}
 				}
 
