@@ -550,6 +550,12 @@
 				}
 				display(section) {
 					['input', 'results'].forEach(id => elements[id].classList.toggle('hidden', id !== section));
+					if (section === 'results') {
+						elements.results.setAttribute('tabindex', '-1');
+						elements.results.focus();
+					} else {
+						elements.seats.focus();
+					}
 				}
 				modal(visible) {
 					if (visible) {
@@ -563,7 +569,6 @@
 				error(message) {
 					elements.error.textContent = message || '';
 					elements.error.classList.toggle('hidden', !message);
-					elements.calculate.disabled = !!message;
 				}
 				add() {
 					this.error();
