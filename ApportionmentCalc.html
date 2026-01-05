@@ -556,9 +556,9 @@
 						this.lastFocus = document.activeElement;
 						this.renderSteps();
 						elements.modal.showModal();
-					} else {
-						elements.modal.close();
+						return;
 					}
+					elements.modal.close();
 				}
 				error(message) {
 					elements.error.textContent = message || '';
