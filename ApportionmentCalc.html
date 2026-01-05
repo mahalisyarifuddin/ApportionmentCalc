@@ -215,31 +215,45 @@
 				display: block;
 				font-weight: 500;
 			}
-			#modal {
-				position: fixed;
-				inset: 0;
-				background: rgba(0, 0, 0, .5);
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				z-index: 1000;
-			}
-			#content {
+			dialog {
 				background: var(--surface);
-				padding: 2rem;
+				color: var(--text);
+				border: 1px solid var(--border);
 				border-radius: 8px;
-				max-width: 90%;
+				padding: 1.5rem;
+				max-width: 800px;
 				max-height: 90%;
+				width: 100%;
+				margin: auto;
+				position: fixed;
 				overflow-y: auto;
-				width: 800px;
-				position: relative;
 			}
-			#close {
-				position: absolute;
-				top: 1rem;
-				right: 1rem;
+			dialog::backdrop {
+				background: rgba(0, 0, 0, 0.5);
+			}
+			.dialog-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 1.5rem;
+			}
+			.dialog-header h2 {
+				margin: 0;
+				font-size: 1.5rem;
+			}
+			.close-button {
+				background: transparent;
+				color: var(--text);
+				padding: .25rem;
+				font-size: 1.5rem;
+				line-height: 1;
+				border: 0;
 				width: auto;
-				padding: calc(.5rem - 1px) calc(1rem - 1px);
+				cursor: pointer;
+			}
+			.close-button:hover {
+				background: var(--muted);
+				color: var(--text);
 			}
 			.actions {
 				display: flex;
@@ -331,13 +345,13 @@
 				</div>
 			</div>
 		</div>
-		<div id="modal" class="hidden">
-			<div id="content">
-				<button id="close" class="secondary">×</button>
+		<dialog id="modal">
+			<div class="dialog-header">
 				<h2 id="modalTitle"></h2>
-				<div id="modalSteps"></div>
+				<button id="close" class="close-button">×</button>
 			</div>
-		</div>
+			<div id="modalSteps"></div>
+		</dialog>
 		<script>
 			const text = {
 				en: {
@@ -487,7 +501,12 @@
 					};
 					Object.entries(handlers).forEach(([id, handler]) => elements[id].onclick = handler);
 					elements.file.onchange = event => this.load(event.target.files[0]);
-					elements.modal.onclick = event => event.target === elements.modal && this.modal(false);
+					elements.modal.onclick = event => {
+						const rect = elements.modal.getBoundingClientRect();
+						const inDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
+						!inDialog && this.modal(false);
+					};
+					elements.modal.addEventListener('close', () => this.lastFocus?.focus());
 					elements.language.onchange = event => this.lang(event.target.value);
 					elements.theme.onchange = event => this.theme(event.target.value);
 					elements.input.oninput = () => this.error();
@@ -503,7 +522,6 @@
 					};
 				}
 				key(event) {
-					(event.key === 'Escape' && !elements.modal.classList.contains('hidden')) && this.modal(false);
 					((event.ctrlKey || event.metaKey) && event.key === 'Enter') && this.calculate();
 					const row = event.target.closest('.party-row');
 					(!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input')) && (event.preventDefault(),
@@ -534,8 +552,13 @@
 					['input', 'results'].forEach(id => elements[id].classList.toggle('hidden', id !== section));
 				}
 				modal(visible) {
-					elements.modal.classList.toggle('hidden', !visible);
-					visible ? (this.lastFocus = document.activeElement, this.renderSteps(), elements.close.focus()) : this.lastFocus?.focus();
+					if (visible) {
+						this.lastFocus = document.activeElement;
+						this.renderSteps();
+						elements.modal.showModal();
+					} else {
+						elements.modal.close();
+					}
 				}
 				error(message) {
 					elements.error.textContent = message || '';
