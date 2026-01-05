@@ -6,31 +6,51 @@
 		<title>ApportionmentCalc</title>
 		<style>
 			:root {
-				--primary: #1976d2;
-				--hover: #1565c0;
+				--primary: #005dac;
+				--on-primary: #ffffff;
+				--hover: #00539a;
 				--background: #f9f9ff;
-				--surface: #fff;
+				--surface: #ffffff;
 				--text: #181c21;
 				--border: #c1c6d4;
-				--muted: #e0e2ec;
-				--success: #2e8534;
+				--muted: #f2f3fc;
+				--success: #0b6b1d;
+				--on-success: #ffffff;
 				--danger: #ba1a1a;
+				--on-danger: #ffffff;
+				--highlight-bg: #d4e3ff;
 			}
 			@media (prefers-color-scheme: dark) {
 				:root:not(.light) {
+					--primary: #a5c8ff;
+					--on-primary: #00315f;
+					--hover: #72adff;
 					--background: #101319;
 					--surface: #0b0e14;
 					--text: #e0e2ea;
 					--border: #414752;
-					--muted: #44474f;
+					--muted: #181c21;
+					--success: #82db7e;
+					--on-success: #00390a;
+					--danger: #ffb4ab;
+					--on-danger: #93000a;
+					--highlight-bg: #001c3a;
 				}
 			}
 			:root.dark {
+				--primary: #a5c8ff;
+				--on-primary: #00315f;
+				--hover: #72adff;
 				--background: #101319;
 				--surface: #0b0e14;
 				--text: #e0e2ea;
 				--border: #414752;
-				--muted: #44474f;
+				--muted: #181c21;
+				--success: #82db7e;
+				--on-success: #00390a;
+				--danger: #ffb4ab;
+				--on-danger: #93000a;
+				--highlight-bg: #001c3a;
 			}
 			* {
 				box-sizing: border-box;
@@ -89,7 +109,7 @@
 			}
 			.primary {
 				background: var(--primary);
-				color: #fff;
+				color: var(--on-primary);
 				border: 0;
 			}
 			.primary:hover:not(:disabled) {
@@ -99,12 +119,13 @@
 				background: var(--muted);
 			}
 			.danger, .success {
-				color: #fff;
+				color: var(--on-danger);
 				border: 0;
 				background: var(--danger);
 			}
 			.success {
 				background: var(--success);
+				color: var(--on-success);
 			}
 			.danger:hover, .success:hover {
 				filter: brightness(.9);
@@ -163,7 +184,7 @@
 			}
 			th {
 				background: var(--primary);
-				color: #fff;
+				color: var(--on-primary);
 			}
 			.comparison {
 				margin-top: 2rem;
@@ -185,7 +206,7 @@
 				border-radius: 4px;
 			}
 			.highlight {
-				background: rgba(0, 112, 234, .1);
+				background: var(--highlight-bg);
 				font-weight: 700;
 			}
 			.error {
@@ -219,6 +240,7 @@
 				top: 1rem;
 				right: 1rem;
 				width: auto;
+				padding: calc(.5rem - 1px) calc(1rem - 1px);
 			}
 			.actions {
 				display: flex;
