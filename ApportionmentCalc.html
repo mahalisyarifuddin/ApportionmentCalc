@@ -211,7 +211,7 @@
 			.error {
 				color: var(--danger);
 				font-size: .9rem;
-				margin-top: 1rem;
+				margin: 1rem 0;
 				display: block;
 				font-weight: 500;
 			}
@@ -396,7 +396,7 @@
 					share: '%',
 					passedHeader: 'Passed Threshold?',
 					hareSeatsHeader: 'Hare Seats',
-					sainteLagueSeatsHeader: 'Sainte-Laguë Seats',
+					sainteLagueSeatsHeader: 'Kursi Sainte-Laguë',
 					differenceHeader: 'Difference',
 					yes: 'Yes',
 					no: 'No',
@@ -524,8 +524,14 @@
 				key(event) {
 					((event.ctrlKey || event.metaKey) && event.key === 'Enter') && this.calculate();
 					const row = event.target.closest('.party-row');
-					(!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input')) && (event.preventDefault(),
-						event.target.type === 'text' ? event.target.nextElementSibling?.focus() : row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : this.add());
+					!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input') && (
+						event.preventDefault(),
+						(() => {
+							const party = this.parties.find(p => p.id === +row.dataset.id);
+							party && (event.target.type === 'text' ? party.name = event.target.value : party.votes = Math.max(0, Math.round(+event.target.value) || 0));
+						})(),
+						event.target.type === 'text' ? event.target.nextElementSibling?.focus() : row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : this.add()
+					);
 				}
 				string(key) {
 					return text[this.language]?.[key] ?? key;
@@ -550,21 +556,10 @@
 				}
 				display(section) {
 					['input', 'results'].forEach(id => elements[id].classList.toggle('hidden', id !== section));
-					if (section === 'results') {
-						elements.results.setAttribute('tabindex', '-1');
-						elements.results.focus();
-					} else {
-						elements.seats.focus();
-					}
+					section === 'results' ? (elements.results.setAttribute('tabindex', '-1'), elements.results.focus()) : elements.seats.focus();
 				}
 				modal(visible) {
-					if (visible) {
-						this.lastFocus = document.activeElement;
-						this.renderSteps();
-						elements.modal.showModal();
-						return;
-					}
-					elements.modal.close();
+					visible ? (this.lastFocus = document.activeElement, this.renderSteps(), elements.modal.showModal()) : elements.modal.close();
 				}
 				error(message) {
 					elements.error.textContent = message || '';
@@ -591,29 +586,30 @@
 					elements.list.innerHTML = this.parties.map((party, i) => `<div class="party-row" data-id="${party.id}"><input type="text" value="${escape(party.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${i + 1}"><input type="number" value="${party.votes || ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${i + 1}"><button class="danger" aria-label="${this.string('removeParty')} ${i + 1}">×</button></div>`).join('');
 				}
 				load(file) {
-					if (!file) return;
 					const reader = new FileReader();
 					reader.onload = event => {
 						try {
 							const lines = event.target.result.split(/\r?\n/).filter(line => line.trim());
-							if (!lines.length) throw 0;
+							!lines.length && (() => { throw 0; })();
 							const separator = lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
 							const parse = line => line.split(new RegExp(`\\${separator}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell => cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
 							const header = parse(lines[0]);
 							const find = regex => header.findIndex(cell => regex.test(cell));
 							let nameIndex = find(/party|partai|name|nama/i), voteIndex = find(/vote|suara/i), start = 1;
-							if (nameIndex < 0 || voteIndex < 0) {
-								start = 0;
-								const isNumber = cell => /^\d+$/.test(cell.replace(/[.,]/g, '').trim());
-								voteIndex = header.findIndex(isNumber);
-								nameIndex = voteIndex >= 0 && header.length === 2 ? 1 - voteIndex : header.findIndex(cell => !isNumber(cell));
-							}
-							if (nameIndex < 0 || voteIndex < 0) throw 0;
+							(nameIndex < 0 || voteIndex < 0) && (
+								start = 0,
+								(() => {
+									const isNumber = cell => /^\d+$/.test(cell.replace(/[.,]/g, '').trim());
+									voteIndex = header.findIndex(isNumber);
+									nameIndex = voteIndex >= 0 && header.length === 2 ? 1 - voteIndex : header.findIndex(cell => !isNumber(cell));
+								})()
+							);
+							(nameIndex < 0 || voteIndex < 0) && (() => { throw 0; })();
 							const parties = lines.slice(start).map(line => {
 								const cells = parse(line);
-								return cells[nameIndex] ? { id: this.nextIndex++, name: cells[nameIndex], votes: +((cells[voteIndex] || '').replace(/\D/g, '')) || 0 } : null;
+								return cells[nameIndex] ? { id: this.nextIndex++, name: cells[nameIndex], votes: +((cells[voteIndex] || '').replace(/[^\d.]/g, '')) || 0 } : null;
 							}).filter(Boolean);
-							if (!parties.length) throw 0;
+							!parties.length && (() => { throw 0; })();
 							this.parties = parties;
 							this.error();
 							this.renderParties();
@@ -622,65 +618,72 @@
 							this.error(this.string('alertImport'));
 						}
 					};
-					reader.readAsText(file);
+					file && reader.readAsText(file);
 				}
 				calculate() {
 					this.error();
 					const seats = parseInt(elements.seats.value), threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
-					(isNaN(seats) || seats < 1) && this.error(this.string('alertSeats'));
-					if (isNaN(seats) || seats < 1) return;
-					const valid = this.parties.filter(party => party.votes >= 0 && (party.name || party.votes > 0)).map(party => ({ ...party, name: party.name || `${this.string('party')} ${party.id}`, hare: 0, sainteLague: 0, remainder: 0 }));
-					const total = valid.reduce((sum, party) => sum + party.votes, 0);
-					if (total === 0) return this.error(this.string('alertParties'));
-					const minimumVotes = total * threshold / 100, passed = valid.filter(party => party.votes >= minimumVotes - 1e-7);
-					if (!passed.length) return this.error(this.string('belowThreshold'));
-					const quota = total / seats;
-					passed.forEach(party => {
-						party.hare = Math.floor(party.votes * seats / total);
-						party.remainder = (party.votes * seats % total) / seats;
-						party.divisor = 1;
-						party.quotient = party.votes;
-					});
-					let allocated = passed.reduce((sum, party) => sum + party.hare, 0);
-					[...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes).slice(0, seats - allocated).forEach(party => party.hare++);
-					const steps = Array.from({ length: seats }, (_, i) => {
-						const winner = passed.reduce((best, party) => party.quotient > best.quotient || (party.quotient === best.quotient && party.votes > best.votes) ? party : best);
-						const step = { round: i + 1, winner: winner.name, winnerId: winner.id, value: winner.quotient, divisor: winner.divisor, all: i < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null };
-						winner.sainteLague++;
-						winner.divisor += 2;
-						winner.quotient = winner.votes / winner.divisor;
-						return step;
-					});
-					this.data = { total, minimumVotes, threshold, seats, quota, steps, results: valid.map(party => ({ ...party, passed: party.votes >= minimumVotes - 1e-7 })) };
-					this.renderResults();
-					this.display('results');
+					this.parties = this.parties.filter(p => p.name.trim() || p.votes > 0);
+					this.renderParties();
+					(isNaN(seats) || seats < 1) ? this.error(this.string('alertSeats')) : (() => {
+						const valid = this.parties.filter(party => party.votes >= 0 && (party.name || party.votes > 0)).map(party => ({ ...party, name: party.name || `${this.string('party')} ${party.id}`, hare: 0, sainteLague: 0, remainder: 0 }));
+						const total = valid.reduce((sum, party) => sum + party.votes, 0);
+						total === 0 ? this.error(this.string('alertParties')) : (() => {
+							const minimumVotes = total * threshold / 100, passed = valid.filter(party => party.votes >= minimumVotes - 1e-7);
+							!passed.length ? this.error(this.string('belowThreshold')) : (() => {
+								const quota = total / seats;
+								passed.forEach(party => {
+									party.hare = Math.floor(party.votes * seats / total);
+									party.remainder = (party.votes * seats % total) / seats;
+									party.divisor = 1;
+									party.quotient = party.votes;
+								});
+								let allocated = passed.reduce((sum, party) => sum + party.hare, 0);
+								[...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes).slice(0, seats - allocated).forEach(party => party.hare++);
+								const steps = Array.from({ length: seats }, (_, i) => {
+									const winner = passed.reduce((best, party) => party.quotient > best.quotient || (party.quotient === best.quotient && party.votes > best.votes) ? party : best);
+									const step = { round: i + 1, winner: winner.name, winnerId: winner.id, value: winner.quotient, divisor: winner.divisor, all: i < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null };
+									winner.sainteLague++;
+									winner.divisor += 2;
+									winner.quotient = winner.votes / winner.divisor;
+									return step;
+								});
+								this.data = { total, minimumVotes, threshold, seats, quota, steps, results: valid.map(party => ({ ...party, passed: party.votes >= minimumVotes - 1e-7 })) };
+								this.renderResults();
+								this.display('results');
+							})();
+						})();
+					})();
 				}
 				renderResults() {
-					if (!this.data) return;
-					const { results, total, minimumVotes, threshold, quota } = this.data, passed = results.filter(result => result.passed), failed = results.filter(result => !result.passed);
-					const row = (result, seats, extra = '') => `<tr><td>${escape(result.name)}</td><td>${this.format(result.votes)}</td><td>${this.format(result.votes / total * 100, { maximumFractionDigits: 2 })}%</td><td><strong>${seats}</strong></td>${extra}</tr>`;
-					elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(total)}<br>${this.string('thresholdVotes')} (${this.format(threshold)}%): ${this.format(minimumVotes, { maximumFractionDigits: 0 })}` + (failed.length ? `<br><span style="font-style:italic">${this.string('belowThreshold')}: ${failed.map(result => `${escape(result.name)} (${this.format(result.votes)}, ${this.format(result.votes / total * 100, { maximumFractionDigits: 2 })}%)`).join(', ')}</span>` : '') + '</div>';
-					const headers = ['party', 'votes', 'share', 'seatsColumn'].map(key => this.string(key));
-					elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)}</p>` + this.table([...headers, this.string('remainder')], [...passed].sort((a, b) => b.hare - a.hare).map(result => row(result, result.hare, `<td>${this.format(result.remainder, { maximumFractionDigits: 6 })}</td>`)).join(''));
-					elements.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')}</p>` + this.table(headers, [...passed].sort((a, b) => b.sainteLague - a.sainteLague).map(result => row(result, result.sainteLague)).join(''));
-					elements.compare.innerHTML = this.table([this.string('party'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...passed].sort((a, b) => b.votes - a.votes).map(result => {
-						const difference = result.sainteLague - result.hare;
-						return `<tr><td>${escape(result.name)}</td><td>${result.hare}</td><td>${result.sainteLague}</td><td class="${difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'neutral'}">${difference > 0 ? '+' : ''}${difference}</td></tr>`;
-					}).join(''));
+					this.data && (() => {
+						const { results, total, minimumVotes, threshold, quota } = this.data, passed = results.filter(result => result.passed), failed = results.filter(result => !result.passed);
+						const row = (result, seats, extra = '') => `<tr><td>${escape(result.name)}</td><td>${this.format(result.votes)}</td><td>${this.format(result.votes / total * 100, { maximumFractionDigits: 2 })}%</td><td><strong>${seats}</strong></td>${extra}</tr>`;
+						elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(total)}<br>${this.string('thresholdVotes')} (${this.format(threshold)}%): ${this.format(minimumVotes, { maximumFractionDigits: 0 })}` + (failed.length ? `<br><span style="font-style:italic">${this.string('belowThreshold')}: ${failed.map(result => `${escape(result.name)} (${this.format(result.votes)}, ${this.format(result.votes / total * 100, { maximumFractionDigits: 2 })}%)`).join(', ')}</span>` : '') + '</div>';
+						const headers = ['party', 'votes', 'share', 'seatsColumn'].map(key => this.string(key));
+						elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)}</p>` + this.table([...headers, this.string('remainder')], [...passed].sort((a, b) => b.hare - a.hare).map(result => row(result, result.hare, `<td>${this.format(result.remainder, { maximumFractionDigits: 6 })}</td>`)).join(''));
+						elements.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')}</p>` + this.table(headers, [...passed].sort((a, b) => b.sainteLague - a.sainteLague).map(result => row(result, result.sainteLague)).join(''));
+						elements.compare.innerHTML = this.table([this.string('party'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...passed].sort((a, b) => b.votes - a.votes).map(result => {
+							const difference = result.sainteLague - result.hare;
+							return `<tr><td>${escape(result.name)}</td><td>${result.hare}</td><td>${result.sainteLague}</td><td class="${difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'neutral'}">${difference > 0 ? '+' : ''}${difference}</td></tr>`;
+						}).join(''));
+					})();
 				}
 				renderSteps() {
 					const { steps } = this.data || {};
-					if (!steps?.length) return;
-					const details = steps.slice(0, STEPS_LIMIT), warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
-					const template = this.string('seatAllocated'), prefix = this.string('winnerPrefix'), options = { maximumFractionDigits: 2 };
-					elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), steps.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${warning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${escape(step.winner)}</h4>` + this.table(step.all.map(quotient => `${escape(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + warning;
+					steps?.length && (() => {
+						const details = steps.slice(0, STEPS_LIMIT), warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
+						const template = this.string('seatAllocated'), prefix = this.string('winnerPrefix'), options = { maximumFractionDigits: 2 };
+						elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), steps.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${warning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${escape(step.winner)}</h4>` + this.table(step.all.map(quotient => `${escape(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + warning;
+					})();
 				}
 				export() {
-					if (!this.data) return;
-					const { results } = this.data, total = results.reduce((sum, party) => sum + party.votes, 0);
-					const headers = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
-					const csv = headers + '\n' + results.map(result => `"${result.name.replace(/"/g, '""')}",${result.votes},"${this.format(result.votes / total * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}",${result.passed ? this.string('yes') : this.string('no')},${result.hare},${result.sainteLague},${result.sainteLague - result.hare}`).join('\n');
-					Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv` }).click();
+					this.data && (() => {
+						const { results } = this.data, total = results.reduce((sum, party) => sum + party.votes, 0);
+						const headers = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
+						const csv = headers + '\n' + results.map(result => `"${result.name.replace(/"/g, '""')}",${result.votes},"${this.format(result.votes / total * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}",${result.passed ? this.string('yes') : this.string('no')},${result.hare},${result.sainteLague},${result.sainteLague - result.hare}`).join('\n');
+						Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv` }).click();
+					})();
 				}
 			}
 			new ApportionmentCalc();
