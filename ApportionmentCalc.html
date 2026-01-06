@@ -211,7 +211,7 @@
 			.error {
 				color: var(--danger);
 				font-size: .9rem;
-				margin-top: 1rem;
+				margin: 1rem 0;
 				display: block;
 				font-weight: 500;
 			}
@@ -526,6 +526,10 @@
 					const row = event.target.closest('.party-row');
 					!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input') && (
 						event.preventDefault(),
+						(() => {
+							const party = this.parties.find(p => p.id === +row.dataset.id);
+							party && (event.target.type === 'text' ? party.name = event.target.value : party.votes = Math.max(0, Math.round(+event.target.value) || 0));
+						})(),
 						event.target.type === 'text' ? event.target.nextElementSibling?.focus() : row.nextElementSibling ? row.nextElementSibling.querySelector('input')?.focus() : this.add()
 					);
 				}
@@ -619,6 +623,8 @@
 				calculate() {
 					this.error();
 					const seats = parseInt(elements.seats.value), threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
+					this.parties = this.parties.filter(p => p.name.trim() || p.votes > 0);
+					this.renderParties();
 					(isNaN(seats) || seats < 1) ? this.error(this.string('alertSeats')) : (() => {
 						const valid = this.parties.filter(party => party.votes >= 0 && (party.name || party.votes > 0)).map(party => ({ ...party, name: party.name || `${this.string('party')} ${party.id}`, hare: 0, sainteLague: 0, remainder: 0 }));
 						const total = valid.reduce((sum, party) => sum + party.votes, 0);
