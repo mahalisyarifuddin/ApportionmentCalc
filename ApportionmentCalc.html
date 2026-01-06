@@ -392,6 +392,7 @@
 					divisorsText: 'Divisors: 1, 3, 5, 7...',
 					quotientDetail: 'Quotient Detail',
 					detailsLimited: 'Showing details for the first {n} rounds only.',
+					summaryLimited: 'Showing first {n} rounds only.',
 					winnerPrefix: 'Winner: ',
 					share: '%',
 					passedHeader: 'Passed Threshold?',
@@ -447,6 +448,7 @@
 					divisorsText: 'Pembagi: 1, 3, 5, 7...',
 					quotientDetail: 'Rincian Bilangan',
 					detailsLimited: 'Menampilkan rincian untuk {n} putaran pertama saja.',
+					summaryLimited: 'Menampilkan {n} putaran pertama saja.',
 					winnerPrefix: 'Pemenang: ',
 					share: '%',
 					passedHeader: 'Lolos Ambang Batas?',
@@ -468,6 +470,7 @@
 			const elements = new Proxy({}, { get: (_, id) => document.getElementById(id) });
 			const escape = string => string.replace(/[&<>"']/g, char => '&#' + char.charCodeAt(0) + ';');
 			const STEPS_LIMIT = 50;
+			const SUMMARY_LIMIT = 1000;
 
 			class ApportionmentCalc {
 				constructor() {
@@ -672,9 +675,10 @@
 				renderSteps() {
 					const { steps } = this.data || {};
 					steps?.length && (() => {
-						const details = steps.slice(0, STEPS_LIMIT), warning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
+						const summary = steps.slice(0, SUMMARY_LIMIT), summaryWarning = steps.length > SUMMARY_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
+						const details = steps.slice(0, STEPS_LIMIT), detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 						const template = this.string('seatAllocated'), prefix = this.string('winnerPrefix'), options = { maximumFractionDigits: 2 };
-						elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), steps.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${warning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${escape(step.winner)}</h4>` + this.table(step.all.map(quotient => `${escape(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + warning;
+						elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${escape(step.winner)}</h4>` + this.table(step.all.map(quotient => `${escape(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
 					})();
 				}
 				export() {
