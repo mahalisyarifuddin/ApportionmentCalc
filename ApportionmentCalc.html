@@ -672,23 +672,25 @@
 					const remainders = [...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes);
 					remainders.slice(0, seats - allocated).forEach(party => party.hare++);
 
-					const steps = Array.from({ length: seats }, (_, i) => {
+					const steps = [];
+					for (let i = 0; i < seats; i++) {
 						const winner = passed.reduce((best, party) =>
 							party.quotient > best.quotient || (party.quotient === best.quotient && party.votes > best.votes) ? party : best
 						);
-						const step = {
-							round: i + 1,
-							winner: winner.name,
-							winnerId: winner.id,
-							value: winner.quotient,
-							divisor: winner.divisor,
-							all: i < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null
-						};
+						if (i < SUMMARY_LIMIT) {
+							steps.push({
+								round: i + 1,
+								winner: winner.name,
+								winnerId: winner.id,
+								value: winner.quotient,
+								divisor: winner.divisor,
+								all: i < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null
+							});
+						}
 						winner.sainteLague++;
 						winner.divisor += 2;
 						winner.quotient = winner.votes / winner.divisor;
-						return step;
-					});
+					}
 
 					const results = valid.map(party => ({ ...party, passed: party.votes >= minimumVotes - 1e-7 }));
 					return {
@@ -712,7 +714,7 @@
 				renderSteps() {
 					const { steps } = this.data || {};
 					steps?.length && (() => {
-						const summary = steps.slice(0, SUMMARY_LIMIT), summaryWarning = steps.length > SUMMARY_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
+						const summary = steps.slice(0, SUMMARY_LIMIT), summaryWarning = this.data.seats > SUMMARY_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
 						const details = steps.slice(0, STEPS_LIMIT), detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 						const template = this.string('seatAllocated'), prefix = this.string('winnerPrefix'), options = { maximumFractionDigits: 2 };
 						elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${escape(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${escape(step.winner)}</h4>` + this.table(step.all.map(quotient => `${escape(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
