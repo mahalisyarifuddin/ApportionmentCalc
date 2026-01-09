@@ -20,6 +20,11 @@
 				--on-danger: #ffffff;
 				--highlight-bg: #d4e3ff;
 			}
+			.drag-active .container {
+				border-color: var(--primary);
+				box-shadow: 0 0 0 2px var(--highlight-bg);
+				background: var(--muted);
+			}
 			@media (prefers-color-scheme: dark) {
 				:root:not(.light) {
 					--primary: #a5c8ff;
@@ -522,6 +527,24 @@
 						const row = event.target.closest('.party-row');
 						const party = row && this.parties.find(p => p.id === +row.dataset.id);
 						party && (event.target.type === 'text' ? party.name = event.target.value : event.target.value = party.votes = Math.max(0, Math.round(+event.target.value) || 0));
+					};
+					let dragCounter = 0;
+					document.body.ondragenter = event => {
+						event.preventDefault();
+						dragCounter++;
+						document.body.classList.add('drag-active');
+					};
+					document.body.ondragleave = event => {
+						dragCounter--;
+						if (dragCounter === 0) document.body.classList.remove('drag-active');
+					};
+					document.body.ondragover = event => event.preventDefault();
+					document.body.ondrop = event => {
+						event.preventDefault();
+						dragCounter = 0;
+						document.body.classList.remove('drag-active');
+						const file = event.dataTransfer.files[0];
+						file && this.load(file);
 					};
 				}
 				key(event) {
