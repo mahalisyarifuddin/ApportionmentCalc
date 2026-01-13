@@ -701,10 +701,11 @@
 
 					if (!passed.length) return { error: 'belowThreshold' };
 
-					const quota = total / seats;
+					const passedTotal = passed.reduce((sum, party) => sum + party.votes, 0);
+					const quota = passedTotal / seats;
 					passed.forEach(party => {
-						party.hare = Math.floor(party.votes * seats / total);
-						party.remainder = (party.votes * seats % total) / seats;
+						party.hare = Math.floor(party.votes * seats / passedTotal);
+						party.remainder = (party.votes * seats % passedTotal) / seats;
 						party.divisor = 1;
 						party.quotient = party.votes;
 					});
