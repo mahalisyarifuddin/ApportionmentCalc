@@ -331,6 +331,7 @@
 				<div class="actions">
 					<button id="edit" class="secondary" style="flex:1"></button>
 					<button id="steps" class="secondary" style="flex:1"></button>
+					<button id="shareAction" class="secondary" style="flex:1"></button>
 					<button id="export" class="success" style="flex:1"></button>
 				</div>
 				<div id="stats" class="stats"></div>
@@ -414,7 +415,10 @@
 					closeModal: 'Close Modal',
 					languageLabel: 'Language',
 					themeLabel: 'Theme',
-					gallagher: 'Gallagher Index'
+					gallagher: 'Gallagher Index',
+					shareAction: 'Share Link',
+					linkCopied: 'Link Copied!',
+					alertLink: 'Error copying link to clipboard.'
 				},
 				id: {
 					title: 'ApportionmentCalc',
@@ -471,7 +475,10 @@
 					closeModal: 'Tutup Modal',
 					languageLabel: 'Bahasa',
 					themeLabel: 'Tema',
-					gallagher: 'Indeks Gallagher'
+					gallagher: 'Indeks Gallagher',
+					shareAction: 'Bagikan Tautan',
+					linkCopied: 'Tautan Disalin!',
+					alertLink: 'Gagal menyalin tautan.'
 				}
 			};
 			const elements = new Proxy({}, { get: (_, id) => document.getElementById(id) });
@@ -497,6 +504,7 @@
 					this.setup();
 					this.theme('auto');
 					this.lang(navigator.language?.startsWith('id') ? 'id' : 'en');
+					this.loadHash();
 				}
 				setup() {
 					const handlers = {
@@ -507,6 +515,7 @@
 						steps: () => this.modal(true),
 						close: () => this.modal(false),
 						export: () => this.export(),
+						shareAction: () => this.share(),
 						import: () => elements.file.click()
 					};
 					Object.entries(handlers).forEach(([id, handler]) => elements[id].onclick = handler);
@@ -777,6 +786,45 @@
 						const csv = headers + '\n' + results.map(result => `"${result.name.replace(/"/g, '""')}",${result.votes},"${this.format(result.votes / total * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}",${result.passed ? this.string('yes') : this.string('no')},${result.hare},${result.sainteLague},${result.sainteLague - result.hare}`).join('\n');
 						Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv` }).click();
 					})();
+				}
+				getHash() {
+					const s = encodeURIComponent(elements.seats.value);
+					const t = encodeURIComponent(elements.threshold.value);
+					const p = encodeURIComponent(JSON.stringify(this.parties.map(({ name, votes }) => ({ n: name, v: votes }))));
+					return `#s=${s}&t=${t}&p=${p}`;
+				}
+				loadHash() {
+					const hash = window.location.hash.slice(1);
+					if (!hash) return;
+					const params = new URLSearchParams(hash);
+					const s = params.get('s');
+					const t = params.get('t');
+					const p = params.get('p');
+					if (s && t && p) {
+						try {
+							elements.seats.value = s;
+							elements.threshold.value = t;
+							const data = JSON.parse(decodeURIComponent(p));
+							this.parties = data.map(({ n, v }, i) => ({
+								id: i + 1,
+								name: n,
+								votes: v || 0
+							}));
+							this.nextIndex = this.parties.length + 1;
+							this.renderParties();
+						} catch (e) {
+							console.error(e);
+						}
+					}
+				}
+				share() {
+					const hash = this.getHash();
+					window.location.hash = hash;
+					const url = window.location.href;
+					navigator.clipboard.writeText(url).then(() => {
+						elements.shareAction.textContent = this.string('linkCopied');
+						setTimeout(() => elements.shareAction.textContent = this.string('shareAction'), 2000);
+					}).catch(() => this.error(this.string('alertLink')));
 				}
 			}
 			new ApportionmentCalc();
