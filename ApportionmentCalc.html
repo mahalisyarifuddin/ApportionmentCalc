@@ -481,22 +481,56 @@
 
 			class ApportionmentCalc {
 				constructor() {
-					this.parties = Object.entries({
-						Apple: 25000,
-						Blueberry: 15000,
-						Cherry: 9000,
-						Date: 5000,
-						Elderberry: 1500
-					}).map(([name, votes], i) => ({
-						id: i + 1,
-						name: name + ' Party',
-						votes
-					}));
-					this.nextIndex = 6;
-					this.data = null;
+					this.parties = [];
 					this.setup();
 					this.theme('auto');
 					this.lang(navigator.language?.startsWith('id') ? 'id' : 'en');
+					if (!this.loadState()) {
+						this.parties = Object.entries({
+							Apple: 25000,
+							Blueberry: 15000,
+							Cherry: 9000,
+							Date: 5000,
+							Elderberry: 1500
+						}).map(([name, votes], i) => ({
+							id: i + 1,
+							name: name + ' Party',
+							votes
+						}));
+						this.nextIndex = 6;
+						this.renderParties();
+					} else {
+						this.calculate();
+					}
+					window.onhashchange = () => this.loadState() && this.calculate();
+				}
+				loadState() {
+					try {
+						if (!location.hash) return false;
+						const state = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+						if (!state?.seats || !state?.parties?.length) return false;
+						elements.seats.value = state.seats;
+						elements.threshold.value = state.threshold ?? 0;
+						this.parties = state.parties.map((p, i) => ({
+							id: i + 1,
+							name: p.name || '',
+							votes: p.votes || 0
+						}));
+						this.nextIndex = this.parties.length + 1;
+						this.renderParties();
+						return true;
+					} catch {
+						return false;
+					}
+				}
+				saveState() {
+					const state = {
+						seats: elements.seats.value,
+						threshold: elements.threshold.value,
+						parties: this.parties.map(({ name, votes }) => ({ name, votes }))
+					};
+					const hash = encodeURIComponent(JSON.stringify(state));
+					location.hash !== '#' + hash && (location.hash = hash);
 				}
 				setup() {
 					const handlers = {
@@ -676,6 +710,11 @@
 					return invalidSeats ? this.error(this.string('alertSeats')) : (() => {
 						const { error, data } = this.computeAllocation(seats, threshold, this.parties);
 						error ? this.error(this.string(error)) : (() => {
+							try {
+								this.saveState();
+							} catch (e) {
+								console.error('saveState error:', e);
+							}
 							this.data = data;
 							this.renderResults();
 							this.display('results');
