@@ -225,6 +225,9 @@
 				opacity: 0.6;
 				background: var(--muted);
 			}
+			.hide-failed .failed-party {
+				display: none;
+			}
 			dialog {
 				background: var(--surface);
 				color: var(--text);
@@ -320,6 +323,10 @@
 					<div class="group">
 						<label id="thresholdLabel" for="threshold"></label>
 						<input type="text" id="threshold" value="4">
+						<label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-weight:400;font-size:.9rem">
+							<input type="checkbox" id="hide" style="width:auto;margin:0">
+							<span id="hideLabel"></span>
+						</label>
 					</div>
 				</div>
 				<div id="list" style="margin-bottom:1rem"></div>
@@ -372,6 +379,7 @@
 					darkTheme: 'Dark',
 					seatsLabel: 'Total Seats',
 					thresholdLabel: 'Electoral Threshold (%)',
+					hideLabel: 'Hide parties below threshold',
 					add: '+ Add Party',
 					calculate: 'Calculate Allocation',
 					edit: 'Edit Inputs',
@@ -429,6 +437,7 @@
 					darkTheme: 'Gelap',
 					seatsLabel: 'Jumlah Kursi',
 					thresholdLabel: 'Ambang Batas Parlemen (%)',
+					hideLabel: 'Sembunyikan partai di bawah ambang batas',
 					add: '+ Tambah Partai',
 					calculate: 'Hitung Alokasi',
 					edit: 'Ubah Input',
@@ -516,6 +525,7 @@
 						if (!state?.seats || !state?.parties?.length) return false;
 						elements.seats.value = state.seats;
 						elements.threshold.value = state.threshold ?? 0;
+						elements.hide.checked = !!state.hide;
 						this.parties = state.parties.map((p, i) => ({
 							id: i + 1,
 							name: p.name || '',
@@ -532,6 +542,7 @@
 					const state = {
 						seats: elements.seats.value,
 						threshold: elements.threshold.value,
+						hide: elements.hide.checked,
 						parties: this.parties.map(({ name, votes }) => ({ name, votes }))
 					};
 					const hash = encodeURIComponent(JSON.stringify(state));
@@ -790,6 +801,7 @@
 				}
 				renderResults() {
 					this.data && (() => {
+						elements.results.classList.toggle('hide-failed', elements.hide.checked);
 						const { results, total, minimumVotes, threshold, quota, hareIndex, sainteLagueIndex } = this.data;
 						const row = (result, seats, extra = '') => {
 							const p = result.votes / total * 100;
