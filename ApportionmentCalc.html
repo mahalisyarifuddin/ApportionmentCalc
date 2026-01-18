@@ -704,7 +704,7 @@
 						return {
 							id: this.nextIndex++,
 							name: cells[nameIdx],
-							votes: +((cells[voteIdx] || '').replace(/[^\d.]/g, '')) || 0
+							votes: +((cells[voteIdx] || '').replace(/\D/g, '')) || 0
 						};
 					}).filter(Boolean);
 
