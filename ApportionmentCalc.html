@@ -823,9 +823,10 @@
 						const headers = ['party', 'votes', 'share', 'seatsColumn'].map(key => this.string(key));
 						elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)} | ${this.string('gallagher')}: ${this.format(hareIndex, { maximumFractionDigits: 4 })}</p>` + this.table([...headers, this.string('remainder')], [...results].sort((a, b) => b.hare - a.hare || b.votes - a.votes).map(result => row(result, result.hare, `<td>${this.format(result.remainder, { maximumFractionDigits: 6 })}</td>`)).join(''));
 						elements.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')} | ${this.string('gallagher')}: ${this.format(sainteLagueIndex, { maximumFractionDigits: 4 })}</p>` + this.table(headers, [...results].sort((a, b) => b.sainteLague - a.sainteLague || b.votes - a.votes).map(result => row(result, result.sainteLague)).join(''));
-						elements.compare.innerHTML = this.table([this.string('party'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...results].sort((a, b) => b.votes - a.votes).map(result => {
+						elements.compare.innerHTML = this.table([this.string('party'), this.string('votes'), this.string('share'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...results].sort((a, b) => b.votes - a.votes).map(result => {
 							const difference = result.sainteLague - result.hare;
-							return `<tr class="${result.passed ? '' : 'failed-party'}"><td>${this.escapeHtml(result.name)}</td><td>${result.hare}</td><td>${result.sainteLague}</td><td class="${difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'neutral'}">${difference > 0 ? '+' : ''}${difference}</td></tr>`;
+							const p = result.votes / total * 100;
+							return `<tr class="${result.passed ? '' : 'failed-party'}"><td>${this.escapeHtml(result.name)}</td><td>${this.format(result.votes)}</td><td>${this.format(p, { maximumFractionDigits: 2 })}%</td><td>${result.hare}</td><td>${result.sainteLague}</td><td class="${difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'neutral'}">${difference > 0 ? '+' : ''}${difference}</td></tr>`;
 						}).join(''));
 					})();
 				}
