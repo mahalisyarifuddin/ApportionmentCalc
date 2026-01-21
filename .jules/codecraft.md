@@ -8,3 +8,8 @@
 **Mode:** Medic
 **Learning:** The codebase shadowed the deprecated global `escape` function with a local variable of the same name. This led to initial misdiagnosis of a bug (assuming deprecated behavior) and could lead to silent failures if the local definition were removed.
 **Action:** Avoid using standard global function names for local variables. Refactor them into class methods with distinct names (e.g., `escapeHtml`) to improve clarity and safety.
+
+## 2025-02-18 - [Live Updates vs Model Consistency]
+**Mode:** Palette
+**Learning:** In a vanilla JS app where the data model updates on `change` (blur), implementing real-time feedback (like live percentages) on `input` requires reading directly from DOM elements instead of the model. Relying on the model would cause lag or require changing the model update strategy, potentially introducing side effects (e.g., premature validation).
+**Action:** For "live" UI features in this architecture, derive state transiently from the DOM during the `input` event, while keeping the persistent model update on `change`.
