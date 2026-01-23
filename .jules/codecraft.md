@@ -13,3 +13,8 @@
 **Mode:** Palette
 **Learning:** Changing `<td>` to `<th>` for row headers to improve accessibility can break existing CSS that targets `th` elements (often used for column headers).
 **Action:** Use `role="rowheader"` on `<td>` elements instead of changing the tag. This provides the same semantic value to assistive technology without risking style regressions in legacy codebases.
+
+## 2025-10-27 - Localization of Attributes
+**Mode:** Palette
+**Learning:** The `lang()` method iterates through `text` keys and updates `textContent` by default. It does not automatically handle attributes like `title` or `placeholder`. These must be manually updated in the `lang()` method or during rendering if they are dynamic.
+**Action:** When adding localized tooltips or attributes, verify they are explicitly updated in `lang()` or the render loop, as the auto-update loop misses them.
