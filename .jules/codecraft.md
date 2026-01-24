@@ -13,3 +13,8 @@
 **Mode:** Palette
 **Learning:** Changing `<td>` to `<th>` for row headers to improve accessibility can break existing CSS that targets `th` elements (often used for column headers).
 **Action:** Use `role="rowheader"` on `<td>` elements instead of changing the tag. This provides the same semantic value to assistive technology without risking style regressions in legacy codebases.
+
+## 2025-10-27 - [Reuse Localization Keys for Consistency]
+**Mode:** Palette
+**Learning:** When adding new UI elements that display standard concepts (like "Total Valid Votes"), check existing localization dictionaries first. Reusing keys (`totalVotes`, `thresholdVotes`) ensures consistency and avoids bloating the text object, even if the context is slightly different (e.g., input stats vs result stats).
+**Action:** Always `grep` for potential existing string keys before adding new ones to the localization object.

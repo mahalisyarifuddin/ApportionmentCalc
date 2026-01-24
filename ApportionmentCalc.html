@@ -340,6 +340,7 @@
 					</div>
 				</div>
 				<div id="list" style="margin-bottom:1rem"></div>
+				<div id="inputStats" class="info" style="margin-bottom:1rem;text-align:right"></div>
 				<div class="row" style="gap:.5rem">
 					<button id="add" class="secondary" style="flex:1"></button>
 					<button id="clear" class="secondary" style="flex:1"></button>
@@ -578,7 +579,10 @@
 					elements.modal.addEventListener('close', () => this.lastFocus?.focus());
 					elements.language.onchange = event => this.lang(event.target.value);
 					elements.theme.onchange = event => this.theme(event.target.value);
-					elements.input.oninput = () => this.error();
+					elements.input.oninput = () => {
+						this.error();
+						this.updateInputStats();
+					};
 					document.onkeydown = event => this.key(event);
 					elements.list.onclick = event => {
 						const row = event.target.closest('.party-row');
@@ -672,8 +676,15 @@
 					const target = Math.min(index, this.parties.length - 1);
 					target >= 0 ? elements.list.children[target]?.querySelector('.danger')?.focus() : elements.add.focus();
 				}
+				updateInputStats() {
+					const votes = [...elements.list.querySelectorAll('input[type=number]')].reduce((sum, input) => sum + (Math.max(0, parseInt(input.value) || 0)), 0);
+					const threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
+					const minVotes = votes * threshold / 100;
+					elements.inputStats.innerHTML = `${this.string('totalVotes')}: <strong>${this.format(votes)}</strong> | ${this.string('thresholdVotes')} (${this.format(threshold)}%): <strong>${this.format(minVotes, { maximumFractionDigits: 0 })}</strong>`;
+				}
 				renderParties() {
 					elements.list.innerHTML = this.parties.map((party, i) => `<div class="party-row" data-id="${party.id}"><input type="text" value="${this.escapeHtml(party.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${i + 1}"><input type="number" value="${party.votes || ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${i + 1}"><button class="danger" aria-label="${this.string('removeParty')} ${i + 1}">×</button></div>`).join('');
+					this.updateInputStats();
 				}
 				load(file) {
 					if (!file) return;
