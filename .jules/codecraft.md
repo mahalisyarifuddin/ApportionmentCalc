@@ -18,3 +18,8 @@
 **Mode:** Palette
 **Learning:** When adding new UI elements that display standard concepts (like "Total Valid Votes"), check existing localization dictionaries first. Reusing keys (`totalVotes`, `thresholdVotes`) ensures consistency and avoids bloating the text object, even if the context is slightly different (e.g., input stats vs result stats).
 **Action:** Always `grep` for potential existing string keys before adding new ones to the localization object.
+
+## 2025-10-28 - [Live Feedback for Input-Heavy Forms]
+**Mode:** Palette
+**Learning:** In a single-file app where state updates on `change` (blur), adding real-time feedback (like percentage shares) requires hooking into `input` events and calculating derived values directly from the DOM. This bypasses the need for full model updates on every keystroke, keeping the UI responsive while providing immediate value.
+**Action:** For calculator-like inputs, implement a lightweight `updateStats` method bound to `input` that manipulates the DOM directly for auxiliary indicators, separate from the heavy `render` cycle.
