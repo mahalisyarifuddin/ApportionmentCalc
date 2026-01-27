@@ -18,3 +18,8 @@
 **Mode:** Palette
 **Learning:** When adding new UI elements that display standard concepts (like "Total Valid Votes"), check existing localization dictionaries first. Reusing keys (`totalVotes`, `thresholdVotes`) ensures consistency and avoids bloating the text object, even if the context is slightly different (e.g., input stats vs result stats).
 **Action:** Always `grep` for potential existing string keys before adding new ones to the localization object.
+
+## 2025-01-26 - [Avoid Integer Truncation in Threshold Displays]
+**Mode:** Palette
+**Learning:** Displaying calculated thresholds as integers (default `maximumFractionDigits: 0`) creates confusion when the actual threshold is fractional (e.g., 4.2 votes shown as 4). Users see their vote count equals the displayed threshold but still fail.
+**Action:** Always specify `{ maximumFractionDigits: 2 }` (or higher) when formatting calculated boundary values like electoral thresholds to ensure transparency.
