@@ -1,4 +1,3 @@
-
 ## 2025-02-18 - [Fix CSV Parsing for International Formats]
 **Mode:** Medic
 **Learning:** The CSV parsing logic used `replace(/[^\d.]/g, '')` which preserved dots, causing `1.000` (Indonesian thousand) to be parsed as `1`. Since the app uses integer votes (rounding in UI), robust parsing should strictly enforce integers by stripping all non-digits (`/\D/g`) to support all thousands separators.
@@ -23,3 +22,8 @@
 **Mode:** Palette
 **Learning:** Displaying calculated thresholds as integers (default `maximumFractionDigits: 0`) creates confusion when the actual threshold is fractional (e.g., 4.2 votes shown as 4). Users see their vote count equals the displayed threshold but still fail.
 **Action:** Always specify `{ maximumFractionDigits: 2 }` (or higher) when formatting calculated boundary values like electoral thresholds to ensure transparency.
+
+## 2025-10-27 - [Constructor Crash on Missing DOM Elements]
+**Mode:** Medic
+**Learning:** The `ApportionmentCalc.setup` method assigns event handlers by iterating over a predefined object (e.g., `copy: handler`) and setting `elements[id].onclick`. If the corresponding DOM element (e.g., `id="copy"`) is missing from the HTML, the `elements` Proxy returns `null`, causing `null.onclick` assignment to throw a `TypeError`. This halts the entire application initialization.
+**Action:** When adding new UI handlers, ensure the HTML markup for the element exists *before* adding the handler to the logic. Alternatively, add null checks in the setup loop if optional elements are expected.

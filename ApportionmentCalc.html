@@ -354,6 +354,7 @@
 				<div class="actions">
 					<button id="edit" class="secondary" style="flex:1"></button>
 					<button id="steps" class="secondary" style="flex:1"></button>
+					<button id="copy" class="secondary" style="flex:1"></button>
 					<button id="export" class="success" style="flex:1"></button>
 				</div>
 				<div id="stats" class="stats"></div>
@@ -426,7 +427,7 @@
 					share: '%',
 					passedHeader: 'Passed Threshold?',
 					hareSeatsHeader: 'Hare Seats',
-					sainteLagueSeatsHeader: 'Kursi Sainte-Laguë',
+					sainteLagueSeatsHeader: 'Sainte-Laguë Seats',
 					differenceHeader: 'Difference',
 					yes: 'Yes',
 					no: 'No',
@@ -438,7 +439,9 @@
 					closeModal: 'Close Modal',
 					languageLabel: 'Language',
 					themeLabel: 'Theme',
-					gallagher: 'Gallagher Index'
+					gallagher: 'Gallagher Index',
+					copy: 'Copy Results',
+					copied: 'Copied!'
 				},
 				id: {
 					title: 'ApportionmentCalc',
@@ -496,7 +499,9 @@
 					closeModal: 'Tutup Modal',
 					languageLabel: 'Bahasa',
 					themeLabel: 'Tema',
-					gallagher: 'Indeks Gallagher'
+					gallagher: 'Indeks Gallagher',
+					copy: 'Salin Hasil',
+					copied: 'Tersalin!'
 				}
 			};
 			const elements = new Proxy({}, { get: (_, id) => document.getElementById(id) });
@@ -566,6 +571,7 @@
 						edit: () => this.display('input'),
 						steps: () => this.modal(true),
 						close: () => this.modal(false),
+						copy: () => this.copy(),
 						export: () => this.export(),
 						import: () => elements.file.click()
 					};
@@ -848,6 +854,18 @@
 						const details = steps.slice(0, STEPS_LIMIT), detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 						const template = this.string('seatAllocated'), prefix = this.string('winnerPrefix'), options = { minimumFractionDigits: 2, maximumFractionDigits: 6 };
 						elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${template.replace('{n}', step.round)}</td><td><strong>${this.escapeHtml(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${template.replace('{n}', step.round)} - ${prefix}${this.escapeHtml(step.winner)}</h4>` + this.table(step.all.map(quotient => `${this.escapeHtml(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
+					})();
+				}
+				copy() {
+					this.data && (() => {
+						const { results } = this.data, total = results.reduce((sum, party) => sum + party.votes, 0);
+						const headers = [this.string('party'), this.string('votes'), this.string('share'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('diff')].join('\t');
+						const tsv = headers + '\n' + results.map(r => [r.name, r.votes, this.format(r.votes / total * 100, { maximumFractionDigits: 2 }) + '%', r.hare, r.sainteLague, r.sainteLague - r.hare].join('\t')).join('\n');
+						navigator.clipboard.writeText(tsv).then(() => {
+							const btn = elements.copy;
+							btn.textContent = this.string('copied');
+							setTimeout(() => btn.textContent = this.string('copy'), 2000);
+						}).catch(() => {});
 					})();
 				}
 				export() {
