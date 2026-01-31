@@ -303,6 +303,16 @@
 				flex-direction: column; 
 			}
 		}
+		body.drag-active::after {
+			content: "";
+			position: fixed;
+			inset: 0;
+			background: var(--highlight-bg);
+			border: 4px dashed var(--primary);
+			opacity: 0.9;
+			z-index: 9999;
+			pointer-events: none;
+		}
 	</style>
 </head>
 <body>
