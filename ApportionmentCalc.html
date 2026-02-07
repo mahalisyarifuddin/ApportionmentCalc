@@ -65,6 +65,7 @@
 			background: var(--background);
 			color: var(--text);
 			font-family: sans-serif;
+			font-variant-numeric: tabular-nums;
 			display: flex;
 			justify-content: center;
 			min-height: 100vh;
@@ -98,6 +99,10 @@
 			font-size: 1rem;
 			padding: .5rem;
 			width: 100%;
+		}
+		input[type="number"],
+		#threshold {
+			text-align: right;
 		}
 		button { 
 			cursor: pointer; 
@@ -139,6 +144,12 @@
 		.selectors select { 
 			width: auto; 
 			font-size: .9rem; 
+		}
+		#list, #inputStats {
+			margin-bottom: 1rem;
+		}
+		#inputStats {
+			text-align: right;
 		}
 		.row { 
 			display: flex; 
@@ -186,6 +197,10 @@
 			border: 1px solid var(--border); 
 			padding: .5rem; 
 			text-align: left; 
+		}
+		#results th:not(:first-child),
+		#results td:not(:first-child) {
+			text-align: right;
 		}
 		th { 
 			background: var(--primary); 
@@ -338,8 +353,8 @@
 					</label>
 				</div>
 			</div>
-			<div id="list" style="margin-bottom:1rem"></div>
-			<div id="inputStats" class="info" style="margin-bottom:1rem;text-align:right"></div>
+			<div id="list"></div>
+			<div id="inputStats" class="info"></div>
 			<div class="row" style="gap:.5rem">
 				<button id="add" class="secondary" style="flex:1"></button>
 				<button id="clear" class="secondary" style="flex:1"></button>
