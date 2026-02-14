@@ -725,6 +725,18 @@
 				reader.readAsText(file);
 			}
 
+			parseNumber(str) {
+				if (!str) return 0;
+				let val = str.trim().replace(/\s/g, '');
+				if (this.language === 'id') {
+					val = val.replace(/\./g, '').replace(',', '.');
+				} else {
+					val = val.replace(/,/g, '');
+				}
+				const num = parseFloat(val);
+				return Math.max(0, Math.round(num) || 0);
+			}
+
 			parseCSV(csvText) {
 				const lines = csvText.split(/\r?\n/).filter(line => line.trim());
 				if (!lines.length) throw new Error();
@@ -753,7 +765,7 @@
 					return {
 						id: this.nextIndex++,
 						name: cells[nameIndex],
-						votes: +((cells[voteIndex] || '').replace(/\D/g, '')) || 0
+						votes: this.parseNumber(cells[voteIndex])
 					};
 				}).filter(Boolean);
 
