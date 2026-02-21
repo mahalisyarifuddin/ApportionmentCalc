@@ -27,3 +27,8 @@
 **Mode:** Medic
 **Learning:** The `ApportionmentCalc.setup` method assigns event handlers by iterating over a predefined object (e.g., `copy: handler`) and setting `elements[id].onclick`. If the corresponding DOM element (e.g., `id="copy"`) is missing from the HTML, the `elements` Proxy returns `null`, causing `null.onclick` assignment to throw a `TypeError`. This halts the entire application initialization.
 **Action:** When adding new UI handlers, ensure the HTML markup for the element exists *before* adding the handler to the logic. Alternatively, add null checks in the setup loop if optional elements are expected.
+
+## 2025-05-21 - [Refactoring Inline Styles to CSS Classes]
+**Mode:** Razor
+**Learning:** In a single-file application with heavy DOM manipulation, inline styles in JavaScript template literals quickly become unreadable and hard to maintain. Refactoring them to utility classes with CSS variables (e.g., `style="--percentage:..."`) significantly improves code clarity and separation of concerns without adding build complexity.
+**Action:** When working on legacy or single-file projects, prioritize extracting repeated inline styles into utility classes and use CSS variables for dynamic values.
