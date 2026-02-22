@@ -305,6 +305,20 @@
 			border: 1px solid var(--border); 
 			border-radius: 4px; 
 		}
+		.flex-align-center { display: flex; align-items: center; }
+		.gap-sm { gap: .5rem; }
+		.mt-sm { margin-top: .5rem; }
+		.mt-md { margin-top: 1rem; }
+		.mt-lg { margin-top: 2rem; }
+		.font-normal { font-weight: 400; }
+		.text-sm { font-size: .9rem; }
+		.w-auto { width: auto; }
+		.m-0 { margin: 0; }
+		.flex-1 { flex: 1; }
+		.italic { font-style: italic; }
+		.gradient-bar {
+			background: linear-gradient(90deg, var(--highlight-bg) var(--percentage), transparent var(--percentage));
+		}
 		@media(max-width: 768px) {
 			.results-grid { 
 				grid-template-columns: 1fr; 
@@ -347,18 +361,18 @@
 				<div class="group">
 					<label id="thresholdLabel" for="threshold"></label>
 					<input type="text" id="threshold" value="4">
-					<label style="display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-weight:400;font-size:.9rem">
-						<input type="checkbox" id="hide" style="width:auto;margin:0">
+					<label class="flex-align-center gap-sm mt-sm font-normal text-sm">
+						<input type="checkbox" id="hide" class="w-auto m-0">
 						<span id="hideLabel"></span>
 					</label>
 				</div>
 			</div>
 			<div id="list"></div>
 			<div id="inputStats" class="info"></div>
-			<div class="row" style="gap:.5rem">
-				<button id="add" class="secondary" style="flex:1"></button>
-				<button id="clear" class="secondary" style="flex:1"></button>
-				<button id="import" class="secondary" style="flex:1"></button>
+			<div class="row gap-sm">
+				<button id="add" class="secondary flex-1"></button>
+				<button id="clear" class="secondary flex-1"></button>
+				<button id="import" class="secondary flex-1"></button>
 			</div>
 			<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
 			<span id="error" class="error hidden" aria-live="polite"></span>
@@ -366,10 +380,10 @@
 		</div>
 		<div id="results" class="hidden">
 			<div class="actions">
-				<button id="edit" class="secondary" style="flex:1"></button>
-				<button id="steps" class="secondary" style="flex:1"></button>
-				<button id="copy" class="secondary" style="flex:1"></button>
-				<button id="export" class="success" style="flex:1"></button>
+				<button id="edit" class="secondary flex-1"></button>
+				<button id="steps" class="secondary flex-1"></button>
+				<button id="copy" class="secondary flex-1"></button>
+				<button id="export" class="success flex-1"></button>
 			</div>
 			<div id="stats" class="stats"></div>
 			<div class="results-grid">
@@ -865,7 +879,7 @@
 
 				const row = (result, seatCount, extra = '') => {
 					const percentage = result.votes / total * 100;
-					return `<tr class="${result.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(result.name)}</td><td>${this.format(result.votes)}</td><td style="background:linear-gradient(90deg,var(--highlight-bg) ${percentage}%,transparent ${percentage}%)">${this.format(percentage, { maximumFractionDigits: 2 })}%</td><td><strong>${seatCount}</strong></td>${extra}</tr>`;
+					return `<tr class="${result.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(result.name)}</td><td>${this.format(result.votes)}</td><td class="gradient-bar" style="--percentage:${percentage}%">${this.format(percentage, { maximumFractionDigits: 2 })}%</td><td><strong>${seatCount}</strong></td>${extra}</tr>`;
 				};
 
 				elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(total)}<br>${this.string('thresholdVotes')} (${this.format(threshold)}%): ${this.format(minimumVotes, { maximumFractionDigits: 2 })}</div>`;
@@ -887,14 +901,14 @@
 				if (!steps?.length) return;
 
 				const summary = steps.slice(0, SUMMARY_LIMIT);
-				const summaryWarning = this.data.seats > SUMMARY_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
+				const summaryWarning = this.data.seats > SUMMARY_LIMIT ? `<p class="info mt-md italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
 				const details = steps.slice(0, STEPS_LIMIT);
-				const detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info" style="margin-top:1rem;font-style:italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
+				const detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info mt-md italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
 				const seatTemplate = this.string('seatAllocated');
 				const winnerPrefix = this.string('winnerPrefix');
 				const options = { minimumFractionDigits: 2, maximumFractionDigits: 6 };
 
-				elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${seatTemplate.replace('{n}', step.round)}</td><td><strong>${this.escapeHtml(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 style="margin-top:2rem">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${seatTemplate.replace('{n}', step.round)} - ${winnerPrefix}${this.escapeHtml(step.winner)}</h4>` + this.table(step.all.map(quotient => `${this.escapeHtml(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
+				elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${seatTemplate.replace('{n}', step.round)}</td><td><strong>${this.escapeHtml(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 class="mt-lg">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${seatTemplate.replace('{n}', step.round)} - ${winnerPrefix}${this.escapeHtml(step.winner)}</h4>` + this.table(step.all.map(quotient => `${this.escapeHtml(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
 			}
 
 			copy() {
