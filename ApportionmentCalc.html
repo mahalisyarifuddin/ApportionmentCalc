@@ -407,7 +407,7 @@
 		const text = {
 			en: {
 				title: 'ApportionmentCalc',
-				subtitle: 'Electoral seat allocation calculator: Sainte-Laguë vs Hare Quota',
+				subtitle: 'Electoral seat allocation calculator: Sainte-Lagu\u00eb vs Hare Quota',
 				autoTheme: 'Auto Theme',
 				lightTheme: 'Light',
 				darkTheme: 'Dark',
@@ -417,12 +417,12 @@
 				add: '+ Add Party',
 				calculate: 'Calculate Allocation',
 				edit: 'Edit Inputs',
-				steps: 'Show Sainte-Laguë Steps',
+				steps: 'Show Sainte-Lagu\u00eb Steps',
 				export: 'Export to CSV',
 				hareTitle: 'Hare Quota Method',
-				sainteLagueTitle: 'Sainte-Laguë Method',
+				sainteLagueTitle: 'Sainte-Lagu\u00eb Method',
 				compareTitle: 'Results Comparison',
-				modalTitle: 'Sainte-Laguë Step-by-Step',
+				modalTitle: 'Sainte-Lagu\u00eb Step-by-Step',
 				party: 'Party',
 				votes: 'Votes',
 				seatsColumn: 'Seats',
@@ -449,7 +449,7 @@
 				share: '%',
 				passedHeader: 'Passed Threshold?',
 				hareSeatsHeader: 'Hare Seats',
-				sainteLagueSeatsHeader: 'Sainte-Laguë Seats',
+				sainteLagueSeatsHeader: 'Sainte-Lagu\u00eb Seats',
 				differenceHeader: 'Difference',
 				yes: 'Yes',
 				no: 'No',
@@ -467,7 +467,7 @@
 			},
 			id: {
 				title: 'ApportionmentCalc',
-				subtitle: 'Kalkulator alokasi kursi pemilu: Sainte-Laguë vs Kuota Hare',
+				subtitle: 'Kalkulator alokasi kursi pemilu: Sainte-Lagu\u00eb vs Kuota Hare',
 				autoTheme: 'Tema Otomatis',
 				lightTheme: 'Terang',
 				darkTheme: 'Gelap',
@@ -477,12 +477,12 @@
 				add: '+ Tambah Partai',
 				calculate: 'Hitung Alokasi',
 				edit: 'Ubah Input',
-				steps: 'Tampilkan Langkah Sainte-Laguë',
+				steps: 'Tampilkan Langkah Sainte-Lagu\u00eb',
 				export: 'Ekspor ke CSV',
 				hareTitle: 'Metode Kuota Hare',
-				sainteLagueTitle: 'Metode Sainte-Laguë',
+				sainteLagueTitle: 'Metode Sainte-Lagu\u00eb',
 				compareTitle: 'Perbandingan Hasil',
-				modalTitle: 'Langkah-langkah Sainte-Laguë',
+				modalTitle: 'Langkah-langkah Sainte-Lagu\u00eb',
 				party: 'Partai',
 				votes: 'Suara',
 				seatsColumn: 'Kursi',
@@ -509,7 +509,7 @@
 				share: '%',
 				passedHeader: 'Lolos Ambang Batas?',
 				hareSeatsHeader: 'Kursi Hare',
-				sainteLagueSeatsHeader: 'Kursi Sainte-Laguë',
+				sainteLagueSeatsHeader: 'Kursi Sainte-Lagu\u00eb',
 				differenceHeader: 'Selisih',
 				yes: 'Ya',
 				no: 'Tidak',
@@ -526,414 +526,345 @@
 				copied: 'Tersalin!'
 			}
 		};
-		const elements = new Proxy({}, { get: (_, id) => document.getElementById(id) });
+		const elements = new Proxy({},{ get: (_,id)=>document.getElementById(id) });
 		const STEPS_LIMIT = 50;
 		const SUMMARY_LIMIT = 1000;
 
 		class ApportionmentCalc {
 			constructor() {
-				this.parties = [];
-				this.setup();
-				this.theme('auto');
-				this.language = navigator.language?.startsWith('id') ? 'id' : 'en';
-				this.lang(this.language);
-				if (!this.loadState()) {
-					this.parties = Object.entries({
-						Apple: 25000,
-						Blueberry: 15000,
-						Cherry: 9000,
-						Date: 5000,
-						Elderberry: 1500
-					}).map(([name, votes], index) => ({ id: index + 1, name: name + ' Party', votes }));
-					this.nextIndex = 6;
-					this.renderParties();
-				} else {
-					this.calculate();
-				}
-				window.onhashchange = () => this.loadState() && this.calculate();
+				(this.parties = [],
+				this.setup(),
+				this.theme('auto'),
+				this.language = navigator.language?.startsWith('id') ? 'id' : 'en',
+				this.lang(this.language),
+				this.loadState()
+					? this.calculate()
+					: (this.parties = Object.entries({
+							Apple: 25000,
+							Blueberry: 15000,
+							Cherry: 9000,
+							Date: 5000,
+							Elderberry: 1500
+						}).map(([n,v],i)=>({ id: i + 1,name: n + ' Party',votes: v })),
+						this.nextIndex = 6,
+						this.renderParties()),
+				window.onhashchange = ()=>this.loadState() && this.calculate())
 			}
 
 			loadState() {
 				try {
-					if (!location.hash) return false;
-					const state = JSON.parse(decodeURIComponent(location.hash.slice(1)));
-					if (!state?.seats || !state?.parties?.length) return false;
-					elements.seats.value = state.seats;
-					elements.threshold.value = state.threshold ?? 0;
-					elements.hide.checked = !!state.hide;
-					this.parties = state.parties.map((party, index) => ({ id: index + 1, name: party.name || '', votes: party.votes || 0 }));
-					this.nextIndex = this.parties.length + 1;
-					this.renderParties();
-					return true;
-				} catch {
-					return false;
+					return !location.hash
+						? false
+						: (s=> (
+							!s?.seats || !s?.parties?.length
+								? false
+								: (elements.seats.value = s.seats,
+									elements.threshold.value = s.threshold ?? 0,
+									elements.hide.checked = !!s.hide,
+									this.parties = s.parties.map((p,i)=>({ id: i + 1,name: p.name || '',votes: p.votes || 0 })),
+									this.nextIndex = this.parties.length + 1,
+									this.renderParties(),
+									true)
+						)) (JSON.parse(decodeURIComponent(location.hash.slice(1))))
+				} catch(e) {
+					return false
 				}
 			}
 
 			saveState() {
-				const state = {
+				(s=> (
+					(h=> (location.hash !== '#' + h && (location.hash = h))) (encodeURIComponent(JSON.stringify(s)))
+				)) ({
 					seats: elements.seats.value,
 					threshold: elements.threshold.value,
 					hide: elements.hide.checked,
-					parties: this.parties.map(({ name, votes }) => ({ name, votes }))
-				};
-				const hash = encodeURIComponent(JSON.stringify(state));
-				if (location.hash !== '#' + hash) location.hash = hash;
+					parties: this.parties.map(({ name,votes })=>({ name,votes }))
+				})
 			}
 
 			setup() {
-				const handlers = {
-					add: () => this.add(),
-					clear: () => this.clear(),
-					calculate: () => this.calculate(),
-					edit: () => this.display('input'),
-					steps: () => this.modal(true),
-					close: () => this.modal(false),
-					copy: () => this.copy(),
-					export: () => this.export(),
-					import: () => elements.file.click()
-				};
-				Object.entries(handlers).forEach(([id, handler]) => elements[id].onclick = handler);
-				elements.file.onchange = event => this.load(event.target.files[0]);
-				elements.modal.onclick = event => {
-					const rect = elements.modal.getBoundingClientRect();
-					const inDialog = rect.top <= event.clientY && event.clientY <= rect.top + rect.height && rect.left <= event.clientX && event.clientX <= rect.left + rect.width;
-					if (!inDialog) this.modal(false);
-				};
-				elements.modal.addEventListener('close', () => this.lastFocus?.focus());
-				elements.language.onchange = event => this.lang(event.target.value);
-				elements.theme.onchange = event => this.theme(event.target.value);
-				elements.input.oninput = () => { this.error(); this.updateInputStats(); };
-				document.onkeydown = event => this.key(event);
-				elements.list.onclick = event => {
-					const row = event.target.closest('.party-row');
-					if (event.target.matches('.danger') && row) this.remove(+row.dataset.id);
-				};
-				elements.list.onchange = event => {
-					const row = event.target.closest('.party-row');
-					const party = row && this.parties.find(p => p.id === +row.dataset.id);
-					if (party) {
-						if (event.target.type === 'text') party.name = event.target.value;
-						else event.target.value = party.votes = Math.max(0, Math.round(+event.target.value) || 0);
-					}
-				};
-				let dragCounter = 0;
-				document.body.ondragenter = event => { event.preventDefault(); dragCounter++; document.body.classList.add('drag-active'); };
-				document.body.ondragleave = event => { dragCounter--; if (dragCounter === 0) document.body.classList.remove('drag-active'); };
-				document.body.ondragover = event => event.preventDefault();
-				document.body.ondrop = event => {
-					event.preventDefault();
-					dragCounter = 0;
-					document.body.classList.remove('drag-active');
-					const file = event.dataTransfer.files[0];
-					if (file) this.load(file);
-				};
+				(Object.entries({
+					add: ()=>this.add(),
+					clear: ()=>this.clear(),
+					calculate: ()=>this.calculate(),
+					edit: ()=>this.display('input'),
+					steps: ()=>this.modal(true),
+					close: ()=>this.modal(false),
+					copy: ()=>this.copy(),
+					export: ()=>this.export(),
+					import: ()=>elements.file.click()
+				}).forEach(([id,h])=>elements[id].onclick = h),
+				elements.file.onchange = e=>this.load(e.target.files[0]),
+				elements.modal.onclick = e=>(r=> ( (r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width) || this.modal(false) )) (elements.modal.getBoundingClientRect()),
+				elements.modal.addEventListener('close',()=>this.lastFocus?.focus()),
+				elements.language.onchange = e=>this.lang(e.target.value),
+				elements.theme.onchange = e=>this.theme(e.target.value),
+				elements.input.oninput = ()=>(this.error(),this.updateInputStats()),
+				document.onkeydown = e=>this.key(e),
+				elements.list.onclick = e=>(r=> ( r && e.target.matches('.danger') && this.remove(+r.dataset.id) )) (e.target.closest('.party-row')),
+				elements.list.onchange = e=>(r=> ( (p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : e.target.value = p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (r && this.parties.find(p=>p.id === +r.dataset.id)) )) (e.target.closest('.party-row')),
+				(c=> (
+					(document.body.ondragenter = e=>(e.preventDefault(),c++,document.body.classList.add('drag-active')),
+					document.body.ondragleave = e=>(c--,c === 0 && document.body.classList.remove('drag-active')),
+					document.body.ondragover = e=>e.preventDefault(),
+					document.body.ondrop = e=>(e.preventDefault(),c = 0,document.body.classList.remove('drag-active'),(f=>f && this.load(f))(e.dataTransfer.files[0])))
+				)) (0))
 			}
 
-			key(event) {
-				if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') this.calculate();
-				const row = event.target.closest('.party-row');
-				if (!event.ctrlKey && !event.metaKey && event.key === 'Enter' && row && event.target.matches('input')) {
-					event.preventDefault();
-					const party = this.parties.find(p => p.id === +row.dataset.id);
-					if (party) {
-						if (event.target.type === 'text') party.name = event.target.value;
-						else party.votes = Math.max(0, Math.round(+event.target.value) || 0);
-					}
-					if (event.target.type === 'text') event.target.nextElementSibling?.focus();
-					else if (row.nextElementSibling) row.nextElementSibling.querySelector('input')?.focus();
-					else this.add();
-				}
+			key(e) {
+				((e.ctrlKey || e.metaKey) && e.key === 'Enter' && this.calculate(),
+				(r=> ( !e.ctrlKey && !e.metaKey && e.key === 'Enter' && r && e.target.matches('input') && (
+					e.preventDefault(),
+					(p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (this.parties.find(p=>p.id === +r.dataset.id)),
+					e.target.type === 'text' ? e.target.nextElementSibling?.focus() : r.nextElementSibling ? r.nextElementSibling.querySelector('input')?.focus() : this.add()
+				) )) (e.target.closest('.party-row')))
 			}
 
-			string(key) { return text[this.language]?.[key] ?? key; }
-			format(value, options = {}) { return value.toLocaleString(this.language === 'id' ? 'id-ID' : 'en-US', options); }
-			escapeHtml(str) { return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
-			table(headers, body) { return `<table><thead><tr>${headers.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`; }
+			string(k) { return text[this.language]?.[k] ?? k }
+			format(v,o = {}) { return v.toLocaleString(this.language === 'id' ? 'id-ID' : 'en-US',o) }
+			escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
+			table(h,b) { return `<table><thead><tr>${h.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>` }
 
-			theme(themeName) {
-				document.documentElement.className = themeName === 'auto' ? '' : themeName;
-				elements.theme.value = themeName;
+			theme(n) {
+				(document.documentElement.className = n === 'auto' ? '' : n,
+				elements.theme.value = n)
 			}
 
-			lang(language) {
-				this.language = elements.language.value = document.documentElement.lang = language;
-				Object.keys(text.en).forEach(key => { if (elements[key]) elements[key].textContent = this.string(key); });
-				[...elements.theme.options].forEach(option => option.textContent = this.string(option.value + 'Theme'));
-				[['close', 'closeModal'], ['language', 'languageLabel'], ['theme', 'themeLabel']].forEach(([id, key]) => elements[id].setAttribute('aria-label', this.string(key)));
-				this.renderParties();
-				if (!elements.results.classList.contains('hidden') && this.data) this.renderResults();
+			lang(l) {
+				(this.language = elements.language.value = document.documentElement.lang = l,
+				Object.keys(text.en).forEach(k=>elements[k] && (elements[k].textContent = this.string(k))),
+				[...elements.theme.options].forEach(o=>o.textContent = this.string(o.value + 'Theme')),
+				[['close','closeModal'],['language','languageLabel'],['theme','themeLabel']]
+					.forEach(([i,k])=>elements[i].setAttribute('aria-label',this.string(k))),
+				this.renderParties(),
+				!elements.results.classList.contains('hidden') && this.data && this.renderResults())
 			}
 
-			display(section) {
-				['input', 'results'].forEach(id => elements[id].classList.toggle('hidden', id !== section));
-				if (section === 'results') { elements.results.setAttribute('tabindex', '-1'); elements.results.focus(); }
-				else elements.seats.focus();
+			display(s) {
+				(['input','results'].forEach(i=>elements[i].classList.toggle('hidden',i !== s)),
+				s === 'results' ? (elements.results.setAttribute('tabindex','-1'),elements.results.focus()) : elements.seats.focus())
 			}
 
-			modal(visible) {
-				if (visible) { this.lastFocus = document.activeElement; this.renderSteps(); elements.modal.showModal(); }
-				else elements.modal.close();
+			modal(v) {
+				v ? (this.lastFocus = document.activeElement,this.renderSteps(),elements.modal.showModal()) : elements.modal.close()
 			}
 
-			error(message) {
-				elements.error.textContent = message || '';
-				elements.error.classList.toggle('hidden', !message);
+			error(m) {
+				(elements.error.textContent = m || '',
+				elements.error.classList.toggle('hidden',!m))
 			}
 
 			add() {
-				this.error();
-				this.parties.push({ id: this.nextIndex++, name: '', votes: 0 });
-				this.renderParties();
-				elements.list.lastElementChild?.querySelector('input')?.focus();
+				(this.error(),
+				this.parties.push({ id: this.nextIndex++,name: '',votes: 0 }),
+				this.renderParties(),
+				elements.list.lastElementChild?.querySelector('input')?.focus())
 			}
 
 			clear() {
-				if (confirm(this.string('clearConfirm'))) {
-					this.parties = [];
-					this.renderParties();
-					this.add();
-					this.error();
-				}
+				confirm(this.string('clearConfirm')) && (
+					this.parties = [],
+					this.renderParties(),
+					this.add(),
+					this.error()
+				)
 			}
 
-			remove(id) {
-				this.error();
-				const index = this.parties.findIndex(party => party.id === id);
-				this.parties = this.parties.filter(party => party.id !== id);
-				this.renderParties();
-				const target = Math.min(index, this.parties.length - 1);
-				if (target >= 0) elements.list.children[target]?.querySelector('.danger')?.focus();
-				else elements.add.focus();
+			remove(i) {
+				(this.error(),
+				(idx=> (
+					this.parties = this.parties.filter(p=>p.id !== i),
+					this.renderParties(),
+					(t=> ( t >= 0 ? elements.list.children[t]?.querySelector('.danger')?.focus() : elements.add.focus() )) (Math.min(idx,this.parties.length - 1))
+				)) (this.parties.findIndex(p=>p.id === i)))
 			}
 
 			updateInputStats() {
-				const votes = [...elements.list.querySelectorAll('input[type=number]')].reduce((sum, input) => sum + (Math.max(0, parseInt(input.value) || 0)), 0);
-				const threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
-				const minVotes = votes * threshold / 100;
-				elements.inputStats.innerHTML = `${this.string('totalVotes')}: <strong>${this.format(votes)}</strong> | ${this.string('thresholdVotes')} (${this.format(threshold)}%): <strong>${this.format(minVotes, { maximumFractionDigits: 2 })}</strong>`;
+				(v=> (
+					(t=> (
+						(m=> (
+							elements.inputStats.innerHTML = `${this.string('totalVotes')}: <strong>${this.format(v)}</strong> | ${this.string('thresholdVotes')} (${this.format(t)}%): <strong>${this.format(m,{ maximumFractionDigits: 2 })}</strong>`
+						)) (v * t / 100)
+					)) (parseFloat(elements.threshold.value.replace(',','.')) || 0)
+				)) ([...elements.list.querySelectorAll('input[type=number]')]
+					.reduce((s,i)=>s + Math.max(0,parseInt(i.value) || 0),0))
 			}
 
 			renderParties() {
-				elements.list.innerHTML = this.parties.map((party, index) => `
-					<div class="party-row" data-id="${party.id}">
-						<input type="text" value="${this.escapeHtml(party.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${index + 1}">
-						<input type="number" value="${party.votes || ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${index + 1}">
-						<button class="danger" aria-label="${this.string('removeParty')} ${index + 1}">×</button>
-					</div>
-				`).join('');
-				this.updateInputStats();
+				(elements.list.innerHTML = this.parties
+					.map((p,i)=>`
+						<div class="party-row" data-id="${p.id}">
+							<input type="text" value="${this.escapeHtml(p.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${i + 1}">
+							<input type="number" value="${p.votes || ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${i + 1}">
+							<button class="danger" aria-label="${this.string('removeParty')} ${i + 1}">×</button>
+						</div>
+					`).join(''),
+				this.updateInputStats())
 			}
 
-			load(file) {
-				if (!file) return;
-				const reader = new FileReader();
-				reader.onload = event => {
+			load(f) {
+				(r=> (r.onload = e=>{
 					try {
-						this.parseCSV(event.target.result);
-						elements.file.value = '';
-					} catch {
-						this.error(this.string('alertImport'));
+						this.parseCSV(e.target.result),
+						elements.file.value = ''
+					} catch(err) {
+						this.error(this.string('alertImport'))
 					}
-				};
-				reader.readAsText(file);
+				},r.readAsText(f))) (new FileReader())
 			}
 
-			parseNumber(str) {
-				if (!str) return 0;
-				let val = str.trim().replace(/\s/g, '');
-				if (this.language === 'id') {
-					val = val.replace(/\./g, '').replace(',', '.');
-				} else {
-					val = val.replace(/,/g, '');
-				}
-				const num = parseFloat(val);
-				return Math.max(0, Math.round(num) || 0);
+			parseNumber(s) {
+				return (v=> (n=> ( Math.max(0,Math.round(n) || 0) )) (parseFloat(v))) (!s
+					? '0'
+					: s.trim()
+						.replace(/\s/g,'')
+						.replace(this.language === 'id' ? /\./g : /,/g,'')
+						.replace(this.language === 'id' ? /,/ : /\./,'.'))
 			}
 
-			parseCSV(csvText) {
-				const lines = csvText.split(/\r?\n/).filter(line => line.trim());
-				if (!lines.length) throw new Error();
-
-				const separator = lines[0].includes('\t') && lines[0].split('\t').length > lines[0].split(',').length ? '\t' : ',';
-				const parse = line => line.split(new RegExp(`\\${separator}(?=(?:(?:[^"]*"){2})*[^"]*$)`)).map(cell => cell.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
-
-				const header = parse(lines[0]);
-				const isNum = cell => /^\d+$/.test(cell?.replace(/[.,]/g, '').trim());
-
-				let nameIndex = header.findIndex(cell => /party|partai|name|nama/i.test(cell));
-				let voteIndex = header.findIndex(cell => /vote|suara/i.test(cell));
-				let start = 1;
-
-				if (nameIndex < 0 || voteIndex < 0) {
-					start = 0;
-					voteIndex = header.findIndex(isNum);
-					nameIndex = (voteIndex >= 0 && header.length === 2) ? 1 - voteIndex : header.findIndex(cell => !isNum(cell));
-				}
-
-				if (nameIndex < 0 || voteIndex < 0) throw new Error();
-
-				const parties = lines.slice(start).map(line => {
-					const cells = parse(line);
-					if (!cells[nameIndex]) return null;
-					return {
-						id: this.nextIndex++,
-						name: cells[nameIndex],
-						votes: this.parseNumber(cells[voteIndex])
-					};
-				}).filter(Boolean);
-
-				if (!parties.length) throw new Error();
-
-				this.parties = parties;
-				this.error();
-				this.renderParties();
+			parseCSV(t) {
+				(l=> (
+				  !l.length ? (()=>{throw new Error()})() :
+				  (s=> (
+					(p=> (
+					  (h=> (
+						(is=> (
+						  (ni=> (
+							(v_idx=> (
+							  (st=> (
+								( ((ni < 0 || v_idx < 0) && (st = 0,v_idx = h.findIndex(is),ni = (v_idx >= 0 && h.length === 2) ? 1 - v_idx : h.findIndex(c=>!is(c)))),
+								  ni < 0 || v_idx < 0 ? (()=>{throw new Error()})() : (ps=> ( !ps.length ? (()=>{throw new Error()})() : (this.parties = ps,this.error(),this.renderParties()) )) ( l.slice(st)
+									.map(ln=> (c=> !c[ni] ? null : ({id:this.nextIndex++,name:c[ni],votes:this.parseNumber(c[v_idx])}))(p(ln)))
+									.filter(Boolean) ) )
+							  )) (1)
+							)) (h.findIndex(c=>/vote|suara/i.test(c)))
+						  )) (h.findIndex(c=>/party|partai|name|nama/i.test(c)))
+						)) (c=>/^\d+$/.test(c?.replace(/[.,]/g,'').trim()))
+					  )) (p(l[0]))
+					)) (ln=>ln.split(new RegExp(`\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
+						.map(c=>c.trim().replace(/^"|"$/g,'').replace(/""/g,'"')))
+				  )) (l[0].includes('\t')&&l[0].split('\t').length>l[0].split(',').length?'\t':',')
+				)) (t.split(/\r?\n/).filter(ln=>ln.trim()))
 			}
 
 			calculate() {
-				this.error();
-				const seats = parseInt(elements.seats.value);
-				const threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
-
-				this.parties = this.parties.filter(p => p.name.trim() || p.votes > 0);
-				this.renderParties();
-
-				if (isNaN(seats) || seats < 1) return this.error(this.string('alertSeats'));
-
-				const { error, data } = this.computeAllocation(seats, threshold, this.parties);
-				if (error) return this.error(this.string(error));
-
-				try { this.saveState(); } catch (e) { console.error('saveState error:', e); }
-				this.data = data;
-				this.renderResults();
-				this.display('results');
+				(this.error(),
+				this.parties = this.parties.filter(p=>p.name.trim() || p.votes > 0),
+				this.renderParties(),
+				(s=> (
+					(t=> ( isNaN(s) || s < 1
+						? this.error(this.string('alertSeats'))
+						: (res=> ( res.error
+								? this.error(this.string(res.error))
+								: (this.saveState(),this.data = res.data,this.renderResults(),this.display('results'))
+							)) (this.computeAllocation(s,t,this.parties))
+					)) (parseFloat(elements.threshold.value.replace(',','.')) || 0)
+				)) (parseInt(elements.seats.value)))
 			}
 
-			computeAllocation(seats, threshold, parties) {
-				const valid = parties
-					.filter(party => party.votes >= 0 && (party.name || party.votes > 0))
-					.map(party => ({
-						...party,
-						name: party.name || `${this.string('party')} ${party.id}`,
-						hare: 0,
-						sainteLague: 0,
-						remainder: 0
-					}));
-
-				const total = valid.reduce((sum, party) => sum + party.votes, 0);
-				if (total === 0) return { error: 'alertParties' };
-
-				const minimumVotes = total * threshold / 100;
-				const passed = valid.filter(party => party.votes >= minimumVotes - 1e-7);
-
-				if (!passed.length) return { error: 'belowThreshold' };
-
-				const passedTotal = passed.reduce((sum, party) => sum + party.votes, 0);
-				const quota = passedTotal / seats;
-				passed.forEach(party => {
-					party.hare = Math.floor(party.votes * seats / passedTotal);
-					party.remainder = (party.votes * seats % passedTotal) / seats;
-					party.divisor = 1;
-					party.quotient = party.votes;
-				});
-
-				const allocated = passed.reduce((sum, party) => sum + party.hare, 0);
-				const remainders = [...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes);
-				remainders.slice(0, seats - allocated).forEach(party => party.hare++);
-
-				const steps = [];
-				for (let index = 0; index < seats; index++) {
-					const winner = passed.reduce((best, party) =>
-						party.quotient > best.quotient || (party.quotient === best.quotient && party.votes > best.votes) ? party : best
-					);
-					if (index < SUMMARY_LIMIT) {
-						steps.push({
-							round: index + 1,
-							winner: winner.name,
-							winnerId: winner.id,
-							value: winner.quotient,
-							divisor: winner.divisor,
-							all: index < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null
-						});
-					}
-					winner.sainteLague++;
-					winner.divisor += 2;
-					winner.quotient = winner.votes / winner.divisor;
-				}
-
-				const results = valid.map(party => ({ ...party, passed: party.votes >= minimumVotes - 1e-7 }));
-				const calculateGallagher = (key) => Math.sqrt(0.5 * valid.reduce((sum, p) => sum + Math.pow((p.votes / total * 100) - (p[key] / seats * 100), 2), 0));
-				return {
-					data: {
-						total, minimumVotes, threshold, seats, quota, steps, results,
-						hareIndex: calculateGallagher('hare'),
-						sainteLagueIndex: calculateGallagher('sainteLague')
-					}
-				};
+			computeAllocation(s,t,ps) {
+				return (v=> (
+					(tot=> ( tot === 0 ? { error: 'alertParties' } : (m=> (
+						(passed=> ( !passed.length ? { error: 'belowThreshold' } : (pt=> (
+							(q=> (
+								(passed.forEach(p=>(p.hare = Math.floor(p.votes * s / pt),p.remainder = (p.votes * s % pt) / pt,p.divisor = 1,p.quotient = p.votes)),
+								(rem=> ( rem.slice(0,s - passed.reduce((sum,p)=>sum + p.hare,0)).forEach(p=>p.hare++) )) ([...passed].sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes)),
+								(steps=> (
+									([...Array(s)].forEach((_,i)=>(w=> (
+										(i < SUMMARY_LIMIT && steps.push({ round: i + 1,winner: w.name,winnerId: w.id,value: w.quotient,divisor: w.divisor,all: i < STEPS_LIMIT ? passed.map(({ id,name,quotient,divisor })=>({ id,name,quotient,divisor })) : null })),
+										w.sainteLague++,w.divisor += 2,w.quotient = w.votes / w.divisor
+									)) (passed.reduce((best,p)=>p.quotient > best.quotient || (p.quotient === best.quotient && p.votes > best.votes) ? p : best)))),
+									(res=> (cg=> ({ data: { total: tot,minimumVotes: m,threshold: t,seats: s,quota: q,steps,results: res,hareIndex: cg('hare'),sainteLagueIndex: cg('sainteLague') } })) (k=> Math.sqrt(0.5 * v.reduce((sum,p)=>sum + Math.pow((p.votes / tot * 100) - (p[k] / s * 100),2),0)))) (v.map(p=>({ ...p,passed: p.votes >= m - 1e-7 })))
+								)) ([]))
+							)) (pt / s)
+						)) (passed.reduce((sum,p)=>sum + p.votes,0))
+					)) (v.filter(p=>p.votes >= m - 1e-7)) )) (tot * t / 100) )) (v.reduce((sum,p)=>sum + p.votes,0))
+				)) (ps.filter(p=>p.votes >= 0 && (p.name || p.votes > 0))
+					.map(p=>({ ...p,name: p.name || `${this.string('party')} ${p.id}`,hare: 0,sainteLague: 0,remainder: 0 })))
 			}
 
 			renderResults() {
-				if (!this.data) return;
-				elements.results.classList.toggle('hide-failed', elements.hide.checked);
-				const { results, total, minimumVotes, threshold, quota, hareIndex, sainteLagueIndex } = this.data;
-
-				const row = (result, seatCount, extra = '') => {
-					const percentage = result.votes / total * 100;
-					return `<tr class="${result.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(result.name)}</td><td>${this.format(result.votes)}</td><td class="gradient-bar" style="--percentage:${percentage}%">${this.format(percentage, { maximumFractionDigits: 2 })}%</td><td><strong>${seatCount}</strong></td>${extra}</tr>`;
-				};
-
-				elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(total)}<br>${this.string('thresholdVotes')} (${this.format(threshold)}%): ${this.format(minimumVotes, { maximumFractionDigits: 2 })}</div>`;
-				const headers = ['party', 'votes', 'share', 'seatsColumn'].map(key => this.string(key));
-
-				elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(quota)} | ${this.string('gallagher')}: ${this.format(hareIndex, { maximumFractionDigits: 4 })}</p>` + this.table([...headers, this.string('remainder')], [...results].sort((a, b) => b.hare - a.hare || b.votes - a.votes).map(result => row(result, result.hare, `<td>${this.format(result.remainder, { maximumFractionDigits: 6 })}</td>`)).join(''));
-
-				elements.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')} | ${this.string('gallagher')}: ${this.format(sainteLagueIndex, { maximumFractionDigits: 4 })}</p>` + this.table(headers, [...results].sort((a, b) => b.sainteLague - a.sainteLague || b.votes - a.votes).map(result => row(result, result.sainteLague)).join(''));
-
-				elements.compare.innerHTML = this.table([this.string('party'), this.string('votes'), this.string('share'), 'Hare', 'Sainte-Laguë', this.string('diff')], [...results].sort((a, b) => b.votes - a.votes).map(result => {
-					const difference = result.sainteLague - result.hare;
-					const percentage = result.votes / total * 100;
-					return `<tr class="${result.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(result.name)}</td><td>${this.format(result.votes)}</td><td>${this.format(percentage, { maximumFractionDigits: 2 })}%</td><td>${result.hare}</td><td>${result.sainteLague}</td><td class="${difference > 0 ? 'positive' : difference < 0 ? 'negative' : 'neutral'}">${difference > 0 ? '+' : ''}${difference}</td></tr>`;
-				}).join(''));
+				this.data && (
+					(elements.results.classList.toggle('hide-failed',elements.hide.checked),
+					(d=> (
+						(r=> (
+							(elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(d.total)}<br>${this.string('thresholdVotes')} (${this.format(d.threshold)}%): ${this.format(d.minimumVotes,{ maximumFractionDigits: 2 })}</div>`,
+							elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(d.quota)} | ${this.string('gallagher')}: ${this.format(d.hareIndex,{ maximumFractionDigits: 4 })}</p>`
+								+ this.table([...['party','votes','share','seatsColumn'].map(k=>this.string(k)),this.string('remainder')], [...d.results]
+									.sort((a,b)=>b.hare - a.hare || b.votes - a.votes)
+									.map(res=>r(res,res.hare,`<td>${this.format(res.remainder,{ maximumFractionDigits: 6 })}</td>`))
+									.join('')),
+							elements.sainteLague.innerHTML = `<p class="info">${this.string('divisorsText')} | ${this.string('gallagher')}: ${this.format(d.sainteLagueIndex,{ maximumFractionDigits: 4 })}</p>`
+								+ this.table(['party','votes','share','seatsColumn'].map(k=>this.string(k)), [...d.results]
+									.sort((a,b)=>b.sainteLague - a.sainteLague || b.votes - a.votes)
+									.map(res=>r(res,res.sainteLague))
+									.join('')),
+							elements.compare.innerHTML = this.table([this.string('party'),this.string('votes'),this.string('share'),'Hare','Sainte-Lagu\u00eb',this.string('diff')], [...d.results]
+								.sort((a,b)=>b.votes - a.votes)
+								.map(res=>(diff=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td>${this.format(res.votes / d.total * 100,{ maximumFractionDigits: 2 })}%</td><td>${res.hare}</td><td>${res.sainteLague}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>` )) (res.sainteLague - res.hare))
+								.join('')))
+						)) ((res,count,extra = '')=> (pct=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td class="gradient-bar" style="--percentage:${pct}%">${this.format(pct,{ maximumFractionDigits: 2 })}%</td><td><strong>${count}</strong></td>${extra}</tr>` )) (res.votes / d.total * 100))
+					)) (this.data))
+				)
 			}
 
 			renderSteps() {
-				const { steps } = this.data || {};
-				if (!steps?.length) return;
-
-				const summary = steps.slice(0, SUMMARY_LIMIT);
-				const summaryWarning = this.data.seats > SUMMARY_LIMIT ? `<p class="info mt-md italic">${this.string('summaryLimited').replace('{n}', SUMMARY_LIMIT)}</p>` : '';
-				const details = steps.slice(0, STEPS_LIMIT);
-				const detailsWarning = steps.length > STEPS_LIMIT ? `<p class="info mt-md italic">${this.string('detailsLimited').replace('{n}', STEPS_LIMIT)}</p>` : '';
-				const seatTemplate = this.string('seatAllocated');
-				const winnerPrefix = this.string('winnerPrefix');
-				const options = { minimumFractionDigits: 2, maximumFractionDigits: 6 };
-
-				elements.modalSteps.innerHTML = this.table(['round', 'winner', 'quotient', 'divisor'].map(key => this.string(key)), summary.map(step => `<tr><td>${seatTemplate.replace('{n}', step.round)}</td><td><strong>${this.escapeHtml(step.winner)}</strong></td><td>${this.format(step.value, options)}</td><td>${step.divisor}</td></tr>`).join('')) + summaryWarning + `<h3 class="mt-lg">${this.string('quotientDetail')}</h3>${detailsWarning}` + details.map(step => step.all ? `<div class="step"><h4>${seatTemplate.replace('{n}', step.round)} - ${winnerPrefix}${this.escapeHtml(step.winner)}</h4>` + this.table(step.all.map(quotient => `${this.escapeHtml(quotient.name)} (/${quotient.divisor})`), `<tr>${step.all.map(quotient => `<td class="${quotient.id === step.winnerId ? 'highlight' : ''}">${this.format(quotient.quotient, options)}</td>`).join('')}</tr>`) + '</div>' : '').join('') + detailsWarning;
+				(d=> d?.steps?.length && (
+				  (sum=> (
+					(sumW=> (
+					  (det=> (
+						(detW=> (
+						  (st=> (
+							(wp=> (
+							  (opt=> (
+								(elements.modalSteps.innerHTML = this.table(['round','winner','quotient','divisor'].map(k=>this.string(k)),sum
+									.map(s=>`<tr><td>${st.replace('{n}',s.round)}</td><td><strong>${this.escapeHtml(s.winner)}</strong></td><td>${this.format(s.value,opt)}</td><td>${s.divisor}</td></tr>`).join(''))
+									+ sumW + `<h3 class="mt-lg">${this.string('quotientDetail')}</h3>${detW}`
+									+ det.map(s=>s.all
+										? `<div class="step"><h4>${st.replace('{n}',s.round)} - ${wp}${this.escapeHtml(s.winner)}</h4>`
+											+ this.table(s.all.map(q=>`${this.escapeHtml(q.name)} (/${q.divisor})`),`<tr>${s.all.map(q=>`<td class="${q.id === s.winnerId ? 'highlight' : ''}">${this.format(q.quotient,opt)}</td>`).join('')}</tr>`)
+											+ '</div>'
+										: '').join('')
+									+ detW)
+							  )) ({ minimumFractionDigits: 2,maximumFractionDigits: 6 })
+							)) (this.string('winnerPrefix'))
+						  )) (this.string('seatAllocated'))
+						)) (d.steps.length > STEPS_LIMIT ? `<p class="info mt-md italic">${this.string('detailsLimited').replace('{n}',STEPS_LIMIT)}</p>` : '')
+					  )) (d.steps.slice(0,STEPS_LIMIT))
+					)) (d.seats > SUMMARY_LIMIT ? `<p class="info mt-md italic">${this.string('summaryLimited').replace('{n}',SUMMARY_LIMIT)}</p>` : '')
+				  )) (d.steps.slice(0,SUMMARY_LIMIT))
+				)) (this.data)
 			}
 
 			copy() {
-				if (!this.data) return;
-				const { results } = this.data;
-				const total = results.reduce((sum, party) => sum + party.votes, 0);
-				const headers = [this.string('party'), this.string('votes'), this.string('share'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('diff')].join('\t');
-				const tsv = headers + '\n' + results.map(r => [r.name, r.votes, this.format(r.votes / total * 100, { maximumFractionDigits: 2 }) + '%', r.hare, r.sainteLague, r.sainteLague - r.hare].join('\t')).join('\n');
-				navigator.clipboard.writeText(tsv).then(() => {
-					const button = elements.copy;
-					button.textContent = this.string('copied');
-					setTimeout(() => button.textContent = this.string('copy'), 2000);
-				}).catch(() => {});
+				this.data && (r=> (
+				  (t=> (
+					(h=> (
+					  (tsv=> (
+						navigator.clipboard.writeText(tsv)
+							.then(()=>(b=> (b.textContent = this.string('copied'),setTimeout(()=>b.textContent = this.string('copy'), 2000))) (elements.copy))
+					  )) ( [h,...r.map(res=>[res.name,res.votes,this.format(res.votes / t * 100,{ maximumFractionDigits: 2 }) + '%',res.hare,res.sainteLague,res.sainteLague - res.hare].join('\t'))].join('\n') )
+					)) ( [this.string('party'),this.string('votes'),this.string('share'),this.string('hareSeatsHeader'),this.string('sainteLagueSeatsHeader'),this.string('diff')].join('\t') )
+				  )) ( r.reduce((sum,p)=>sum + p.votes,0) )
+				)) (this.data.results)
 			}
 
 			export() {
-				if (!this.data) return;
-				const { results } = this.data;
-				const total = results.reduce((sum, party) => sum + party.votes, 0);
-				const headers = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
-				const csv = headers + '\n' + results.map(result => `"${result.name.replace(/"/g, '""')}",${result.votes},"${this.format(result.votes / total * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}",${result.passed ? this.string('yes') : this.string('no')},${result.hare},${result.sainteLague},${result.sainteLague - result.hare}`).join('\n');
-				Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv' })), download: `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv` }).click();
+				this.data && (r=> (
+				  (t=> (
+					(h=> (
+					  (csv=> (
+						Object.assign(document.createElement('a'), {
+							href: URL.createObjectURL(new Blob([csv],{ type: 'text/csv' })),
+							download: `apportionment_${new Date().toISOString().slice(0,19).replace(/[T:]/g,'-')}.csv`
+						}).click()
+					  )) ( [h,...r.map(res=>`"${res.name.replace(/"/g,'""')}",${res.votes},"${this.format(res.votes / t * 100,{ minimumFractionDigits: 2,maximumFractionDigits: 2 })}",${res.passed ? this.string('yes') : this.string('no')},${res.hare},${res.sainteLague},${res.sainteLague - res.hare}`)].join('\n') )
+					)) ( [this.string('party'),this.string('votes'),this.string('share'),this.string('passedHeader'),this.string('hareSeatsHeader'),this.string('sainteLagueSeatsHeader'),this.string('differenceHeader')].join(',') )
+				  )) ( r.reduce((sum,p)=>sum + p.votes,0) )
+				)) (this.data.results)
 			}
 		}
 		new ApportionmentCalc();
-	</script>
+</script>
 </body>
 </html>
