@@ -593,7 +593,7 @@
 					copy: ()=>this.copy(),
 					export: ()=>this.export(),
 					import: ()=>elements.file.click()
-				}).forEach(([id,h])=>elements[id].onclick = h),
+				}).forEach(([id,h])=>elements[id] && (elements[id].onclick = h)),
 				elements.file.onchange = e=>this.load(e.target.files[0]),
 				elements.modal.onclick = e=>(r=> ( (r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width) || this.modal(false) )) (elements.modal.getBoundingClientRect()),
 				elements.modal.addEventListener('close',()=>this.lastFocus?.focus()),
