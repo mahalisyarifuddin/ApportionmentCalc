@@ -770,10 +770,10 @@
 								(passed.forEach(p=>(p.hare = Math.floor(p.votes * s / pt),p.remainder = (p.votes * s % pt) / pt,p.divisor = 1,p.quotient = p.votes)),
 								(rem=> ( rem.slice(0,s - passed.reduce((sum,p)=>sum + p.hare,0)).forEach(p=>p.hare++) )) ([...passed].sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes)),
 								(steps=> (
-									([...Array(s)].forEach((_,i)=>(w=> (
+									((()=>{ for(let i=0;i<s;i++)(w=> (
 										(i < SUMMARY_LIMIT && steps.push({ round: i + 1,winner: w.name,winnerId: w.id,value: w.quotient,divisor: w.divisor,all: i < STEPS_LIMIT ? passed.map(({ id,name,quotient,divisor })=>({ id,name,quotient,divisor })) : null })),
 										w.sainteLague++,w.divisor += 2,w.quotient = w.votes / w.divisor
-									)) (passed.reduce((best,p)=>p.quotient > best.quotient || (p.quotient === best.quotient && p.votes > best.votes) ? p : best)))),
+									)) (passed.reduce((best,p)=>p.quotient > best.quotient || (p.quotient === best.quotient && p.votes > best.votes) ? p : best))})()),
 									(res=> (cg=> ({ data: { total: tot,minimumVotes: m,threshold: t,seats: s,quota: q,steps,results: res,hareIndex: cg('hare'),sainteLagueIndex: cg('sainteLague') } })) (k=> Math.sqrt(0.5 * v.reduce((sum,p)=>sum + Math.pow((p.votes / tot * 100) - (p[k] / s * 100),2),0)))) (v.map(p=>({ ...p,passed: p.votes >= m - 1e-7 })))
 								)) ([]))
 							)) (pt / s)

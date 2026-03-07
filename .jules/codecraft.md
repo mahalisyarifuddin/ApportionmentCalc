@@ -1,3 +1,8 @@
+## 2025-05-22 - Avoid Array Allocation for Large Loops
+**Mode:** Bolt
+**Learning:** Using `[...Array(n)].forEach()` for iteration is concise but allocates an array of size `n` in memory. If `n` is user-provided and very large (e.g., millions of seats in an apportionment calculation or stress test), it causes massive garbage collection overhead, huge O(N) memory usage, and potential browser crashes.
+**Action:** When a loop count can be significantly large, use a traditional `for` loop wrapped in an IIFE `(()=>{ for(let i=0; i<n; i++) { ... } })()` to maintain functional chaining while reducing memory complexity to O(1) and drastically improving speed.
+
 ## 2025-02-18 - [Fix CSV Parsing for International Formats]
 **Mode:** Medic
 **Learning:** The CSV parsing logic used `replace(/[^\d.]/g, '')` which preserved dots, causing `1.000` (Indonesian thousand) to be parsed as `1`. Since the app uses integer votes (rounding in UI), robust parsing should strictly enforce integers by stripping all non-digits (`/\D/g`) to support all thousands separators.
