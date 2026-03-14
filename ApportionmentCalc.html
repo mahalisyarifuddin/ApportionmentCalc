@@ -621,7 +621,15 @@
 			}
 
 			string(k) { return text[this.language]?.[k] ?? k }
-			format(v,o = {}) { return v.toLocaleString(this.language === 'id' ? 'id-ID' : 'en-US',o) }
+
+			format(v,o = {}) {
+				this._fmt = this._fmt || {};
+				const loc = this.language === 'id' ? 'id-ID' : 'en-US';
+				const key = loc + JSON.stringify(o);
+				this._fmt[key] = this._fmt[key] || new Intl.NumberFormat(loc, o);
+				return this._fmt[key].format(v);
+			}
+
 			escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
 			table(h,b) { return `<table><thead><tr>${h.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>` }
 
