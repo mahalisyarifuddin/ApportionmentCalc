@@ -548,7 +548,7 @@
 						}).map(([n,v],i)=>({ id: i + 1,name: n + ' Party',votes: v })),
 						this.nextIndex = 6,
 						this.renderParties()),
-				window.onhashchange = ()=>this.loadState() && this.calculate())
+				window.onhashchange = ()=> (this._skipHash ? (this._skipHash = false) : (this.loadState() && this.calculate())))
 			}
 
 			loadState() {
@@ -573,7 +573,7 @@
 
 			saveState() {
 				(s=> (
-					(h=> (location.hash !== '#' + h && (location.hash = h))) (encodeURIComponent(JSON.stringify(s)))
+					(h=> (location.hash !== '#' + h && (this._skipHash = true, location.hash = h))) (encodeURIComponent(JSON.stringify(s)))
 				)) ({
 					seats: elements.seats.value,
 					threshold: elements.threshold.value,
