@@ -599,6 +599,7 @@
 				elements.modal.addEventListener('close',()=>this.lastFocus?.focus()),
 				elements.language.onchange = e=>this.lang(e.target.value),
 				elements.theme.onchange = e=>this.theme(e.target.value),
+				elements.hide.onchange = ()=>(elements.results.classList.toggle('hide-failed',elements.hide.checked),this.saveState()),
 				elements.input.oninput = ()=>(this.error(),this.updateInputStats()),
 				document.onkeydown = e=>this.key(e),
 				elements.list.onclick = e=>(r=> ( r && e.target.matches('.danger') && this.remove(+r.dataset.id) )) (e.target.closest('.party-row')),
