@@ -712,10 +712,10 @@
 			}
 
 			load(f) {
-				(r=> (r.onload = e=>{
+				f && (r=> (r.onload = e=>{
+					elements.file.value = '';
 					try {
-						this.parseCSV(e.target.result),
-						elements.file.value = ''
+						this.parseCSV(e.target.result)
 					} catch(err) {
 						this.error(this.string('alertImport'))
 					}
