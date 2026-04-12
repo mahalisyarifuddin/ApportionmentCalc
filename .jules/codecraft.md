@@ -37,3 +37,8 @@
 **Mode:** Razor
 **Learning:** In a single-file application with heavy DOM manipulation, inline styles in JavaScript template literals quickly become unreadable and hard to maintain. Refactoring them to utility classes with CSS variables (e.g., `style="--percentage:..."`) significantly improves code clarity and separation of concerns without adding build complexity.
 **Action:** When working on legacy or single-file projects, prioritize extracting repeated inline styles into utility classes and use CSS variables for dynamic values.
+
+## 2025-10-27 - [Avoid Falsy Fallbacks for Valid Zero Inputs]
+**Mode:** Medic
+**Learning:** In the rendering logic of inputs, using `value="${p.votes || ''}"` causes valid `0` entries to be replaced with an empty string `""` on re-render, effectively wiping user input. This happens because `0` evaluates to falsy in JavaScript.
+**Action:** When rendering numeric fields where `0` is a valid input, use nullish coalescing `??` (e.g., `p.votes ?? ''`) instead of logical OR `||` to prevent valid zero values from being wiped.
