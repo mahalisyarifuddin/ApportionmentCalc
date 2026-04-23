@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>HijriTrack</title>
+	<style>
+		:root {
+			--primary: #005dac;
+			--on-primary: #ffffff;
+			--hover: #00539a;
+			--background: #f9f9ff;
+			--surface: #ffffff;
+			--text: #181c21;
+			--border: #c1c6d4;
+			--muted: #f2f3fc;
+			--success: #0b6b1d;
+			--on-success: #ffffff;
+			--error: #ba1a1a;
+			--on-error: #ffffff;
+			--highlight-bg: #d4e3ff;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root:not(.light) {
+				--primary: #a5c8ff;
+				--on-primary: #00315f;
+				--hover: #72adff;
+				--background: #101319;
+				--surface: #0b0e14;
+				--text: #e0e2ea;
+				--border: #414752;
+				--muted: #181c21;
+				--success: #82db7e;
+				--on-success: #00390a;
+				--error: #ffb4ab;
+				--on-error: #93000a;
+				--highlight-bg: #001c3a;
+			}
+		}
+		:root.dark {
+			--primary: #a5c8ff;
+			--on-primary: #00315f;
+			--hover: #72adff;
+			--background: #101319;
+			--surface: #0b0e14;
+			--text: #e0e2ea;
+			--border: #414752;
+			--muted: #181c21;
+			--success: #82db7e;
+			--on-success: #00390a;
+			--error: #ffb4ab;
+			--on-error: #93000a;
+			--highlight-bg: #001c3a;
+		}
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body {
+			background: var(--background);
+			color: var(--text);
+			font-family: system-ui, -apple-system, sans-serif;
+			font-variant-numeric: tabular-nums;
+			display: flex;
+			justify-content: center;
+			min-height: 100vh;
+			padding: 1rem;
+		}
+		.container {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 12px;
+			max-width: 900px;
+			padding: 2rem;
+			width: 100%;
+			position: relative;
+			margin: 2rem 0;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+		}
+		.selectors {
+			position: absolute;
+			right: 2rem;
+			top: 1rem;
+			display: flex;
+			gap: 8px;
+		}
+		select, button {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			color: var(--text);
+			padding: .25rem .5rem;
+			font-size: .9rem;
+			cursor: pointer;
+		}
+		h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+		.subtitle { font-size: 1.1rem; opacity: 0.8; margin-bottom: 2rem; }
+		.card {
+			background: var(--muted);
+			border-radius: 8px;
+			padding: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+		.status-box {
+			text-align: center;
+			padding: 2rem;
+			border-radius: 8px;
+			margin: 2rem 0;
+			font-weight: bold;
+			font-size: 1.5rem;
+		}
+		.serempak { background: var(--success); color: var(--on-success); }
+		.tidak-serempak { background: var(--error); color: var(--on-error); }
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-top: 1.5rem;
+		}
+		.criteria-item {
+			border: 1px solid var(--border);
+			padding: 1rem;
+			border-radius: 8px;
+			background: var(--surface);
+		}
+		.criteria-item h3 { font-size: 1rem; margin-bottom: .5rem; color: var(--primary); }
+		.stat-value { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+		.stat-label { font-size: 0.9rem; opacity: 0.8; }
+		.info-text { font-size: 0.9rem; line-height: 1.6; margin-top: 1rem; }
+		.tag {
+			display: inline-block;
+			padding: 0.2rem 0.5rem;
+			border-radius: 4px;
+			font-size: 0.8rem;
+			font-weight: bold;
+			margin-bottom: 0.5rem;
+		}
+		.tag-ref { background: var(--highlight-bg); color: var(--text); }
+		.month-selector {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			margin-bottom: 1.5rem;
+			flex-wrap: wrap;
+		}
+		.month-selector select { flex: 1; min-width: 200px; padding: 0.5rem; font-size: 1rem; }
+		footer { margin-top: 3rem; text-align: center; font-size: 0.8rem; opacity: 0.6; }
+		.label-sm { font-size: 0.8rem; opacity: 0.7; font-weight: normal; display: block; margin-top: 0.25rem; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="selectors">
+			<select id="language"><option value="id">Bahasa Indonesia</option><option value="en">English</option></select>
+			<select id="theme"><option value="auto">Auto</option><option value="light">Light</option><option value="dark">Dark</option></select>
+		</div>
+		<h1 id="title">HijriTrack</h1>
+		<p id="subtitle" class="subtitle"></p>
+
+		<div class="card">
+			<div class="stat-label" id="statLabel"></div>
+			<div class="stat-value">69.19%</div>
+			<div class="info-text" id="statDesc"></div>
+		</div>
+
+		<div id="targetMonth" class="card">
+			<div class="month-selector">
+				<label for="monthSelect" id="selectLabel" style="font-weight:bold"></label>
+				<select id="monthSelect"></select>
+			</div>
+
+			<div id="status" class="status-box"></div>
+
+			<div class="grid">
+				<div class="criteria-item">
+					<h3 id="critAName">Neo-MABIMS</h3>
+					<p>Banda Aceh</p>
+					<span class="label-sm">Min: 3° Alt, 6.4° Elon</span>
+					<div id="valA" class="info-text"></div>
+				</div>
+				<div class="criteria-item">
+					<h3 id="critBName">KHGT (Global)</h3>
+					<p id="critBLoc">Westernmost < 00:00 UTC</p>
+					<span class="label-sm">Min: 5° Alt, 8° Elon</span>
+					<div id="valB" class="info-text"></div>
+				</div>
+				<div class="criteria-item">
+					<span class="tag tag-ref" id="refLabel"></span>
+					<h3 id="critRName">Mecca</h3>
+					<p>Reference Only</p>
+					<span class="label-sm">3° Alt, 6.4° Elon</span>
+					<div id="valR" class="info-text"></div>
+				</div>
+			</div>
+			<div id="startDate" class="info-text" style="text-align:right; font-weight:bold; border-top:1px solid var(--border); padding-top:1rem"></div>
+		</div>
+
+		<h2 id="howItWorksTitle"></h2>
+		<div class="info-text" id="howItWorks"></div>
+
+		<footer>
+			<p>HijriTrack &bull; 10,000 Year Analysis &bull; 2024</p>
+		</footer>
+	</div>
+
+	<script>
+		const data = [{"h": "Rajab 1445", "isSimultaneous": true, "aceh": {"alt": 12.04, "elong": 14.43}, "khgt": {"alt": 7.12, "elong": 8.99}, "mecca": {"alt": 12.04, "elong": 16.19}, "date": "2024-01-12"}, {"h": "Sya'ban 1445", "isSimultaneous": true, "aceh": {"alt": 6.48, "elong": 8.49}, "khgt": {"alt": 11.76, "elong": 14.99}, "mecca": {"alt": 7.59, "elong": 10.29}, "date": "2024-02-10"}, {"h": "Ramadhan 1445", "isSimultaneous": true, "aceh": {"alt": 13.54, "elong": 15.9}, "khgt": {"alt": 7.07, "elong": 9.14}, "mecca": {"alt": 16.22, "elong": 18.03}, "date": "2024-03-11"}, {"h": "Syawal 1445", "isSimultaneous": true, "aceh": {"alt": 7.55, "elong": 10.22}, "khgt": {"alt": 6.99, "elong": 17.14}, "mecca": {"alt": 10.55, "elong": 12.45}, "date": "2024-04-09"}, {"h": "Dzulqa'dah 1445", "isSimultaneous": false, "aceh": {"alt": 15.2, "elong": 18.45}, "khgt": {"alt": 6.25, "elong": 9.95}, "mecca": {"alt": 5.6, "elong": 7.75}, "date": "2024-05-09"}, {"h": "Dzulhijjah 1445", "isSimultaneous": true, "aceh": {"alt": 10.6, "elong": 13.24}, "khgt": {"alt": 9.4, "elong": 18.84}, "mecca": {"alt": 13.55, "elong": 15.3}, "date": "2024-06-07"}, {"h": "Muharram 1446", "isSimultaneous": true, "aceh": {"alt": 5.77, "elong": 8.17}, "khgt": {"alt": 7.09, "elong": 13.04}, "mecca": {"alt": 8.19, "elong": 9.89}, "date": "2024-07-06"}, {"h": "Safar 1446", "isSimultaneous": true, "aceh": {"alt": 10.42, "elong": 12.19}, "khgt": {"alt": 14.05, "elong": 17.37}, "mecca": {"alt": 10.9, "elong": 13.98}, "date": "2024-08-05"}, {"h": "Rabi'ul Awal 1446", "isSimultaneous": false, "aceh": {"alt": 12.22, "elong": 15.39}, "khgt": {"alt": 8.01, "elong": 10.04}, "mecca": {"alt": 4.06, "elong": 6.46}, "date": "2024-09-04"}, {"h": "Rabi'ul Akhir 1446", "isSimultaneous": true, "aceh": {"alt": 4.47, "elong": 7.58}, "khgt": {"alt": 9.7, "elong": 13.18}, "mecca": {"alt": 4.05, "elong": 9.21}, "date": "2024-10-03"}, {"h": "Jumadil Awal 1446", "isSimultaneous": true, "aceh": {"alt": 6.32, "elong": 10.98}, "khgt": {"alt": 12.33, "elong": 16.62}, "mecca": {"alt": 5.01, "elong": 12.5}, "date": "2024-11-02"}, {"h": "Jumadil Akhir 1446", "isSimultaneous": false, "aceh": {"alt": 10.64, "elong": 14.86}, "khgt": {"alt": 5.98, "elong": 9.72}, "mecca": {"alt": 8.99, "elong": 16.37}, "date": "2024-12-02"}, {"h": "Rajab 1446", "isSimultaneous": true, "aceh": {"alt": 4.91, "elong": 8.25}, "khgt": {"alt": 7.26, "elong": 13.48}, "mecca": {"alt": 4.72, "elong": 9.62}, "date": "2024-12-31"}, {"h": "Sya'ban 1446", "isSimultaneous": true, "aceh": {"alt": 11.15, "elong": 12.95}, "khgt": {"alt": 15.94, "elong": 19.24}, "mecca": {"alt": 12.25, "elong": 14.71}, "date": "2025-01-30"}, {"h": "Ramadhan 1446", "isSimultaneous": true, "aceh": {"alt": 4.63, "elong": 6.41}, "khgt": {"alt": 11.29, "elong": 13.27}, "mecca": {"alt": 6.6, "elong": 8.39}, "date": "2025-02-28"}, {"h": "Syawal 1446", "isSimultaneous": true, "aceh": {"alt": 11.38, "elong": 14.83}, "khgt": {"alt": 8.66, "elong": 22.01}, "mecca": {"alt": 14.96, "elong": 17.07}, "date": "2025-03-30"}, {"h": "Dzulqa'dah 1446", "isSimultaneous": true, "aceh": {"alt": 6.73, "elong": 10.47}, "khgt": {"alt": 5.56, "elong": 17.16}, "mecca": {"alt": 10.45, "elong": 12.73}, "date": "2025-04-28"}, {"h": "Dzulhijjah 1446", "isSimultaneous": true, "aceh": {"alt": 3.16, "elong": 7.11}, "khgt": {"alt": 7.2, "elong": 11.11}, "mecca": {"alt": 6.76, "elong": 9.04}, "date": "2025-05-27"}, {"h": "Muharram 1447", "isSimultaneous": true, "aceh": {"alt": 12.92, "elong": 14.88}, "khgt": {"alt": 13.58, "elong": 20.78}, "mecca": {"alt": 14.96, "elong": 17.07}, "date": "2025-06-26"}, {"h": "Safar 1447", "isSimultaneous": true, "aceh": {"alt": 7.69, "elong": 9.42}, "khgt": {"alt": 11.49, "elong": 15.09}, "mecca": {"alt": 8.9, "elong": 11.43}, "date": "2025-07-25"}, {"h": "Rabi'ul Awal 1447", "isSimultaneous": false, "aceh": {"alt": 11.47, "elong": 14.69}, "khgt": {"alt": 6.79, "elong": 8.77}, "mecca": {"alt": 10.38, "elong": 16.6}, "date": "2025-08-24"}, {"h": "Rabi'ul Akhir 1447", "isSimultaneous": true, "aceh": {"alt": 4.03, "elong": 7.58}, "khgt": {"alt": 11.63, "elong": 13.35}, "mecca": {"alt": 3.55, "elong": 9.31}, "date": "2025-09-22"}, {"h": "Jumadil Awal 1447", "isSimultaneous": true, "aceh": {"alt": 5.9, "elong": 11.2}, "khgt": {"alt": 11.75, "elong": 16.66}, "mecca": {"alt": 4.43, "elong": 12.72}, "date": "2025-10-22"}, {"h": "Jumadil Akhir 1447", "isSimultaneous": true, "aceh": {"alt": 8.99, "elong": 13.84}, "khgt": {"alt": 7.6, "elong": 9.47}, "mecca": {"alt": 7.19, "elong": 15.24}, "date": "2025-11-21"}, {"h": "Rajab 1447", "isSimultaneous": false, "aceh": {"alt": 13.38, "elong": 16.18}, "khgt": {"alt": 8.21, "elong": 9.96}, "mecca": {"alt": 12.35, "elong": 17.61}, "date": "2025-12-21"}, {"h": "Sya'ban 1447", "isSimultaneous": true, "aceh": {"alt": 6.21, "elong": 8.12}, "khgt": {"alt": 10.02, "elong": 13.5}, "mecca": {"alt": 6.89, "elong": 9.6}, "date": "2026-01-19"}, {"h": "Ramadhan 1447", "isSimultaneous": true, "aceh": {"alt": 9.96, "elong": 12.21}, "khgt": {"alt": 16.56, "elong": 18.45}, "mecca": {"alt": 12.25, "elong": 14.01}, "date": "2026-02-18"}, {"h": "Syawal 1447", "isSimultaneous": false, "aceh": {"alt": 15.05, "elong": 19.17}, "khgt": {"alt": 6.57, "elong": 10.58}, "mecca": {"alt": 5.87, "elong": 8.07}, "date": "2026-03-20"}, {"h": "Dzulqa'dah 1447", "isSimultaneous": true, "aceh": {"alt": 10.26, "elong": 14.52}, "khgt": {"alt": 7.17, "elong": 21.22}, "mecca": {"alt": 14.31, "elong": 16.72}, "date": "2026-04-18"}, {"h": "Dzulhijjah 1447", "isSimultaneous": true, "aceh": {"alt": 6.86, "elong": 10.62}, "khgt": {"alt": 6.06, "elong": 16.91}, "mecca": {"alt": 10.66, "elong": 12.82}, "date": "2026-05-17"}, {"h": "Muharram 1448", "isSimultaneous": true, "aceh": {"alt": 3.94, "elong": 6.98}, "khgt": {"alt": 5.73, "elong": 12.74}, "mecca": {"alt": 7.13, "elong": 8.99}, "date": "2026-06-15"}, {"h": "Safar 1448", "isSimultaneous": true, "aceh": {"alt": 13.37, "elong": 15.34}, "khgt": {"alt": 17.68, "elong": 21.73}, "mecca": {"alt": 13.85, "elong": 17.68}, "date": "2026-07-15"}, {"h": "Rabi'ul Awal 1448", "isSimultaneous": true, "aceh": {"alt": 7.46, "elong": 10.17}, "khgt": {"alt": 14.6, "elong": 16.61}, "mecca": {"alt": 7.36, "elong": 12.38}, "date": "2026-08-13"}, {"h": "Rabi'ul Akhir 1448", "isSimultaneous": false, "aceh": {"alt": 11.42, "elong": 17.14}, "khgt": {"alt": 9.23, "elong": 11.05}, "mecca": {"alt": 9.16, "elong": 19.08}, "date": "2026-09-12"}, {"h": "Jumadil Awal 1448", "isSimultaneous": true, "aceh": {"alt": 4.87, "elong": 10.68}, "khgt": {"alt": 11.06, "elong": 16.48}, "mecca": {"alt": 3.53, "elong": 12.32}, "date": "2026-10-11"}, {"h": "Jumadil Akhir 1448", "isSimultaneous": false, "aceh": {"alt": 8.76, "elong": 14.2}, "khgt": {"alt": 5.79, "elong": 8.08}, "mecca": {"alt": 6.82, "elong": 15.66}, "date": "2026-11-10"}, {"h": "Rajab 1448", "isSimultaneous": false, "aceh": {"alt": 12.96, "elong": 16.12}, "khgt": {"alt": 8.4, "elong": 11.25}, "mecca": {"alt": 11.61, "elong": 17.52}, "date": "2026-12-10"}, {"h": "Sya'ban 1448", "isSimultaneous": true, "aceh": {"alt": 5.3, "elong": 7.23}, "khgt": {"alt": 8.56, "elong": 12.23}, "mecca": {"alt": 5.82, "elong": 8.6}, "date": "2027-01-08"}, {"h": "Ramadhan 1448", "isSimultaneous": true, "aceh": {"alt": 7.13, "elong": 9.19}, "khgt": {"alt": 12.86, "elong": 14.72}, "mecca": {"alt": 9.07, "elong": 10.77}, "date": "2027-02-07"}, {"h": "Syawal 1448", "isSimultaneous": true, "aceh": {"alt": 9.42, "elong": 13.26}, "khgt": {"alt": 5.42, "elong": 17.43}, "mecca": {"alt": 12.73, "elong": 15.02}, "date": "2027-03-09"}, {"h": "Dzulqa'dah 1448", "isSimultaneous": true, "aceh": {"alt": 2.95, "elong": 7.68}, "khgt": {"alt": 6.14, "elong": 11.5}, "mecca": {"alt": 6.36, "elong": 9.39}, "date": "2027-04-07"}, {"h": "Dzulhijjah 1448", "isSimultaneous": true, "aceh": {"alt": 10.73, "elong": 14.5}, "khgt": {"alt": 8.15, "elong": 20.65}, "mecca": {"alt": 14.54, "elong": 16.62}, "date": "2027-05-07"}, {"h": "Muharram 1449", "isSimultaneous": true, "aceh": {"alt": 7.52, "elong": 10.07}, "khgt": {"alt": 8.34, "elong": 16.2}, "mecca": {"alt": 10.5, "elong": 12.29}, "date": "2027-06-05"}, {"h": "Safar 1449", "isSimultaneous": false, "aceh": {"alt": 17.35, "elong": 19.44}, "khgt": {"alt": 8.12, "elong": 12.01}, "mecca": {"alt": 5.93, "elong": 7.96}, "date": "2027-07-05"}, {"h": "Rabi'ul Awal 1449", "isSimultaneous": true, "aceh": {"alt": 11.82, "elong": 15.34}, "khgt": {"alt": 19.99, "elong": 22.13}, "mecca": {"alt": 10.9, "elong": 17.73}, "date": "2027-08-03"}, {"h": "Rabi'ul Akhir 1449", "isSimultaneous": true, "aceh": {"alt": 6.01, "elong": 10.99}, "khgt": {"alt": 15.95, "elong": 17.79}, "mecca": {"alt": 5.06, "elong": 13.17}, "date": "2027-09-01"}, {"h": "Jumadil Awal 1449", "isSimultaneous": false, "aceh": {"alt": 11.7, "elong": 18.91}, "khgt": {"alt": 7.24, "elong": 12.8}, "mecca": {"alt": 8.92, "elong": 20.84}, "date": "2027-10-01"}, {"h": "Jumadil Akhir 1449", "isSimultaneous": true, "aceh": {"alt": 6.6, "elong": 12.46}, "khgt": {"alt": 13.54, "elong": 18.51}, "mecca": {"alt": 5.04, "elong": 14.1}, "date": "2027-10-30"}, {"h": "Rajab 1449", "isSimultaneous": false, "aceh": {"alt": 12.49, "elong": 16.05}, "khgt": {"alt": 7.63, "elong": 10.77}, "mecca": {"alt": 11.05, "elong": 17.58}, "date": "2027-11-29"}, {"h": "Sya'ban 1449", "isSimultaneous": true, "aceh": {"alt": 5.43, "elong": 7.37}, "khgt": {"alt": 8.62, "elong": 12.59}, "mecca": {"alt": 5.94, "elong": 8.81}, "date": "2027-12-28"}, {"h": "Ramadhan 1449", "isSimultaneous": true, "aceh": {"alt": 7.3, "elong": 9.37}, "khgt": {"alt": 12.78, "elong": 14.68}, "mecca": {"alt": 9.19, "elong": 10.88}, "date": "2028-01-27"}, {"h": "Syawal 1449", "isSimultaneous": true, "aceh": {"alt": 8.17, "elong": 12.01}, "khgt": {"alt": 15.6, "elong": 17.38}, "mecca": {"alt": 11.27, "elong": 13.57}, "date": "2028-02-26"}, {"h": "Dzulqa'dah 1449", "isSimultaneous": false, "aceh": {"alt": 10.63, "elong": 15.44}, "khgt": {"alt": 6.17, "elong": 8.78}, "mecca": {"alt": 3.39, "elong": 7.01}, "date": "2028-03-27"}, {"h": "Dzulhijjah 1449", "isSimultaneous": true, "aceh": {"alt": 4.81, "elong": 9.16}, "khgt": {"alt": 7.95, "elong": 12.76}, "mecca": {"alt": 8.27, "elong": 10.85}, "date": "2028-04-25"}, {"h": "Muharram 1450", "isSimultaneous": true, "aceh": {"alt": 12.27, "elong": 14.59}, "khgt": {"alt": 11.42, "elong": 20.43}, "mecca": {"alt": 14.92, "elong": 16.7}, "date": "2028-05-25"}, {"h": "Safar 1450", "isSimultaneous": true, "aceh": {"alt": 7.85, "elong": 9.6}, "khgt": {"alt": 11.43, "elong": 15.76}, "mecca": {"alt": 9.31, "elong": 11.88}, "date": "2028-06-23"}, {"h": "Rabi'ul Awal 1450", "isSimultaneous": false, "aceh": {"alt": 15.28, "elong": 19.09}, "khgt": {"alt": 9.81, "elong": 11.8}, "mecca": {"alt": 3.61, "elong": 7.59}, "date": "2028-07-23"}, {"h": "Rabi'ul Akhir 1450", "isSimultaneous": false, "aceh": {"alt": 9.67, "elong": 15.4}, "khgt": {"alt": 6.39, "elong": 8.43}, "mecca": {"alt": 7.94, "elong": 17.69}, "date": "2028-08-21"}, {"h": "Jumadil Awal 1450", "isSimultaneous": true, "aceh": {"alt": 4.82, "elong": 11.37}, "khgt": {"alt": 16.19, "elong": 18.26}, "mecca": {"alt": 3.6, "elong": 13.42}, "date": "2028-09-19"}, {"h": "Jumadil Akhir 1450", "isSimultaneous": false, "aceh": {"alt": 12.87, "elong": 19.32}, "khgt": {"alt": 7.82, "elong": 13.03}, "mecca": {"alt": 10.3, "elong": 21.25}, "date": "2028-10-19"}, {"h": "Rajab 1450", "isSimultaneous": true, "aceh": {"alt": 8.71, "elong": 12.6}, "khgt": {"alt": 16.09, "elong": 19.18}, "mecca": {"alt": 7.77, "elong": 14.33}, "date": "2028-11-17"}, {"h": "Sya'ban 1450", "isSimultaneous": false, "aceh": {"alt": 15.35, "elong": 17.25}, "khgt": {"alt": 9.62, "elong": 11.4}, "mecca": {"alt": 3.83, "elong": 6.67}, "date": "2028-12-17"}, {"h": "Ramadhan 1450", "isSimultaneous": true, "aceh": {"alt": 7.06, "elong": 9.14}, "khgt": {"alt": 12.73, "elong": 14.77}, "mecca": {"alt": 9.01, "elong": 10.73}, "date": "2029-01-15"}, {"h": "Syawal 1450", "isSimultaneous": true, "aceh": {"alt": 8.65, "elong": 12.5}, "khgt": {"alt": 16.1, "elong": 17.85}, "mecca": {"alt": 11.78, "elong": 14.04}, "date": "2029-02-14"}, {"h": "Dzulqa'dah 1450", "isSimultaneous": false, "aceh": {"alt": 10.31, "elong": 15.15}, "khgt": {"alt": 6.06, "elong": 8.73}, "mecca": {"alt": 3.34, "elong": 7.08}, "date": "2029-03-16"}, {"h": "Dzulhijjah 1450", "isSimultaneous": true, "aceh": {"alt": 3.34, "elong": 7.88}, "khgt": {"alt": 6.19, "elong": 11.1}, "mecca": {"alt": 6.54, "elong": 9.34}, "date": "2029-04-14"}, {"h": "Muharram 1451", "isSimultaneous": true, "aceh": {"alt": 8.11, "elong": 10.62}, "khgt": {"alt": 7.62, "elong": 15.82}, "mecca": {"alt": 10.73, "elong": 12.45}, "date": "2029-05-14"}, {"h": "Safar 1451", "isSimultaneous": false, "aceh": {"alt": 13.9, "elong": 15.68}, "khgt": {"alt": 5.77, "elong": 9.4}, "mecca": {"alt": 14.64, "elong": 17.77}, "date": "2029-06-13"}, {"h": "Rabi'ul Awal 1451", "isSimultaneous": true, "aceh": {"alt": 7.71, "elong": 10.65}, "khgt": {"alt": 14.36, "elong": 16.58}, "mecca": {"alt": 7.53, "elong": 12.82}, "date": "2029-07-12"}, {"h": "Rabi'ul Akhir 1451", "isSimultaneous": false, "aceh": {"alt": 13.33, "elong": 19.34}, "khgt": {"alt": 10.79, "elong": 12.65}, "mecca": {"alt": 10.86, "elong": 21.55}, "date": "2029-08-11"}, {"h": "Jumadil Awal 1451", "isSimultaneous": false, "aceh": {"alt": 8.42, "elong": 15.29}, "khgt": {"alt": 6.35, "elong": 9.05}, "mecca": {"alt": 6.48, "elong": 17.4}, "date": "2029-09-09"}, {"h": "Jumadil Akhir 1451", "isSimultaneous": true, "aceh": {"alt": 4.61, "elong": 10.63}, "khgt": {"alt": 12.19, "elong": 17.49}, "mecca": {"alt": 3.63, "elong": 12.56}, "date": "2029-10-08"}, {"h": "Rajab 1451", "isSimultaneous": false, "aceh": {"alt": 14.25, "elong": 18.39}, "khgt": {"alt": 8.44, "elong": 11.78}, "mecca": {"alt": 12.64, "elong": 20.33}, "date": "2029-11-07"}, {"h": "Sya'ban 1451", "isSimultaneous": true, "aceh": {"alt": 9.79, "elong": 11.84}, "khgt": {"alt": 17.13, "elong": 18.96}, "mecca": {"alt": 10.24, "elong": 13.69}, "date": "2029-12-06"}, {"h": "Ramadhan 1451", "isSimultaneous": false, "aceh": {"alt": 16.09, "elong": 18.21}, "khgt": {"alt": 9.48, "elong": 11.53}, "mecca": {"alt": 5.3, "elong": 7.02}, "date": "2030-01-05"}, {"h": "Syawal 1451", "isSimultaneous": true, "aceh": {"alt": 7.39, "elong": 11.16}, "khgt": {"alt": 15.18, "elong": 16.94}, "mecca": {"alt": 10.56, "elong": 12.79}, "date": "2030-02-03"}, {"h": "Dzulqa'dah 1451", "isSimultaneous": false, "aceh": {"alt": 10.38, "elong": 15.12}, "khgt": {"alt": 5.52, "elong": 8.28}, "mecca": {"alt": 14.13, "elong": 16.75}, "date": "2030-03-05"}, {"h": "Dzulhijjah 1451", "isSimultaneous": true, "aceh": {"alt": 3.28, "elong": 7.73}, "khgt": {"alt": 6.22, "elong": 11.06}, "mecca": {"alt": 6.43, "elong": 9.21}, "date": "2030-04-03"}, {"h": "Muharram 1452", "isSimultaneous": true, "aceh": {"alt": 7.47, "elong": 9.98}, "khgt": {"alt": 7.03, "elong": 15.09}, "mecca": {"alt": 10.02, "elong": 11.74}, "date": "2030-05-03"}, {"h": "Safar 1452", "isSimultaneous": true, "aceh": {"alt": 11.68, "elong": 13.38}, "khgt": {"alt": 13.33, "elong": 18.55}, "mecca": {"alt": 12.66, "elong": 15.29}, "date": "2030-06-02"}, {"h": "Rabi'ul Awal 1452", "isSimultaneous": true, "aceh": {"alt": 4.46, "elong": 7.18}, "khgt": {"alt": 10.3, "elong": 12.35}, "mecca": {"alt": 4.67, "elong": 9.08}, "date": "2030-07-01"}, {"h": "Rabi'ul Akhir 1452", "isSimultaneous": true, "aceh": {"alt": 7.91, "elong": 13.01}, "khgt": {"alt": 16.81, "elong": 18.54}, "mecca": {"alt": 6.5, "elong": 14.95}, "date": "2030-07-31"}, {"h": "Jumadil Awal 1452", "isSimultaneous": true, "aceh": {"alt": 1.97, "elong": 8.26}, "khgt": {"alt": 11.67, "elong": 13.76}, "mecca": {"alt": 1.29, "elong": 9.95}, "date": "2030-08-29"}, {"h": "Jumadil Akhir 1452", "isSimultaneous": false, "aceh": {"alt": 8.68, "elong": 14.66}, "khgt": {"alt": 6.44, "elong": 8.82}, "mecca": {"alt": 7.0, "elong": 16.61}, "date": "2030-09-28"}, {"h": "Rajab 1452", "isSimultaneous": true, "aceh": {"alt": 5.15, "elong": 8.94}, "khgt": {"alt": 12.6, "elong": 15.93}, "mecca": {"alt": 4.89, "elong": 10.84}, "date": "2030-10-27"}, {"h": "Sya'ban 1452", "isSimultaneous": false, "aceh": {"alt": 14.72, "elong": 16.91}, "khgt": {"alt": 8.22, "elong": 10.09}, "mecca": {"alt": 14.64, "elong": 18.84}, "date": "2030-11-26"}, {"h": "Ramadhan 1452", "isSimultaneous": true, "aceh": {"alt": 9.04, "elong": 11.12}, "khgt": {"alt": 15.06, "elong": 17.84}, "mecca": {"alt": 11.09, "elong": 12.98}, "date": "2030-12-25"}, {"h": "Syawal 1452", "isSimultaneous": false, "aceh": {"alt": 15.22, "elong": 18.64}, "khgt": {"alt": 10.1, "elong": 11.95}, "mecca": {"alt": 5.02, "elong": 7.64}, "date": "2031-01-24"}, {"h": "Dzulqa'dah 1452", "isSimultaneous": true, "aceh": {"alt": 7.51, "elong": 12.08}, "khgt": {"alt": 16.31, "elong": 18.19}, "mecca": {"alt": 11.18, "elong": 13.83}, "date": "2031-02-22"}, {"h": "Dzulhijjah 1452", "isSimultaneous": false, "aceh": {"alt": 12.87, "elong": 16.77}, "khgt": {"alt": 7.16, "elong": 9.31}, "mecca": {"alt": 4.29, "elong": 7.26}, "date": "2031-03-24"}, {"h": "Muharram 1453", "isSimultaneous": true, "aceh": {"alt": 6.81, "elong": 9.28}, "khgt": {"alt": 6.91, "elong": 14.85}, "mecca": {"alt": 9.39, "elong": 11.13}, "date": "2031-04-22"}, {"h": "Safar 1453", "isSimultaneous": true, "aceh": {"alt": 11.58, "elong": 13.27}, "khgt": {"alt": 12.97, "elong": 18.52}, "mecca": {"alt": 12.73, "elong": 15.18}, "date": "2031-05-22"}, {"h": "Rabi'ul Awal 1453", "isSimultaneous": true, "aceh": {"alt": 4.16, "elong": 6.88}, "khgt": {"alt": 9.66, "elong": 11.75}, "mecca": {"alt": 4.42, "elong": 8.67}, "date": "2031-06-20"}, {"h": "Rabi'ul Akhir 1453", "isSimultaneous": true, "aceh": {"alt": 6.54, "elong": 11.23}, "khgt": {"alt": 14.43, "elong": 16.13}, "mecca": {"alt": 5.44, "elong": 12.98}, "date": "2031-07-20"}, {"h": "Jumadil Awal 1453", "isSimultaneous": false, "aceh": {"alt": 9.4, "elong": 15.45}, "khgt": {"alt": 8.01, "elong": 10.19}, "mecca": {"alt": 7.35, "elong": 17.23}, "date": "2031-08-19"}, {"h": "Jumadil Akhir 1453", "isSimultaneous": true, "aceh": {"alt": 3.75, "elong": 9.06}, "khgt": {"alt": 12.85, "elong": 14.69}, "mecca": {"alt": 2.97, "elong": 10.72}, "date": "2031-09-17"}, {"h": "Rajab 1453", "isSimultaneous": false, "aceh": {"alt": 10.26, "elong": 14.08}, "khgt": {"alt": 5.16, "elong": 8.15}, "mecca": {"alt": 9.21, "elong": 15.92}, "date": "2031-10-17"}, {"h": "Sya'ban 1453", "isSimultaneous": true, "aceh": {"alt": 5.93, "elong": 7.84}, "khgt": {"alt": 12.86, "elong": 14.78}, "mecca": {"alt": 6.68, "elong": 9.68}, "date": "2031-11-15"}, {"h": "Ramadhan 1453", "isSimultaneous": false, "aceh": {"alt": 13.87, "elong": 15.78}, "khgt": {"alt": 6.97, "elong": 9.29}, "mecca": {"alt": 15.41, "elong": 17.63}, "date": "2031-12-15"}, {"h": "Syawal 1453", "isSimultaneous": true, "aceh": {"alt": 7.12, "elong": 10.49}, "khgt": {"alt": 15.08, "elong": 16.97}, "mecca": {"alt": 10.23, "elong": 12.26}, "date": "2032-01-13"}, {"h": "Dzulqa'dah 1453", "isSimultaneous": false, "aceh": {"alt": 14.0, "elong": 18.0}, "khgt": {"alt": 9.25, "elong": 11.34}, "mecca": {"alt": 3.8, "elong": 7.17}, "date": "2032-02-12"}, {"h": "Dzulhijjah 1453", "isSimultaneous": true, "aceh": {"alt": 7.91, "elong": 11.59}, "khgt": {"alt": 5.56, "elong": 16.22}, "mecca": {"alt": 11.34, "elong": 13.57}, "date": "2032-03-12"}, {"h": "Muharram 1454", "isSimultaneous": false, "aceh": {"alt": 15.46, "elong": 17.93}, "khgt": {"alt": 6.8, "elong": 9.55}, "mecca": {"alt": 5.39, "elong": 7.18}, "date": "2032-04-11"}, {"h": "Safar 1454", "isSimultaneous": true, "aceh": {"alt": 9.83, "elong": 11.56}, "khgt": {"alt": 11.86, "elong": 17.39}, "mecca": {"alt": 11.3, "elong": 13.62}, "date": "2032-05-10"}, {"h": "Rabi'ul Awal 1454", "isSimultaneous": false, "aceh": {"alt": 14.73, "elong": 17.17}, "khgt": {"alt": 9.06, "elong": 11.22}, "mecca": {"alt": 3.87, "elong": 8.0}, "date": "2032-06-09"}, {"h": "Rabi'ul Akhir 1454", "isSimultaneous": true, "aceh": {"alt": 6.79, "elong": 11.08}, "khgt": {"alt": 14.15, "elong": 15.95}, "mecca": {"alt": 5.91, "elong": 12.85}, "date": "2032-07-08"}, {"h": "Jumadil Awal 1454", "isSimultaneous": false, "aceh": {"alt": 9.4, "elong": 14.68}, "khgt": {"alt": 7.57, "elong": 9.58}, "mecca": {"alt": 7.51, "elong": 16.4}, "date": "2032-08-07"}, {"h": "Jumadil Akhir 1454", "isSimultaneous": true, "aceh": {"alt": 2.76, "elong": 7.51}, "khgt": {"alt": 10.78, "elong": 12.55}, "mecca": {"alt": 2.26, "elong": 9.05}, "date": "2032-09-05"}, {"h": "Rajab 1454", "isSimultaneous": true, "aceh": {"alt": 7.01, "elong": 10.27}, "khgt": {"alt": 13.03, "elong": 16.06}, "mecca": {"alt": 6.49, "elong": 11.95}, "date": "2032-10-05"}, {"h": "Sya'ban 1454", "isSimultaneous": false, "aceh": {"alt": 12.53, "elong": 14.7}, "khgt": {"alt": 7.25, "elong": 9.0}, "mecca": {"alt": 12.31, "elong": 16.39}, "date": "2032-11-04"}, {"h": "Ramadhan 1454", "isSimultaneous": true, "aceh": {"alt": 6.53, "elong": 8.51}, "khgt": {"alt": 12.79, "elong": 14.78}, "mecca": {"alt": 8.28, "elong": 10.09}, "date": "2032-12-03"}, {"h": "Syawal 1454", "isSimultaneous": false, "aceh": {"alt": 12.33, "elong": 14.99}, "khgt": {"alt": 6.89, "elong": 8.72}, "mecca": {"alt": 14.92, "elong": 16.71}, "date": "2033-01-02"}, {"h": "Dzulqa'dah 1454", "isSimultaneous": true, "aceh": {"alt": 5.3, "elong": 9.23}, "khgt": {"alt": 13.7, "elong": 15.51}, "mecca": {"alt": 8.6, "elong": 10.94}, "date": "2033-01-31"}, {"h": "Dzulhijjah 1454", "isSimultaneous": false, "aceh": {"alt": 13.12, "elong": 16.41}, "khgt": {"alt": 7.74, "elong": 9.63}, "mecca": {"alt": 16.54, "elong": 18.48}, "date": "2033-03-02"}, {"h": "Muharram 1455", "isSimultaneous": true, "aceh": {"alt": 8.3, "elong": 10.57}, "khgt": {"alt": 9.35, "elong": 17.68}, "mecca": {"alt": 10.99, "elong": 12.79}, "date": "2033-03-31"}, {"h": "Safar 1455", "isSimultaneous": false, "aceh": {"alt": 17.24, "elong": 19.04}, "khgt": {"alt": 7.97, "elong": 12.12}, "mecca": {"alt": 5.53, "elong": 7.8}, "date": "2033-04-30"}, {"h": "Rabi'ul Awal 1455", "isSimultaneous": true, "aceh": {"alt": 11.62, "elong": 13.95}, "khgt": {"alt": 15.89, "elong": 19.85}, "mecca": {"alt": 11.96, "elong": 16.11}, "date": "2033-05-29"}, {"h": "Rabi'ul Akhir 1455", "isSimultaneous": true, "aceh": {"alt": 5.1, "elong": 9.17}, "khgt": {"alt": 12.43, "elong": 14.34}, "mecca": {"alt": 4.85, "elong": 11.04}, "date": "2033-06-27"}, {"h": "Jumadil Awal 1455", "isSimultaneous": false, "aceh": {"alt": 9.48, "elong": 14.14}, "khgt": {"alt": 6.78, "elong": 8.69}, "mecca": {"alt": 8.09, "elong": 16.0}, "date": "2033-07-27"}, {"h": "Jumadil Akhir 1455", "isSimultaneous": true, "aceh": {"alt": 3.01, "elong": 7.18}, "khgt": {"alt": 10.61, "elong": 12.31}, "mecca": {"alt": 2.73, "elong": 8.82}, "date": "2033-08-25"}];
+
+		const text = {
+			id: {
+				subtitle: 'Pelacak Keserempakan Awal Bulan Hijriah',
+				statLabel: 'Tingkat Keserempakan (10.000 Tahun Hijriah)',
+				statDesc: 'Berdasarkan simulasi astronomis dari tahun 1 AH hingga 10000 AH, awal bulan Hijriah diperkirakan serempak antara kriteria Neo-MABIMS dan KHGT sebanyak 69,19% dari total bulan.',
+				serempak: 'SEREMPAK',
+				tidakSerempak: 'TIDAK SEREMPAK',
+				refLabel: 'REFERENSI',
+				howItWorksTitle: 'Cara Kerja & Kriteria',
+				howItWorks: 'Aplikasi ini membandingkan dua kriteria utama yang digunakan oleh masyarakat Muslim di Indonesia:<br><br>1. <b>Neo-MABIMS:</b> Tinggi hilal minimal 3° dan elongasi minimal 6,4° di titik paling barat Indonesia (Banda Aceh).<br>2. <b>KHGT (Kalender Hijriah Global Tunggal):</b> Tinggi hilal minimal 5° dan elongasi minimal 8° di mana pun di dunia, dengan syarat matahari terbenam sebelum pukul 00:00 UTC.<br><br>Pilih bulan dari menu di atas untuk melihat rincian data astronomis pada hari perkiraan rukyat.',
+				valPass: 'Terpenuhi',
+				valFail: 'Gagal',
+				selectLabel: 'Pilih Bulan:',
+				startDateLabel: 'Mulai Bulan:'
+			},
+			en: {
+				subtitle: 'Hijri Month Start Simultaneity Tracker',
+				statLabel: 'Simultaneity Rate (10,000 Hijri Years)',
+				statDesc: 'Based on astronomical simulations from 1 AH to 10000 AH, the Hijri month start is estimated to be simultaneous between Neo-MABIMS and KHGT criteria in 69.19% of all months.',
+				serempak: 'SIMULTANEOUS',
+				tidakSerempak: 'NOT SIMULTANEOUS',
+				refLabel: 'REFERENCE',
+				howItWorksTitle: 'How It Works & Criteria',
+				howItWorks: 'This app compares two major criteria used by Muslim communities in Indonesia:<br><br>1. <b>Neo-MABIMS:</b> Minimum moon altitude of 3° and elongation of 6.4° at the westernmost point of Indonesia (Banda Aceh).<br>2. <b>KHGT (Global Hijri Calendar):</b> Minimum moon altitude of 5° and elongation of 8° anywhere on Earth, provided sunset occurs before 00:00 UTC.<br><br>Select a month from the menu above to see detailed astronomical data on the estimated observation day.',
+				valPass: 'Met',
+				valFail: 'Fail',
+				selectLabel: 'Select Month:',
+				startDateLabel: 'Start Date:'
+			}
+		};
+
+		const el = new Proxy({}, { get: (_, id) => document.getElementById(id) });
+
+		class HijriTrack {
+			constructor() {
+				this.lang = navigator.language.startsWith('id') ? 'id' : 'en';
+				this.setup();
+				this.renderMonths();
+				this.selectMonth("Dzulhijjah 1447");
+			}
+
+			setup() {
+				el.language.value = this.lang;
+				el.language.onchange = e => { this.lang = e.target.value; this.update(); };
+				el.theme.onchange = e => {
+					const t = e.target.value;
+					document.documentElement.className = t === 'auto' ? '' : t;
+				};
+				el.monthSelect.onchange = e => this.updateDisplay(e.target.value);
+			}
+
+			renderMonths() {
+				el.monthSelect.innerHTML = data.map(m => `<option value="${m.h}">${m.h}</option>`).join('');
+			}
+
+			selectMonth(h) {
+				el.monthSelect.value = h;
+				this.updateDisplay(h);
+			}
+
+			update() {
+				const t = text[this.lang];
+				Object.keys(t).forEach(k => { if (el[k]) el[k].innerHTML = t[k]; });
+				this.updateDisplay(el.monthSelect.value);
+			}
+
+			updateDisplay(h) {
+				const m = data.find(item => item.h === h);
+				if (!m) return;
+				const t = text[this.lang];
+
+				el.status.textContent = m.isSimultaneous ? t.serempak : t.tidakSerempak;
+				el.status.className = 'status-box ' + (m.isSimultaneous ? 'serempak' : 'tidak-serempak');
+
+				const fmt = (v, crit) => {
+					const pass = (crit === 'A' || crit === 'R') ? (v.alt >= 3 && v.elong >= 6.4) : (v.alt >= 5 && v.elong >= 8);
+					return `${pass ? t.valPass : t.valFail} <br> <span class="label-sm">(Alt: ${v.alt}°, Elon: ${v.elong}°)</span>`;
+				};
+
+				el.valA.innerHTML = fmt(m.aceh, 'A');
+				el.valB.innerHTML = fmt(m.khgt, 'B');
+				el.valR.innerHTML = fmt(m.mecca, 'R');
+				el.startDate.innerHTML = `${t.startDateLabel} ${m.date}`;
+			}
+		}
+
+		new HijriTrack();
+	</script>
+</body>
+</html>
