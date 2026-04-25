@@ -750,10 +750,10 @@
 						  )) (h.findIndex(c=>/party|partai|name|nama/i.test(c)))
 						)) (c=>/^\d+$/.test(c?.replace(/[.,]/g,'').trim()))
 					  )) (p(l[0]))
-					)) (ln=>ln.split(new RegExp(`\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
+					)) (ln=>ln.split(new RegExp(s === '\t' ? '\\t(?=(?:(?:[^"]*"){2})*[^"]*$)' : `\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
 						.map(c=>c.trim().replace(/^"|"$/g,'').replace(/""/g,'"')))
 				  )) (l[0].includes('\t')&&l[0].split('\t').length>l[0].split(',').length?'\t':',')
-				)) (t.split(/\r?\n/).filter(ln=>ln.trim()))
+				)) (t.replace(/^\uFEFF/,'').split(/\r?\n/).filter(ln=>ln.trim()))
 			}
 
 			calculate() {
