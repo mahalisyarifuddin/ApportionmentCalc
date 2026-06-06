@@ -613,7 +613,7 @@
 			}
 
 			key(e) {
-				((e.ctrlKey || e.metaKey) && e.key === 'Enter' && this.calculate(),
+				((e.ctrlKey || e.metaKey) && e.key === 'Enter' && (document.activeElement?.blur(), this.calculate()),
 				(r=> ( !e.ctrlKey && !e.metaKey && e.key === 'Enter' && r && e.target.matches('input') && (
 					e.preventDefault(),
 					(p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (this.parties.find(p=>p.id === +r.dataset.id)),
