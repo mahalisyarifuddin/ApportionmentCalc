@@ -1,4 +1,4 @@
-## 2024-05-18 - CSV/TSV Parser Semicolon Support
+## 2025-02-24 - Fix missing value update on Ctrl+Enter
 **Mode:** Medic
-**Learning:** The previous implementation hardcoded fallback behavior based merely on the length of commas vs tabs on the first line. By changing it to an array-reduce statement `['\t',';',','].reduce(...)`, we can support European semicolon-delimited CSV formats dynamically.
-**Action:** Always test delimiter-detection code against an array of common delimiters when dealing with locale-specific string formatting.
+**Learning:** In browser environments, triggering a programmatic save action via keyboard shortcuts (like Ctrl+Enter) does not automatically commit changes from the currently focused input because the `change` event is only fired upon losing focus. JSDOM behaves similarly, but doesn't auto-fire the change event synchronously on blur like real browsers do.
+**Action:** When implementing global keyboard shortcuts that trigger saving or calculation, use `document.activeElement?.blur()` immediately prior to the core logic execution to ensure the active input successfully commits its value to the internal state.
