@@ -696,7 +696,7 @@
 						)) (v * t / 100)
 					)) (parseFloat(elements.threshold.value.replace(',','.')) || 0)
 				)) ([...elements.list.querySelectorAll('input[type=number]')]
-					.reduce((s,i)=>s + Math.max(0,parseInt(i.value) || 0),0))
+					.reduce((s,i)=>s + Math.max(0,Math.round(+i.value) || 0),0))
 			}
 
 			renderParties() {
@@ -768,7 +768,7 @@
 								: (this.saveState(),this.data = res.data,this.renderResults(),this.display('results'))
 							)) (this.computeAllocation(s,t,this.parties))
 					)) (parseFloat(elements.threshold.value.replace(',','.')) || 0)
-				)) (parseInt(elements.seats.value)))
+				)) (Math.round(+elements.seats.value)))
 			}
 
 			computeAllocation(s,t,ps) {
