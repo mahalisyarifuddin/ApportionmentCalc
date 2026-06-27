@@ -752,7 +752,7 @@
 					  )) (p(l[0]))
 					)) (ln=>ln.split(new RegExp(s === '\t' ? '\\t(?=(?:(?:[^"]*"){2})*[^"]*$)' : `\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
 						.map(c=>c.trim().replace(/^"|"$/g,'').replace(/""/g,'"')))
-				  )) (['\t',';',','].reduce((a,b)=>l[0].split(a).length>l[0].split(b).length?a:b))
+		  )) ((rx=>['\t',';',','].reduce((a,b)=>l[0].split(rx(a)).length>l[0].split(rx(b)).length?a:b))(s=>new RegExp(s==='\t'?'\\t(?=(?:(?:[^"]*"){2})*[^"]*$)':`\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`)))
 				)) (t.replace(/^\uFEFF/,'').split(/\r?\n/).filter(ln=>ln.trim()))
 			}
 
