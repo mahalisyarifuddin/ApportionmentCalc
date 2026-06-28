@@ -7,3 +7,8 @@
 **Mode:** Medic
 **Learning:** The `parseInt` function incorrectly parses floating-point values from `<input type="number">` fields and silently truncates scientific notation (`parseInt("1e5")` evaluates to `1`).
 **Action:** Always prefer `Math.round(+value)` for correctly coercing string inputs into rounded numeric values without breaking decimal or scientific notations.
+
+## 2025-02-24 - Fix CSV delimiter detection ignoring quotes
+**Mode:** Medic
+**Learning:** The previous implementation of the CSV parser in `ApportionmentCalc.html` detected delimiters blindly counting splitting characters on the first line `['\t',';',','].reduce((a,b)=>l[0].split(a).length>l[0].split(b).length?a:b)`. This failed if a quoted column contains a comma, because commas inside strings would artificially inflate the split count for `,`, making it think `,` is the delimiter instead of `\t` or `;`.
+**Action:** Use a regex-aware split that ignores delimiters inside quotes for delimiter detection just like the actual parsing logic does.
