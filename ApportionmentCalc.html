@@ -613,12 +613,17 @@
 			}
 
 			key(e) {
-				((e.ctrlKey || e.metaKey) && e.key === 'Enter' && (document.activeElement?.blur(), this.calculate()),
-				(r=> ( !e.ctrlKey && !e.metaKey && e.key === 'Enter' && r && e.target.matches('input') && (
-					e.preventDefault(),
-					(p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (this.parties.find(p=>p.id === +r.dataset.id)),
-					e.target.type === 'text' ? e.target.nextElementSibling?.focus() : r.nextElementSibling ? r.nextElementSibling.querySelector('input')?.focus() : this.add()
-				) )) (e.target.closest('.party-row')))
+				(e.key === 'Enter' && (
+					(e.ctrlKey || e.metaKey)
+						? (document.activeElement?.blur(), this.calculate())
+						: (r=> (
+							r ? e.target.matches?.('input') && (
+								e.preventDefault(),
+								(p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (this.parties.find(p=>p.id === +r.dataset.id)),
+								e.target.type === 'text' ? e.target.nextElementSibling?.focus() : r.nextElementSibling ? r.nextElementSibling.querySelector('input')?.focus() : this.add()
+							) : e.target.matches?.('input') && (document.activeElement?.blur(), this.calculate())
+						)) (e.target.closest?.('.party-row'))
+				))
 			}
 
 			string(k) { return text[this.language]?.[k] ?? k }
