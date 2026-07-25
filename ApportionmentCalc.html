@@ -753,7 +753,7 @@
 							  )) (1)
 							)) (h.findIndex(c=>/vote|suara/i.test(c)))
 						  )) (h.findIndex(c=>/party|partai|name|nama/i.test(c)))
-						)) (c=>/^\d+$/.test(c?.replace(/[.,]/g,'').trim()))
+						)) (c=>/^\d+$/.test(c?.replace(/[.,\s]/g,'')))
 					  )) (p(l[0]))
 					)) (ln=>ln.split(new RegExp(s === '\t' ? '\\t(?=(?:(?:[^"]*"){2})*[^"]*$)' : `\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
 						.map(c=>c.trim().replace(/^"|"$/g,'').replace(/""/g,'"')))
