@@ -17,3 +17,8 @@
 **Mode:** Bolt
 **Learning:** In tight inner execution paths (such as calculating the max quotient for each seat iteratively in Sainte-Laguë), using higher-order functions like `Array.prototype.reduce()` mapped to a closure IIFE introduces significant execution overhead and garbage collection pauses compared to standard native loops.
 **Action:** When working in hot execution paths that run thousands of times synchronously, convert abstraction-heavy iterators (`reduce`, `map`, `filter`) into clean inline `for` loops to drastically improve performance (achieved up to ~3.45x speedup for high seat counts).
+
+## 2025-02-24 - Fix CSV parser number identification throwing error for empty values
+**Mode:** Medic
+**Learning:** In the CSV parser, `c=>/^\d+$/.test(c?.replace(/[.,]/g,'').trim())` was used. While the optional chaining (`c?.replace(...)`) protects against `replace` being called on undefined/null, if it *does* evaluate to undefined, calling `.trim()` on it immediately throws a `TypeError`. This can happen with malformed rows. Additionally, it fails to identify space-separated numbers (e.g. `10 000`) because `.trim()` only targets leading/trailing spaces.
+**Action:** Move whitespace removal into the regex replace itself: `c?.replace(/[.,\s]/g,'')`. This eliminates the `.trim()` call, safely evaluates to undefined if `c` is null/undefined (causing `.test(undefined)` to safely return `false`), and correctly strips internal spaces.
