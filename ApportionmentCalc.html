@@ -763,8 +763,6 @@
 
 			calculate() {
 				(this.error(),
-				this.parties = this.parties.filter(p=>p.name.trim() || p.votes > 0),
-				this.renderParties(),
 				(s=> (
 					(t=> ( isNaN(s) || s < 1
 						? this.error(this.string('alertSeats'))
@@ -795,8 +793,8 @@
 							)) (pt / s)
 						)) (passed.reduce((sum,p)=>sum + p.votes,0))
 					)) (v.filter(p=>p.votes >= m - 1e-7)) )) (tot * t / 100) )) (v.reduce((sum,p)=>sum + p.votes,0))
-				)) (ps.filter(p=>p.votes >= 0 && (p.name || p.votes > 0))
-					.map(p=>({ ...p,name: p.name || `${this.string('party')} ${p.id}`,hare: 0,sainteLague: 0,remainder: 0 })))
+				)) (ps.filter(p=>p.votes >= 0 && (p.name.trim() || p.votes > 0))
+					.map(p=>({ ...p,name: p.name.trim() || `${this.string('party')} ${p.id}`,hare: 0,sainteLague: 0,remainder: 0 })))
 			}
 
 			renderResults() {
