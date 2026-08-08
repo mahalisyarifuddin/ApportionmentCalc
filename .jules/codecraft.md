@@ -22,3 +22,8 @@
 **Mode:** Medic
 **Learning:** In the CSV parser, `c=>/^\d+$/.test(c?.replace(/[.,]/g,'').trim())` was used. While the optional chaining (`c?.replace(...)`) protects against `replace` being called on undefined/null, if it *does* evaluate to undefined, calling `.trim()` on it immediately throws a `TypeError`. This can happen with malformed rows. Additionally, it fails to identify space-separated numbers (e.g. `10 000`) because `.trim()` only targets leading/trailing spaces.
 **Action:** Move whitespace removal into the regex replace itself: `c?.replace(/[.,\s]/g,'')`. This eliminates the `.trim()` call, safely evaluates to undefined if `c` is null/undefined (causing `.test(undefined)` to safely return `false`), and correctly strips internal spaces.
+
+## 2025-02-24 - Enhance tabular scannability and Excel export compatibility
+**Mode:** Palette
+**Learning:** In tables displaying vote shares, dynamic decimal lengths (e.g., `10%` vs `12.50%`) break vertical alignment, making it harder to scan figures. Additionally, exporting CSVs with special characters (like "Sainte-Laguë") without a Byte Order Mark (\uFEFF) causes mangled encoding in Microsoft Excel, especially in locales where Excel uses semicolon delimiters instead of commas.
+**Action:** Use `minimumFractionDigits` in `Intl.NumberFormat` to force uniform decimal widths for percentages. Always prepend `\uFEFF` to the Blob payload when creating a text/csv file export to ensure correct UTF-8 parsing in Excel. Use CSS opacity rules (like `.neutral { opacity: 0.4; }`) to de-emphasize zero differences, making true variations stand out.
