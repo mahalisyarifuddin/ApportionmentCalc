@@ -815,9 +815,9 @@
 									.join('')),
 							elements.compare.innerHTML = this.table([this.string('party'),this.string('votes'),this.string('share'),'Hare','Sainte-Lagu\u00eb',this.string('diff')], [...d.results]
 								.sort((a,b)=>b.votes - a.votes)
-								.map(res=>(diff=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td>${this.format(res.votes / d.total * 100,{ maximumFractionDigits: 2 })}%</td><td>${res.hare}</td><td>${res.sainteLague}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>` )) (res.sainteLague - res.hare))
+								.map(res=>(diff=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td>${this.format(res.votes / d.total * 100,{ minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</td><td>${res.hare}</td><td>${res.sainteLague}</td><td class="${diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral'}">${diff > 0 ? '+' : ''}${diff}</td></tr>` )) (res.sainteLague - res.hare))
 								.join('')))
-						)) ((res,count,extra = '')=> (pct=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td class="gradient-bar" style="--percentage:${pct}%">${this.format(pct,{ maximumFractionDigits: 2 })}%</td><td><strong>${count}</strong></td>${extra}</tr>` )) (res.votes / d.total * 100))
+						)) ((res,count,extra = '')=> (pct=> ( `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td class="gradient-bar" style="--percentage:${pct}%">${this.format(pct,{ minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</td><td><strong>${count}</strong></td>${extra}</tr>` )) (res.votes / d.total * 100))
 					)) (this.data))
 				)
 			}
@@ -857,7 +857,7 @@
 					  (tsv=> (
 						navigator.clipboard.writeText(tsv)
 							.then(()=>(b=> (b.textContent = this.string('copied'),setTimeout(()=>b.textContent = this.string('copy'), 2000))) (elements.copy))
-					  )) ( [h,...r.map(res=>[res.name,res.votes,this.format(res.votes / t * 100,{ maximumFractionDigits: 2 }) + '%',res.hare,res.sainteLague,res.sainteLague - res.hare].join('\t'))].join('\n') )
+					  )) ( [h,...r.map(res=>[res.name,res.votes,this.format(res.votes / t * 100,{ minimumFractionDigits: 2,maximumFractionDigits: 2 }) + '%',res.hare,res.sainteLague,res.sainteLague - res.hare].join('\t'))].join('\n') )
 					)) ( [this.string('party'),this.string('votes'),this.string('share'),this.string('hareSeatsHeader'),this.string('sainteLagueSeatsHeader'),this.string('diff')].join('\t') )
 				  )) ( r.reduce((sum,p)=>sum + p.votes,0) )
 				)) (this.data.results)
