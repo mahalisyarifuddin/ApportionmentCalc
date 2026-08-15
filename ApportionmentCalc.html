@@ -219,6 +219,9 @@
 			color: var(--danger); 
 			font-weight: 700; 
 		}
+		.neutral {
+			opacity: 0.4;
+		}
 		.step {
 			border: 1px solid var(--border);
 			margin-bottom: 1rem;
@@ -869,7 +872,7 @@
 					(h=> (
 					  (csv=> (
 						Object.assign(document.createElement('a'), {
-							href: URL.createObjectURL(new Blob([csv],{ type: 'text/csv' })),
+							href: URL.createObjectURL(new Blob(['\uFEFF', csv],{ type: 'text/csv' })),
 							download: `apportionment_${new Date().toISOString().slice(0,19).replace(/[T:]/g,'-')}.csv`
 						}).click()
 					  )) ( [h,...r.map(res=>`"${res.name.replace(/"/g,'""')}",${res.votes},"${this.format(res.votes / t * 100,{ minimumFractionDigits: 2,maximumFractionDigits: 2 })}",${res.passed ? this.string('yes') : this.string('no')},${res.hare},${res.sainteLague},${res.sainteLague - res.hare}`)].join('\n') )
