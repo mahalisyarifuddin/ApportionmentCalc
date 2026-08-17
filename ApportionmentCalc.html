@@ -5,122 +5,1041 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>ApportionmentCalc</title>
 	<style>
+		/* =====================================================================
+		   SHARED DESIGN CORE — identical in every app. Do not edit in place.
+		   Edit /core.css, then run sync_core.py to push it to all apps.
+
+		   Order: 1) tokens  2) reset/base  3) app shell  4) components.
+		   App-specific rules go in the APP-SPECIFIC block below this one, so
+		   they win on equal specificity without needing !important.
+		   ===================================================================== */
+
+		/* ---------- 1. Tokens: light (default) ----------
+		   Style against these, never raw hex: every token has a dark twin, so
+		   anything built from them themes itself for free. */
 		:root {
+			/* brand */
 			--primary: #005dac;
 			--on-primary: #ffffff;
 			--hover: #00539a;
+			--primary-container: #d4e3ff;
+			--on-primary-container: #001c3a;
+
+			/* surfaces */
 			--background: #f9f9ff;
 			--surface: #ffffff;
-			--text: #181c21;
-			--border: #c1c6d4;
+			--surface-variant: #f2f3fc;
 			--muted: #f2f3fc;
+
+			/* text */
+			--text: #181c21;
+			--text-muted: #5a6069;
+			--text-secondary: #5a6069;
+
+			/* lines */
+			--border: #c1c6d4;
+			--border-strong: #8f95a3;
+
+			/* status */
 			--success: #0b6b1d;
 			--on-success: #ffffff;
+			--success-bg: #d7f5d8;
 			--danger: #ba1a1a;
+			--error: #ba1a1a;
 			--on-danger: #ffffff;
+			--danger-bg: #ffdad6;
+			--warning: #8a5000;
+			--on-warning: #ffffff;
+			--warning-bg: #ffedd5;
+			--warning-text: #9a3412;
+			--accent: #f57c00;
+			--accent-bg: #fff8f0;
 			--highlight-bg: #d4e3ff;
+
+			/* elevation */
+			--shadow-1: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .08);
+			--shadow-2: 0 4px 12px rgba(0, 0, 0, .12);
+			--scrim: rgba(0, 0, 0, .38);
+
+			/* shape */
+			--radius-sm: 4px;
+			--radius: 8px;
+			--radius-lg: 12px;
+			--radius-pill: 999px;
+
+			/* spacing scale */
+			--sp-1: .25rem;
+			--sp-2: .5rem;
+			--sp-3: .75rem;
+			--sp-4: 1rem;
+			--sp-5: 1.5rem;
+			--sp-6: 2rem;
+
+			/* type */
+			--font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+			--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+			/* layout — each app overrides this with its tier:
+		   720 single-column · 960 standard · 1200 wide · 1600 dense/two-rail */
+			--content-max: 960px;
+
+			/* controls */
+			--control-h: 42px;
 		}
+
+		/* ---------- 1b. Tokens: dark ----------
+		   Duplicated on purpose: the media query serves "auto", the .dark class
+		   serves an explicit choice. Change a value here and in .dark together. */
 		@media (prefers-color-scheme: dark) {
 			:root:not(.light) {
 				--primary: #a5c8ff;
 				--on-primary: #00315f;
 				--hover: #72adff;
+				--primary-container: #00468a;
+				--on-primary-container: #d4e3ff;
+
 				--background: #101319;
 				--surface: #0b0e14;
-				--text: #e0e2ea;
-				--border: #414752;
+				--surface-variant: #181c21;
 				--muted: #181c21;
+
+				--text: #e0e2ea;
+				--text-muted: #a9b0bd;
+				--text-secondary: #a9b0bd;
+
+				--border: #414752;
+				--border-strong: #6b7280;
+
 				--success: #82db7e;
 				--on-success: #00390a;
+				--success-bg: #0b2a10;
 				--danger: #ffb4ab;
+				--error: #ffb4ab;
 				--on-danger: #93000a;
+				--danger-bg: #3b0907;
+				--warning: #ffb95c;
+				--on-warning: #3d2600;
+				--warning-bg: #2b1c00;
+				--warning-text: #ffd8a8;
+				--accent: #ffb95c;
+				--accent-bg: #1f1600;
 				--highlight-bg: #001c3a;
+
+				--shadow-1: 0 1px 2px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+				--shadow-2: 0 4px 12px rgba(0, 0, 0, .55);
+				--scrim: rgba(0, 0, 0, .6);
 			}
 		}
+
 		:root.dark {
 			--primary: #a5c8ff;
 			--on-primary: #00315f;
 			--hover: #72adff;
+			--primary-container: #00468a;
+			--on-primary-container: #d4e3ff;
+
 			--background: #101319;
 			--surface: #0b0e14;
-			--text: #e0e2ea;
-			--border: #414752;
+			--surface-variant: #181c21;
 			--muted: #181c21;
+
+			--text: #e0e2ea;
+			--text-muted: #a9b0bd;
+			--text-secondary: #a9b0bd;
+
+			--border: #414752;
+			--border-strong: #6b7280;
+
 			--success: #82db7e;
 			--on-success: #00390a;
+			--success-bg: #0b2a10;
 			--danger: #ffb4ab;
+			--error: #ffb4ab;
 			--on-danger: #93000a;
+			--danger-bg: #3b0907;
+			--warning: #ffb95c;
+			--on-warning: #3d2600;
+			--warning-bg: #2b1c00;
+			--warning-text: #ffd8a8;
+			--accent: #ffb95c;
+			--accent-bg: #1f1600;
 			--highlight-bg: #001c3a;
+
+			--shadow-1: 0 1px 2px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
+			--shadow-2: 0 4px 12px rgba(0, 0, 0, .55);
+			--scrim: rgba(0, 0, 0, .6);
 		}
-		* { 
-			box-sizing: border-box; 
-			margin: 0; 
-			padding: 0; 
-			outline-offset: 2px; 
+
+		/* ---------- 2. Reset & base ----------
+		   Headings are wrapped in :where() so they carry zero specificity — an
+		   app can restyle h2 with a bare `h2 { }` and win. */
+		*,
+		*::before,
+		*::after {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
 		}
-		*:focus-visible { 
-			outline: 2px solid var(--primary); 
+
+		html {
+			-webkit-text-size-adjust: 100%;
 		}
+
 		body {
 			background: var(--background);
 			color: var(--text);
-			font-family: sans-serif;
-			font-variant-numeric: tabular-nums;
-			display: flex;
-			justify-content: center;
-			min-height: 100vh;
-			padding: 1rem;
-		}
-		.container {
-			background: var(--surface);
-			border: 1px solid var(--border);
-			border-radius: 8px;
-			max-width: 960px;
-			padding: 2rem;
-			width: 100%;
-			position: relative;
-			margin: 2rem 0;
-		}
-		.hidden { 
-			display: none !important; 
-		}
-		h1, h2, h3, label { 
-			margin: .5rem 0; 
-		}
-		label { 
-			display: block; 
-			font-weight: 700; 
-		}
-		input, select, button {
-			background: var(--surface);
-			border: 1px solid var(--border);
-			border-radius: 4px;
-			color: var(--text);
+			font-family: var(--font-sans);
 			font-size: 1rem;
-			padding: .5rem;
+			line-height: 1.5;
+			min-height: 100vh;
+			min-height: 100dvh;
+			padding: var(--sp-5) var(--sp-4);
+			display: flex;
+			flex-direction: column;
+			gap: var(--sp-5);
+			-webkit-font-smoothing: antialiased;
+		}
+
+		:where(h1, h2, h3, h4, h5, h6) {
+			line-height: 1.25;
+			font-weight: 600;
+			text-wrap: balance;
+		}
+
+		:where(h1) { font-size: 1.5rem; }
+		:where(h2) { font-size: 1.125rem; }
+		:where(h3) { font-size: 1rem; }
+		:where(h4, h5, h6) { font-size: .9375rem; }
+
+		a {
+			color: var(--primary);
+			text-decoration-thickness: 1px;
+			text-underline-offset: 2px;
+		}
+
+		:focus-visible {
+			outline: 2px solid var(--primary);
+			outline-offset: 2px;
+			border-radius: var(--radius-sm);
+		}
+
+		::selection {
+			background: var(--primary-container);
+			color: var(--on-primary-container);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			*,
+			*::before,
+			*::after {
+				animation-duration: .01ms !important;
+				animation-iteration-count: 1 !important;
+				transition-duration: .01ms !important;
+				scroll-behavior: auto !important;
+			}
+		}
+
+		/* ---------- 3. App shell ----------
+		   Header and main share --content-max, so every app lines up on the same
+		   optical column whatever its width tier.
+
+		   No page footer exists here, on purpose. Decorative footers (app name,
+		   source link, "runs in your browser") are omitted; anything genuinely
+		   useful goes in a .disclosure at the end of .app-main. */
+		.app-header,
+		.app-main {
 			width: 100%;
+			max-width: var(--content-max);
+			margin-inline: auto;
 		}
-		input[type="number"],
-		#threshold {
-			text-align: right;
+
+		.app-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: var(--sp-4);
+			flex-wrap: wrap;
 		}
-		button { 
-			cursor: pointer; 
+
+		.app-title-group {
+			flex: 1 1 16rem;
+			display: flex;
+			flex-direction: column;
+			gap: var(--sp-1);
+			min-width: 0;
 		}
-		button:disabled { 
-			opacity: .6; 
-			cursor: not-allowed; 
+
+		.app-title-group h1 {
+			font-size: 1.5rem;
+			letter-spacing: -.01em;
 		}
-		.primary { 
+
+		.app-subtitle {
+			color: var(--text-muted);
+			font-size: .9375rem;
+			max-width: 68ch;
+		}
+
+		.app-controls {
+			display: flex;
+			align-items: center;
+			gap: var(--sp-2);
+			flex-shrink: 0;
+		}
+
+		.app-main {
+			display: flex;
+			flex-direction: column;
+			gap: var(--sp-5);
+			flex: 1;
+		}
+
+		/* ---------- 4. Components ---------- */
+
+		/* The one surface primitive: every panel is a .card. Add .card-subtle
+		   for a nested block that must read as *inside* another card. */
+		.card {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-lg);
+			padding: var(--sp-5);
+			min-width: 0;
+		}
+
+		.card > h2,
+		.card-title {
+			font-size: 1.125rem;
+			margin-bottom: var(--sp-4);
+		}
+
+		.card-subtle {
+			background: var(--surface-variant);
+		}
+
+		/* Buttons. The bare <button> element is the primary action, so most
+		   markup needs no class. Add .secondary (outline), .danger, .ghost, or
+		   .btn-icon (square, icon-only). Keep one primary per view. */
+		button,
+		.btn {
+			font: inherit;
+			font-weight: 500;
+			line-height: 1.2;
+			background: var(--primary);
+			color: var(--on-primary);
+			border: 1px solid transparent;
+			border-radius: var(--radius);
+			padding: 0 var(--sp-4);
+			min-height: var(--control-h);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: var(--sp-2);
+			cursor: pointer;
+			transition: background-color .15s, border-color .15s, color .15s;
+		}
+
+		button:hover,
+		.btn:hover {
+			background: var(--hover);
+		}
+
+		button:disabled,
+		.btn:disabled {
+			opacity: .5;
+			cursor: not-allowed;
+		}
+
+		button.secondary,
+		.btn-secondary {
+			background: transparent;
+			color: var(--primary);
+			border-color: var(--border);
+		}
+
+		button.secondary:hover,
+		.btn-secondary:hover {
+			background: var(--surface-variant);
+		}
+
+		button.danger,
+		.btn-danger {
+			background: var(--danger);
+			color: var(--on-danger);
+		}
+
+		button.danger:hover,
+		.btn-danger:hover {
+			filter: brightness(.92);
+			background: var(--danger);
+		}
+
+		button.ghost,
+		.btn-ghost {
+			background: transparent;
+			color: var(--text);
+			border-color: transparent;
+		}
+
+		button.ghost:hover,
+		.btn-ghost:hover {
+			background: var(--surface-variant);
+		}
+
+		/* Square icon-only button — the Settings trigger and every dialog close.
+		   Apps that make buttons full width must exclude it; see the
+		   :not(:where(.btn-icon)) pattern in generator / OpenDensityTool. */
+		.btn-icon {
+			background: transparent;
+			color: var(--text);
+			border: 1px solid var(--border);
+			border-radius: var(--radius);
+			width: var(--control-h);
+			min-height: var(--control-h);
+			padding: 0;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+		}
+
+		.btn-icon:hover {
+			background: var(--surface-variant);
+			color: var(--text);
+		}
+
+		.btn-icon svg {
+			width: 20px;
+			height: 20px;
+			display: block;
+		}
+
+		/* Form controls. Inputs, selects and textareas are full width by design:
+		   width is controlled by the .field / .row wrapper, not the control. */
+		label {
+			display: block;
+			font-size: .875rem;
+			font-weight: 500;
+			color: var(--text);
+			margin-bottom: var(--sp-1);
+		}
+
+		input,
+		select,
+		textarea {
+			font: inherit;
+			color: var(--text);
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius);
+			padding: var(--sp-2) var(--sp-3);
+			min-height: var(--control-h);
+			width: 100%;
+			max-width: 100%;
+		}
+
+		select {
+			cursor: pointer;
+			appearance: none;
+			padding-right: 2rem;
+			background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+				linear-gradient(135deg, currentColor 50%, transparent 50%);
+			background-position: right 1.05rem center, right .8rem center;
+			background-size: .3rem .3rem, .3rem .3rem;
+			background-repeat: no-repeat;
+		}
+
+		textarea {
+			min-height: 7rem;
+			resize: vertical;
+			line-height: 1.5;
+		}
+
+		input:hover,
+		select:hover,
+		textarea:hover {
+			border-color: var(--border-strong);
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			border-color: var(--primary);
+		}
+
+		input[type="checkbox"],
+		input[type="radio"] {
+			width: 1.125rem;
+			height: 1.125rem;
+			min-height: 0;
+			accent-color: var(--primary);
+			cursor: pointer;
+			flex-shrink: 0;
+		}
+
+		input[type="range"] {
+			padding: 0;
+			min-height: 0;
+			border: 0;
+			background: transparent;
+			accent-color: var(--primary);
+		}
+
+		input[type="color"] {
+			padding: var(--sp-1);
+			cursor: pointer;
+		}
+
+		input[type="file"] {
+			padding: var(--sp-2);
+		}
+
+		input:disabled,
+		select:disabled,
+		textarea:disabled {
+			background: var(--surface-variant);
+			color: var(--text-muted);
+			cursor: not-allowed;
+		}
+
+		/* Form layout. .field stacks one label + control; .row places fields side
+		   by side. Set the column count on the row itself — style="--cols:3" —
+		   and the responsive rules at the bottom handle the collapse. */
+		.field {
+			display: flex;
+			flex-direction: column;
+			min-width: 0;
+			flex: 1;
+		}
+
+		.row {
+			display: grid;
+			grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+			gap: var(--sp-4);
+			align-items: start;
+		}
+
+		.row-flex {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--sp-3);
+			align-items: center;
+		}
+
+		.check {
+			display: flex;
+			align-items: center;
+			gap: var(--sp-2);
+			font-weight: 400;
+			margin-bottom: 0;
+			cursor: pointer;
+		}
+
+		.hint {
+			color: var(--text-muted);
+			font-size: .8125rem;
+			margin-top: var(--sp-1);
+		}
+
+		/* Tabs. Mark the active one with .active AND aria-selected="true" so
+		   assistive tech and the styling never disagree. */
+		.tabs {
+			display: flex;
+			gap: var(--sp-1);
+			border-bottom: 1px solid var(--border);
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
+
+		.tabs::-webkit-scrollbar {
+			display: none;
+		}
+
+		.tab {
+			background: transparent;
+			color: var(--text-muted);
+			border: 0;
+			border-bottom: 2px solid transparent;
+			border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+			padding: 0 var(--sp-4);
+			white-space: nowrap;
+		}
+
+		.tab:hover {
+			background: var(--surface-variant);
+			color: var(--text);
+		}
+
+		.tab.active {
+			color: var(--primary);
+			border-bottom-color: var(--primary);
+			background: transparent;
+		}
+
+		/* Tables. Cells never wrap; wrap the table in .table-wrap so wide data
+		   scrolls sideways instead of bursting the card. */
+		.table-wrap {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-variant-numeric: tabular-nums;
+		}
+
+		th,
+		td {
+			text-align: left;
+			padding: var(--sp-2) var(--sp-3);
+			border-bottom: 1px solid var(--border);
+			white-space: nowrap;
+		}
+
+		th {
+			font-size: .8125rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			background: var(--surface-variant);
+			position: sticky;
+			top: 0;
+		}
+
+		tbody tr:last-child td {
+			border-bottom: 0;
+		}
+
+		/* Small status pills. Use the semantic variant, not a colour name, so
+		   meaning survives a palette change. */
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--sp-1);
+			font-size: .75rem;
+			font-weight: 600;
+			padding: var(--sp-1) var(--sp-2);
+			border-radius: var(--radius-pill);
+			background: var(--surface-variant);
+			color: var(--text-muted);
+			white-space: nowrap;
+		}
+
+		.badge-success { background: var(--success-bg); color: var(--success); }
+		.badge-danger  { background: var(--danger-bg);  color: var(--danger); }
+		.badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+
+		/* Block-level callouts for explanation or warning. For secondary detail
+		   nobody needs up front, prefer .disclosure below. */
+		.notice {
+			border: 1px solid var(--border);
+			border-left: 3px solid var(--primary);
+			background: var(--surface-variant);
+			border-radius: var(--radius);
+			padding: var(--sp-3) var(--sp-4);
+			font-size: .875rem;
+		}
+
+		.notice-warning { border-left-color: var(--accent); background: var(--warning-bg); color: var(--warning-text); }
+		.notice-danger  { border-left-color: var(--danger); background: var(--danger-bg);  color: var(--danger); }
+
+		/* ---------- Disclosure ----------
+		   Where methodology, references and shortcuts live. Collapsed by default
+		   so it never competes with the tool. This replaces the page footer —
+		   if there is nothing worth reading, omit the block entirely. */
+		.disclosure {
+			background: var(--surface-variant);
+			border: 1px solid var(--border);
+			border-radius: var(--radius);
+			padding: var(--sp-3) var(--sp-4);
+		}
+
+		.disclosure > summary {
+			cursor: pointer;
+			font-size: .875rem;
+			font-weight: 600;
+			color: var(--text-muted);
+			display: flex;
+			align-items: center;
+			gap: var(--sp-2);
+			list-style: none;
+			user-select: none;
+		}
+
+		.disclosure > summary::-webkit-details-marker { display: none; }
+
+		.disclosure > summary::before {
+			content: "";
+			width: 0;
+			height: 0;
+			border-left: 5px solid currentColor;
+			border-top: 4px solid transparent;
+			border-bottom: 4px solid transparent;
+			transition: transform .2s;
+			flex-shrink: 0;
+		}
+
+		.disclosure[open] > summary::before { transform: rotate(90deg); }
+		.disclosure > summary:hover { color: var(--primary); }
+		.disclosure[open] > summary { margin-bottom: var(--sp-3); }
+
+		.disclosure-body {
+			font-size: .875rem;
+			line-height: 1.7;
+			color: var(--text-muted);
+		}
+
+		.disclosure-body > * + * { margin-top: var(--sp-3); }
+
+		.disclosure-body ul,
+		.disclosure-body ol { padding-left: 1.25rem; }
+
+		.disclosure-body li + li { margin-top: var(--sp-1); }
+
+		.disclosure-body pre,
+		.disclosure-body code {
+			font-family: var(--font-mono);
+			font-size: .8125rem;
+		}
+
+		.disclosure-body pre {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: var(--radius-sm);
+			padding: var(--sp-3);
+			white-space: pre-wrap;
+			overflow-x: auto;
+		}
+
+		/* ---------- Settings dialog ----------
+		   Every app has one, opened by the header's .btn-icon. Structure is
+		   .sheet-header / .sheet-body / .sheet-footer; only the body scrolls.
+		   Open and close it via AppSettings.wireSheet, never showModal directly,
+		   or the no-<dialog> fallback below is bypassed. */
+		dialog.sheet {
+			border: 1px solid var(--border);
+			border-radius: var(--radius-lg);
+			background: var(--surface);
+			color: var(--text);
+			padding: 0;
+			width: min(420px, calc(100vw - 2rem));
+			box-shadow: var(--shadow-2);
+			margin: auto;
+			/* The sheet itself never scrolls; .sheet-body is the only scroller,
+			   otherwise the UA default max-height produces a second scrollbar. */
+			max-height: calc(100vh - 2rem);
+			max-height: calc(100dvh - 2rem);
+			overflow: hidden;
+		}
+
+		dialog.sheet[open] {
+			display: flex;
+			flex-direction: column;
+		}
+
+		/* Works whether the sections are wrapped in a <form method="dialog">
+		   or sit directly inside the dialog. */
+		dialog.sheet > form {
+			display: flex;
+			flex-direction: column;
+			flex: 1 1 auto;
+			min-height: 0;
+		}
+
+		/* Literal colours, never var(): ::backdrop did not inherit from its
+		   dialog before Chrome 122, so a custom property resolves to nothing,
+		   the declaration is invalid, and the backdrop falls back to
+		   transparent. That is the classic "dialog does not dim" bug. */
+		dialog.sheet::backdrop {
+			background: rgba(0, 0, 0, .38);
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root:not(.light) dialog.sheet::backdrop {
+				background: rgba(0, 0, 0, .6);
+			}
+		}
+
+		:root.dark dialog.sheet::backdrop {
+			background: rgba(0, 0, 0, .6);
+		}
+
+		/* Dimming. Two paths only:
+		   1. ::backdrop — every browser that has modal <dialog>.
+		   2. .sheet-scrim — a real element the script inserts when showModal()
+		      is missing (pre-2022 Safari/Firefox).
+
+		   Everything in path 2 must stay old-CSS-safe: no inset, no :where,
+		   no @supports selector(). Those all postdate the browsers it serves,
+		   which is exactly how the previous version silently did nothing. */
+
+		/* No <dialog> support means no UA rule hiding a closed dialog, so the
+		   sheet would sit inline in the page. Spell it out. */
+		dialog.sheet:not([open]) {
+			display: none;
+		}
+
+		html.has-open-sheet {
+			overflow: hidden;
+		}
+
+		.sheet-scrim {
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: var(--scrim);
+			z-index: 998;
+		}
+
+		dialog.sheet-fallback {
+			display: flex;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			right: auto;
+			bottom: auto;
+			-webkit-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+			z-index: 999;
+		}
+
+		.sheet-header {
+			flex: 0 0 auto;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--sp-4);
+			padding: var(--sp-4) var(--sp-5);
+			border-bottom: 1px solid var(--border);
+		}
+
+		.sheet-header h2 {
+			font-size: 1.0625rem;
+		}
+
+		.sheet-body {
+			padding: var(--sp-5);
+			display: flex;
+			flex-direction: column;
+			gap: var(--sp-4);
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow-y: auto;
+			overscroll-behavior: contain;
+		}
+
+		.sheet-footer {
+			flex: 0 0 auto;
+			padding: var(--sp-4) var(--sp-5);
+			border-top: 1px solid var(--border);
+			display: flex;
+			justify-content: flex-end;
+			gap: var(--sp-2);
+		}
+
+		/* ---------- Utilities ----------
+		   Deliberately few. If you reach for a stack of these on one element,
+		   the component is missing a class instead. */
+		.hidden { display: none !important; }
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
+			white-space: nowrap;
+			border: 0;
+		}
+		.mono { font-family: var(--font-mono); }
+		.muted { color: var(--text-muted); }
+		.nums { font-variant-numeric: tabular-nums; }
+		.stack { display: flex; flex-direction: column; gap: var(--sp-4); }
+		.grow { flex: 1; }
+
+		/* ---------- Responsive ----------
+		   Column counts are preserved on desktop and collapse predictably:
+		   >=4 cols -> 2 cols on tablet -> 1 col on phone. */
+		@media (max-width: 900px) {
+			.row {
+				grid-template-columns: repeat(min(var(--cols, 2), 2), minmax(0, 1fr));
+			}
+		}
+
+		@media (max-width: 600px) {
+			body {
+				padding: var(--sp-4) var(--sp-3);
+				gap: var(--sp-4);
+			}
+
+			.card {
+				padding: var(--sp-4);
+			}
+
+			.app-header {
+				gap: var(--sp-3);
+				align-items: center;
+				flex-wrap: nowrap;
+			}
+
+			/* full-width action buttons stack rather than squeeze */
+			.row-flex > .grow {
+				flex-basis: 100%;
+			}
+
+			.app-title-group h1 {
+				font-size: 1.25rem;
+			}
+
+			.row {
+				grid-template-columns: 1fr;
+			}
+
+			/* let tabs bleed to the card edge, but only inside a card */
+			.card > .tabs,
+			.card > * > .tabs {
+				margin-inline: calc(var(--sp-4) * -1);
+				padding-inline: var(--sp-4);
+			}
+		}
+
+		/* =====================================================================
+		   APP-SPECIFIC STYLES — ApportionmentCalc
+		   1200px so the Hare and Sainte-Lague tables sit side by side; they stack
+		   below 900px rather than shrinking into unreadable columns.
+		   ===================================================================== */
+		:root {
+			--content-max: 1200px;
+		}
+
+		body {
+			font-variant-numeric: tabular-nums;
+		}
+
+		.party-row {
+			display: flex;
+			gap: var(--sp-2);
+			align-items: center;
+			margin-bottom: var(--sp-2);
+		}
+		.party-row input[type=text] { flex: 2; }
+		.party-row input[type=number] { flex: 1; text-align: right; }
+		.party-row button { width: auto; flex-shrink: 0; }
+
+		/* Two result tables side by side; collapses at 900px via core breakpoint */
+		.results-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: var(--sp-5);
+		}
+		.results-grid > div { min-width: 0; }
+
+		#hare, #sainteLague, #compare { overflow-x: auto; }
+
+		#results th:not(:first-child),
+		#results td:not(:first-child) { text-align: right; }
+
+		#inputStats { text-align: right; }
+		#list { margin-bottom: var(--sp-4); }
+
+		.step {
+			border: 1px solid var(--border);
+			border-radius: var(--radius);
+			margin-bottom: var(--sp-4);
+			padding: var(--sp-4);
+			overflow-x: auto;
+		}
+		.highlight { background: var(--highlight-bg); font-weight: 700; }
+		.positive { color: var(--success); font-weight: 700; }
+		.negative { color: var(--danger); font-weight: 700; }
+		.neutral { opacity: .4; }
+		.failed-party { opacity: .6; background: var(--muted); }
+		.hide-failed .failed-party { display: none; }
+
+		.error {
+			color: var(--danger);
+			font-size: .875rem;
+			display: block;
+			font-weight: 500;
+		}
+
+		.actions {
+			display: flex;
+			gap: var(--sp-3);
+			flex-wrap: wrap;
+		}
+		.actions button { flex: 1; min-width: 160px; }
+
+		.info { font-size: .875rem; color: var(--text-muted); }
+
+		dialog#modal {
+			border: 1px solid var(--border);
+			border-radius: var(--radius-lg);
+			background: var(--surface);
+			color: var(--text);
+			padding: var(--sp-5);
+			width: min(900px, calc(100vw - 2rem));
+			max-height: 85vh;
+			box-shadow: var(--shadow-2);
+			margin: auto;
+		}
+		/* Literal colour: ::backdrop does not inherit custom properties in
+		   browsers before Chrome 122. */
+		dialog#modal::backdrop { background: rgba(0, 0, 0, .38); }
+		:root.dark dialog#modal::backdrop { background: rgba(0, 0, 0, .6); }
+		@media (prefers-color-scheme: dark) {
+			:root:not(.light) dialog#modal::backdrop { background: rgba(0, 0, 0, .6); }
+		}
+		.dialog-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: var(--sp-4);
+			margin-bottom: var(--sp-4);
+		}
+		.dialog-header h2 { font-size: 1.25rem; }
+		.close-button {
+			background: transparent;
+			color: var(--text);
+			border: 1px solid var(--border);
+			width: var(--control-h);
+			padding: 0;
+			font-size: 1.25rem;
+		}
+		.close-button:hover { background: var(--surface-variant); color: var(--text); }
+		.close-button svg { width: 20px; height: 20px; }
+
+		.gradient-bar {
+			background: linear-gradient(90deg, var(--highlight-bg) var(--percentage), transparent var(--percentage));
+		}
+
+		body.drag-active::after {
+			content: "";
+			position: fixed;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background: var(--highlight-bg);
+			opacity: .35;
+			pointer-events: none;
+		}
+
+		@media (max-width: 900px) {
+			.results-grid { grid-template-columns: 1fr; }
+		}
+
+		/* Rules unique to this app that have no equivalent in the core.
+		   Anything here that turns out to be reusable belongs in core.css. */
+		#threshold, #seats { text-align: right; }
+.primary { 
 			background: var(--primary); 
 			color: var(--on-primary); 
 			border: 0; 
 		}
 		.primary:hover:not(:disabled) { 
 			background: var(--hover); 
-		}
-		.secondary:hover:not(:disabled) { 
-			background: var(--muted); 
 		}
 		.danger, .success { 
 			color: var(--on-danger); 
@@ -134,286 +1053,345 @@
 		.danger:hover, .success:hover { 
 			filter: brightness(.9); 
 		}
-		.selectors {
-			position: absolute;
-			right: 2rem;
-			top: 1rem;
-			display: flex;
-			gap: 8px;
-		}
-		.selectors select { 
-			width: auto; 
-			font-size: .9rem; 
-		}
-		#list, #inputStats {
-			margin-bottom: 1rem;
-		}
-		#inputStats {
-			text-align: right;
-		}
-		.row { 
-			display: flex; 
-			gap: 1rem; 
-			margin-bottom: 1rem; 
-		}
-		.group { 
-			flex: 1; 
-		}
-		.party-row {
-			display: flex;
-			gap: .5rem;
-			align-items: center;
-			margin-bottom: .5rem;
-		}
-		.party-row input[type=text] { 
-			flex: 2; 
-		}
-		.party-row input[type=number] { 
-			flex: 1; 
-		}
-		.party-row button { 
-			width: auto; 
-			padding: .5rem 1rem; 
-		}
-		.results-grid {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 1rem;
-			margin-top: 1rem;
-		}
-		.results-grid > div { 
-			min-width: 0; 
-		}
-		#hare, #sainteLague, #compare { 
-			overflow-x: auto; 
-		}
-		table { 
-			border-collapse: collapse; 
-			margin-top: 1rem; 
-			width: 100%; 
-			font-size: .9rem; 
-		}
-		th, td { 
-			border: 1px solid var(--border); 
-			padding: .5rem; 
-			text-align: left; 
-		}
-		#results th:not(:first-child),
-		#results td:not(:first-child) {
-			text-align: right;
-		}
-		th { 
-			background: var(--primary); 
-			color: var(--on-primary); 
-		}
-		.comparison {
-			margin-top: 2rem;
-			padding-top: 1rem;
-			border-top: 1px solid var(--border);
-		}
-		.positive { 
-			color: var(--success); 
-			font-weight: 700; 
-		}
-		.negative { 
-			color: var(--danger); 
-			font-weight: 700; 
-		}
-		.neutral {
-			opacity: 0.4;
-		}
-		.step {
-			border: 1px solid var(--border);
-			margin-bottom: 1rem;
-			padding: 1rem;
-			border-radius: 4px;
-			overflow-x: auto;
-		}
-		.highlight { 
-			background: var(--highlight-bg); 
-			font-weight: 700; 
-		}
-		.error {
-			color: var(--danger);
-			font-size: .9rem;
-			margin: 1rem 0;
-			display: block;
-			font-weight: 500;
-		}
-		.failed-party { 
-			opacity: 0.6; 
-			background: var(--muted); 
-		}
-		.hide-failed .failed-party { 
-			display: none; 
-		}
-		dialog {
-			background: var(--surface);
-			color: var(--text);
-			border: 1px solid var(--border);
-			border-radius: 8px;
-			padding: 1.5rem;
-			max-width: 800px;
-			max-height: 90%;
-			width: 100%;
-			margin: auto;
-			position: fixed;
-			overflow-y: auto;
-		}
-		dialog::backdrop { 
-			background: rgba(0, 0, 0, 0.5); 
-		}
-		.dialog-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 1.5rem;
-		}
-		.dialog-header h2 { 
-			margin: 0; 
-			font-size: 1.5rem; 
-		}
-		.close-button {
-			background: transparent;
-			color: var(--text);
-			padding: .25rem;
-			font-size: 1.5rem;
-			line-height: 1;
-			border: 0;
-			width: auto;
-			cursor: pointer;
-		}
-		.close-button:hover { 
-			background: var(--muted); 
-			color: var(--text); 
-		}
-		.actions { 
-			display: flex; 
-			gap: 1rem; 
-			margin-top: 
-			1rem; 
-			flex-wrap: wrap; 
-		}
-		.actions button { 
-			min-width: 160px; 
-		}
-		.info { 
-			font-size: .9rem; 
-			opacity: .8; 
-			line-height: 1.6; 
-		}
-		.stats { 
-			margin-top: 1rem; 
-			padding: 1rem; 
-			border: 1px solid var(--border); 
-			border-radius: 4px; 
-		}
-		.flex-align-center { display: flex; align-items: center; }
-		.gap-sm { gap: .5rem; }
-		.mt-sm { margin-top: .5rem; }
 		.mt-md { margin-top: 1rem; }
 		.mt-lg { margin-top: 2rem; }
-		.font-normal { font-weight: 400; }
-		.text-sm { font-size: .9rem; }
-		.w-auto { width: auto; }
-		.m-0 { margin: 0; }
-		.flex-1 { flex: 1; }
 		.italic { font-style: italic; }
-		.gradient-bar {
-			background: linear-gradient(90deg, var(--highlight-bg) var(--percentage), transparent var(--percentage));
-		}
-		@media(max-width: 768px) {
-			.results-grid { 
-				grid-template-columns: 1fr; 
-			}
-			.selectors { 
-				position: static; 
-				justify-content: end; 
-				margin-bottom: .5rem; 
-			}
-			.row { 
-				flex-direction: column; 
-			}
-		}
-		body.drag-active::after {
-			content: "";
-			position: fixed;
-			inset: 0;
-			background: var(--highlight-bg);
-			border: 4px dashed var(--primary);
-			opacity: 0.9;
-			z-index: 9999;
-			pointer-events: none;
-		}
 	</style>
 </head>
 <body>
-	<div class="container">
-		<div class="selectors">
-			<select id="language"><option value="en">English</option><option value="id">Bahasa Indonesia</option></select>
-			<select id="theme"><option value="auto"></option><option value="light"></option><option value="dark"></option></select>
+	<header class="app-header">
+		<div class="app-title-group">
+			<h1 id="title"></h1>
+			<p id="subtitle" class="app-subtitle"></p>
 		</div>
-		<h1 id="title"></h1>
-		<p id="subtitle" class="info"></p>
-		<div id="input">
-			<div class="row">
-				<div class="group">
+		<div class="app-controls">
+			<button id="settingsBtn" class="btn-icon" type="button" aria-label="Settings" title="Settings">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+					<circle cx="12" cy="12" r="3"></circle>
+					<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+				</svg>
+			</button>
+		</div>
+	</header>
+
+	<main class="app-main">
+		<section class="card" id="input">
+			<div class="row" style="--cols:2">
+				<div class="field">
 					<label id="seatsLabel" for="seats"></label>
 					<input type="number" id="seats" min="1" value="10">
 				</div>
-				<div class="group">
+				<div class="field">
 					<label id="thresholdLabel" for="threshold"></label>
 					<input type="text" id="threshold" value="4">
-					<label class="flex-align-center gap-sm mt-sm font-normal text-sm">
-						<input type="checkbox" id="hide" class="w-auto m-0">
+					<label class="check" style="margin-top:var(--sp-2)">
+						<input type="checkbox" id="hide">
 						<span id="hideLabel"></span>
 					</label>
 				</div>
 			</div>
 			<div id="list"></div>
 			<div id="inputStats" class="info"></div>
-			<div class="row gap-sm">
-				<button id="add" class="secondary flex-1"></button>
-				<button id="clear" class="secondary flex-1"></button>
-				<button id="import" class="secondary flex-1"></button>
+			<div class="row-flex" style="margin-bottom:var(--sp-4)">
+				<button id="add" class="secondary grow"></button>
+				<button id="clear" class="secondary grow"></button>
+				<button id="import" class="secondary grow"></button>
 			</div>
 			<input type="file" id="file" accept=".csv,.tsv,.txt" class="hidden">
 			<span id="error" class="error hidden" aria-live="polite"></span>
-			<button id="calculate" class="primary"></button>
-		</div>
-		<div id="results" class="hidden">
+			<button id="calculate" class="primary" style="width:100%;margin-top:var(--sp-4)"></button>
+		</section>
+		<div id="results" class="hidden stack">
+			<section class="card">
 			<div class="actions">
 				<button id="edit" class="secondary flex-1"></button>
 				<button id="steps" class="secondary flex-1"></button>
 				<button id="copy" class="secondary flex-1"></button>
-				<button id="export" class="success flex-1"></button>
+				<button id="export" class="success grow"></button>
 			</div>
-			<div id="stats" class="stats"></div>
-			<div class="results-grid">
-				<div><h2 id="hareTitle"></h2><div id="hare"></div></div>
-				<div><h2 id="sainteLagueTitle"></h2><div id="sainteLague"></div></div>
-			</div>
-			<div class="comparison">
-				<h2 id="compareTitle"></h2>
+			<div id="stats" class="notice" style="margin-top:var(--sp-4)"></div>
+			</section>
+			<section class="card">
+				<div class="results-grid">
+					<div><h2 class="card-title" id="hareTitle"></h2><div id="hare"></div></div>
+					<div><h2 class="card-title" id="sainteLagueTitle"></h2><div id="sainteLague"></div></div>
+				</div>
+			</section>
+			<section class="card">
+				<h2 class="card-title" id="compareTitle"></h2>
 				<div id="compare"></div>
-			</div>
+			</section>
 		</div>
-	</div>
+	</main>
+	<dialog id="settingsDialog" class="sheet" aria-labelledby="prefTitle">
+		<form method="dialog">
+			<div class="sheet-header">
+				<h2 id="prefTitle"></h2>
+				<button class="btn-icon" value="close" aria-label="Close settings">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+						<path d="M18 6 6 18M6 6l12 12"></path>
+					</svg>
+				</button>
+			</div>
+			<div class="sheet-body">
+				<div class="field">
+					<label id="langLabel" for="language"></label>
+					<select id="language"><option value="en">English</option><option value="id">Bahasa Indonesia</option></select>
+				</div>
+				<div class="field">
+					<label id="themeLabel" for="theme"></label>
+					<select id="theme"><option value="auto"></option><option value="light"></option><option value="dark"></option></select>
+				</div>
+			</div>
+			<div class="sheet-footer">
+				<button value="close" id="settingsDoneBtn">Done</button>
+			</div>
+		</form>
+	</dialog>
 	<dialog id="modal">
 		<div class="dialog-header">
 			<h2 id="modalTitle"></h2>
-			<button id="close" class="close-button">×</button>
+			<button id="close" class="close-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
 		</div>
 		<div id="modalSteps"></div>
 	</dialog>
+	<script>
+		/* =====================================================================
+		   SHARED SETTINGS BEHAVIOUR — identical in every app. Do not edit here.
+		   Edit /shared-settings.js, then run sync_core.py.
+
+		   Owns theme, language and the settings dialog so all apps behave the
+		   same. Runs before app code, so window.AppSettings is ready by the time
+		   an app's constructor executes.
+
+		   An app is expected to:
+		     1. set AppSettings.strings = <its translation table>
+		     2. call AppSettings.detectLang(...) once to choose a start language
+		     3. delegate its own theme()/lang() to applyTheme()/applyLang()
+		   Persistence stays with the app; this layer never touches storage.
+		   ===================================================================== */
+		(function () {
+			const root = document.documentElement;
+			const $ = id => document.getElementById(id);
+
+			/* Last-resort settings copy, used key-by-key when the app has no
+			   translation table (or is missing a key). Keeps apps without an i18n
+			   layer looking identical to those with one. */
+			const FALLBACK = {
+				en: { prefTitle: 'Settings', prefBtn: 'Settings', langLabel: 'Language',
+					themeLabel: 'Theme', themeAuto: 'Auto', themeLight: 'Light', themeDark: 'Dark' },
+				id: { prefTitle: 'Pengaturan', prefBtn: 'Pengaturan', langLabel: 'Bahasa',
+					themeLabel: 'Tema', themeAuto: 'Otomatis', themeLight: 'Terang', themeDark: 'Gelap' }
+			};
+
+			const AppSettings = {
+				/* The app's table, shaped { en: ..., id: ... }. Assign it as soon as it
+				   is defined — renderSettings reads it on the first applyLang. */
+				strings: null,
+				/* Applies a theme and returns the value actually used.
+				   'auto' clears both classes and defers to prefers-color-scheme.
+				   Idempotent; also syncs the #theme select and fires 'themechange' on
+				   <html> for canvas apps that must repaint. */
+				applyTheme(value) {
+					const v = (value === 'light' || value === 'dark') ? value : 'auto';
+					root.classList.remove('light', 'dark');
+					if (v !== 'auto') root.classList.add(v);
+					const sel = $('theme');
+					if (sel && sel.value !== v) sel.value = v;
+					root.dispatchEvent(new CustomEvent('themechange', { detail: { theme: v } }));
+					return v;
+				},
+
+				/* Switches language: updates <html lang>, the #language select and the
+				   dialog copy. Returns the value applied. Call this from the app's own
+				   lang() rather than touching <html> directly. */
+				applyLang(value) {
+					const sel = $('language');
+					const v = value || (sel && sel.value) || 'en';
+					root.lang = v;
+					if (sel && sel.value !== v) sel.value = v;
+					this.renderSettings(v);
+					return v;
+				},
+
+				/* Repaints the dialog copy: title, both field labels, the three theme
+				   option names, and the trigger's accessible name. Driven entirely by ids
+				   (#prefTitle, #langLabel, #themeLabel), so markup needs the right ids and
+				   nothing else. */
+				renderSettings(lang) {
+					const l = lang || root.lang || 'en';
+					const app = (this.strings && this.strings[l]) || {};
+					const base = FALLBACK[l] || FALLBACK.en;
+					const s = {};
+					for (const k of Object.keys(FALLBACK.en)) s[k] = app[k] || base[k] || FALLBACK.en[k];
+
+					['prefTitle', 'langLabel', 'themeLabel'].forEach(id => {
+						const e = $(id);
+						if (e) e.textContent = s[id];
+					});
+
+					const sel = $('theme');
+					if (sel) [...sel.options].forEach(o => {
+						const k = 'theme' + o.value.charAt(0).toUpperCase() + o.value.slice(1);
+						if (s[k]) o.textContent = s[k];
+					});
+
+					['settingsBtn', 'prefBtn', 'openSettings'].forEach(id => {
+						const b = $(id);
+						if (b) { b.setAttribute('aria-label', s.prefBtn); b.title = s.prefBtn; }
+					});
+					return s;
+				},
+
+				/* Best browser language the app actually ships, e.g.
+				   detectLang(Object.keys(text)). Walks navigator.languages in order and
+				   matches region subtags ('id-ID' -> 'id'); falls back to list[0]. */
+				detectLang(available) {
+					const list = (available && available.length) ? available : ['en'];
+					const tags = (navigator.languages && navigator.languages.length)
+						? navigator.languages : [navigator.language || 'en'];
+					for (const tag of tags) {
+						const t = String(tag).toLowerCase();
+						const hit = list.find(l => t === String(l).toLowerCase()
+							|| t.startsWith(String(l).toLowerCase() + '-'));
+						if (hit) return hit;
+					}
+					return list[0];
+				}
+			};
+
+			/* Modal <dialog> landed in Safari 15.4 / Firefox 98. Older engines get a
+			   non-modal open plus our own scrim, stacking and scroll lock, so the
+			   dialog still dims the page instead of appearing inline. */
+			const CAN_MODAL = typeof HTMLDialogElement !== 'undefined'
+				&& typeof HTMLDialogElement.prototype.showModal === 'function';
+
+			/* The scrim is a real node, not a root pseudo-element, so it needs no
+			   modern CSS and can take the click-to-close itself. */
+			function addScrim(dialog) {
+				var scrim = document.querySelector('.sheet-scrim');
+				if (!scrim) {
+					scrim = document.createElement('div');
+					scrim.className = 'sheet-scrim';
+					document.body.appendChild(scrim);
+				}
+				scrim.onclick = function () { AppSettings.closeSheet(dialog); };
+			}
+
+			function removeScrim() {
+				var scrim = document.querySelector('.sheet-scrim');
+				if (scrim && scrim.parentNode) scrim.parentNode.removeChild(scrim);
+			}
+
+			/* Don't assume ::backdrop painted — engines differ on whether it can be
+			   styled and whether it inherits. Measure it, and supply our own scrim
+			   when it came out transparent, whatever the reason. */
+			function backdropPaints(dialog) {
+				var bg;
+				try { bg = window.getComputedStyle(dialog, '::backdrop').backgroundColor; }
+				catch (e) { return false; }
+				if (!bg || bg === 'transparent' || bg === 'none') return false;
+				var parts = bg.replace(/\s+/g, '').match(/^rgba?\(([^)]+)\)$/);
+				if (!parts) return true;                       // named or hex: it paints
+				var channels = parts[1].split(',');
+				return channels.length < 4 || parseFloat(channels[3]) > 0;
+			}
+
+			AppSettings.openSheet = function (dialog) {
+				if (!dialog) return;
+				if (CAN_MODAL) {
+					try {
+						if (!dialog.open) dialog.showModal();
+						if (!backdropPaints(dialog)) addScrim(dialog);
+						return;
+					} catch (e) { /* wedged dialog: fall through and open it manually */ }
+				}
+				dialog.setAttribute('open', '');
+				dialog.classList.add('sheet-fallback');
+				root.classList.add('has-open-sheet');
+				addScrim(dialog);
+			};
+
+			AppSettings.closeSheet = function (dialog) {
+				if (!dialog) return;
+				if (CAN_MODAL) {
+					if (dialog.open) dialog.close();
+					return;
+				}
+				dialog.removeAttribute('open');
+				dialog.classList.remove('sheet-fallback');
+				root.classList.remove('has-open-sheet');
+				removeScrim();
+			};
+
+			/* Wires a trigger + dialog pair once: open on click, close on backdrop
+			   click, plus — on the fallback path only — Escape and form submit, which
+			   native <dialog> already handles. Use this for every dialog; calling
+			   showModal() directly skips the fallback. */
+			AppSettings.wireSheet = function (btn, dialog) {
+				if (!btn || !dialog || dialog.dataset.sheetWired) return;
+				dialog.dataset.sheetWired = '1';
+				btn.addEventListener('click', () => AppSettings.openSheet(dialog));
+				dialog.addEventListener('click', e => {
+					if (e.target === dialog) AppSettings.closeSheet(dialog);
+				});
+				dialog.addEventListener('close', () => {
+					dialog.classList.remove('sheet-fallback');
+					root.classList.remove('has-open-sheet');
+					removeScrim();
+				});
+				if (!CAN_MODAL) {
+					dialog.addEventListener('submit', e => { e.preventDefault(); AppSettings.closeSheet(dialog); });
+					document.addEventListener('keydown', e => {
+						if (e.key === 'Escape' && dialog.hasAttribute('open')) AppSettings.closeSheet(dialog);
+					});
+				}
+			};
+
+			window.AppSettings = AppSettings;
+
+			/* CSS reacts to an OS scheme change on its own; this only re-fires
+			   'themechange' so canvas apps (which bake colours into pixels) know to
+			   redraw. Silent unless the user is on 'auto'. */
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+				const sel = $('theme');
+				if (!sel || sel.value === 'auto') {
+					root.dispatchEvent(new CustomEvent('themechange', { detail: { theme: 'auto' } }));
+				}
+			});
+
+			document.addEventListener('DOMContentLoaded', () => {
+				/* Baseline wiring so a bare #theme / #language select works with no app
+				   code at all. Apps with their own handlers keep them — both run, and
+				   apply* are idempotent. */
+				const themeSel = $('theme');
+				if (themeSel) {
+					themeSel.addEventListener('change', e => AppSettings.applyTheme(e.target.value));
+					AppSettings.applyTheme(themeSel.value);
+				}
+				const langSel = $('language');
+				if (langSel) {
+					langSel.addEventListener('change', e => AppSettings.applyLang(e.target.value));
+					AppSettings.applyLang(langSel.value);
+				} else {
+					AppSettings.renderSettings();
+				}
+
+				/* The conventional pair. Apps using other ids (HijriCalc,
+				   OpenDensityTool) call wireSheet themselves. */
+				AppSettings.wireSheet($('settingsBtn'), $('settingsDialog'));
+			});
+		})();
+	</script>
+
 	<script>
 		const text = {
 			en: {
 				title: 'ApportionmentCalc',
 				subtitle: 'Electoral seat allocation calculator: Sainte-Lagu\u00eb vs Hare Quota',
-				autoTheme: 'Auto Theme',
-				lightTheme: 'Light',
-				darkTheme: 'Dark',
+				themeAuto: 'Auto',
+				themeLight: 'Light',
+				themeDark: 'Dark',
 				seatsLabel: 'Total Seats',
 				thresholdLabel: 'Electoral Threshold (%)',
 				hideLabel: 'Hide parties below threshold',
@@ -462,7 +1440,10 @@
 				clearConfirm: 'Are you sure you want to clear all parties?',
 				removeParty: 'Remove Party',
 				closeModal: 'Close Modal',
-				languageLabel: 'Language',
+				prefTitle: 'Settings',
+				prefBtn: 'Settings',
+				settingsDoneBtn: 'Done',
+				langLabel: 'Language',
 				themeLabel: 'Theme',
 				gallagher: 'Gallagher Index',
 				copy: 'Copy Results',
@@ -471,9 +1452,9 @@
 			id: {
 				title: 'ApportionmentCalc',
 				subtitle: 'Kalkulator alokasi kursi pemilu: Sainte-Lagu\u00eb vs Kuota Hare',
-				autoTheme: 'Tema Otomatis',
-				lightTheme: 'Terang',
-				darkTheme: 'Gelap',
+				themeAuto: 'Otomatis',
+				themeLight: 'Terang',
+				themeDark: 'Gelap',
 				seatsLabel: 'Jumlah Kursi',
 				thresholdLabel: 'Ambang Batas Parlemen (%)',
 				hideLabel: 'Sembunyikan partai di bawah ambang batas',
@@ -522,7 +1503,10 @@
 				clearConfirm: 'Apakah Anda yakin ingin menghapus semua partai?',
 				removeParty: 'Hapus Partai',
 				closeModal: 'Tutup Modal',
-				languageLabel: 'Bahasa',
+				prefTitle: 'Pengaturan',
+				prefBtn: 'Pengaturan',
+				settingsDoneBtn: 'Selesai',
+				langLabel: 'Bahasa',
 				themeLabel: 'Tema',
 				gallagher: 'Indeks Gallagher',
 				copy: 'Salin Hasil',
@@ -538,7 +1522,7 @@
 				(this.parties = [],
 				this.setup(),
 				this.theme('auto'),
-				this.language = navigator.language?.startsWith('id') ? 'id' : 'en',
+				this.language = AppSettings.detectLang(Object.keys(text)),
 				this.lang(this.language),
 				this.loadState()
 					? this.calculate()
@@ -642,16 +1626,12 @@
 			escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
 			table(h,b) { return `<table><thead><tr>${h.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>` }
 
-			theme(n) {
-				(document.documentElement.className = n === 'auto' ? '' : n,
-				elements.theme.value = n)
-			}
+			theme(n) { AppSettings.applyTheme(n) }
 
 			lang(l) {
-				(this.language = elements.language.value = document.documentElement.lang = l,
+				(this.language = AppSettings.applyLang(l),
 				Object.keys(text.en).forEach(k=>elements[k] && (elements[k].textContent = this.string(k))),
-				[...elements.theme.options].forEach(o=>o.textContent = this.string(o.value + 'Theme')),
-				[['close','closeModal'],['language','languageLabel'],['theme','themeLabel']]
+				[['close','closeModal'],['language','langLabel'],['theme','themeLabel'],['settingsBtn','prefBtn']]
 					.forEach(([i,k])=>elements[i].setAttribute('aria-label',this.string(k))),
 				this.renderParties(),
 				!elements.results.classList.contains('hidden') && this.data && this.renderResults())
@@ -663,7 +1643,7 @@
 			}
 
 			modal(v) {
-				v ? (this.lastFocus = document.activeElement,this.renderSteps(),elements.modal.showModal()) : elements.modal.close()
+				v ? (this.lastFocus = document.activeElement,this.renderSteps(),AppSettings.openSheet(elements.modal)) : AppSettings.closeSheet(elements.modal)
 			}
 
 			error(m) {
