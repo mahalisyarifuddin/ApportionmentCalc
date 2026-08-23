@@ -1539,78 +1539,160 @@
 			}
 
 			loadState() {
+				if (!location.hash) return false;
 				try {
-					return !location.hash
-						? false
-						: (s=> (
-							!s?.seats || !s?.parties?.length
-								? false
-								: (elements.seats.value = s.seats,
-									elements.threshold.value = s.threshold ?? 0,
-									elements.hide.checked = !!s.hide,
-									this.parties = s.parties.map((p,i)=>({ id: i + 1,name: p.name || '',votes: p.votes || 0 })),
-									this.nextIndex = this.parties.length + 1,
-									this.renderParties(),
-									true)
-						)) (JSON.parse(decodeURIComponent(location.hash.slice(1))))
-				} catch(e) {
-					return false
+					const s = JSON.parse(decodeURIComponent(location.hash.slice(1)));
+					if (!s?.seats || !s?.parties?.length) return false;
+
+					elements.seats.value = s.seats;
+					elements.threshold.value = s.threshold ?? 0;
+					elements.hide.checked = !!s.hide;
+
+					this.parties = [];
+					for (let i = 0; i < s.parties.length; i++) {
+						const p = s.parties[i];
+						this.parties.push({ id: i + 1, name: p.name || '', votes: p.votes || 0 });
+					}
+
+					this.nextIndex = this.parties.length + 1;
+					this.renderParties();
+					return true;
+				} catch (e) {
+					return false;
 				}
 			}
 
 			saveState() {
-				(s=> (
-					(h=> (location.hash !== '#' + h && (this._skipHash = true, location.hash = h))) (encodeURIComponent(JSON.stringify(s)))
-				)) ({
+				const s = {
 					seats: elements.seats.value,
 					threshold: elements.threshold.value,
 					hide: elements.hide.checked,
-					parties: this.parties.map(({ name,votes })=>({ name,votes }))
-				})
+					parties: []
+				};
+				for (const p of this.parties) {
+					s.parties.push({ name: p.name, votes: p.votes });
+				}
+				const h = encodeURIComponent(JSON.stringify(s));
+				if (location.hash !== '#' + h) {
+					this._skipHash = true;
+					location.hash = h;
+				}
 			}
 
 			setup() {
-				(Object.entries({
-					add: ()=>this.add(),
-					clear: ()=>this.clear(),
-					calculate: ()=>this.calculate(),
-					edit: ()=>this.display('input'),
-					steps: ()=>this.modal(true),
-					close: ()=>this.modal(false),
-					copy: ()=>this.copy(),
-					export: ()=>this.export(),
-					import: ()=>elements.file.click()
-				}).forEach(([id,h])=>elements[id] && (elements[id].onclick = h)),
-				elements.file.onchange = e=>this.load(e.target.files[0]),
-				elements.modal.onclick = e=>(r=> ( (r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width) || this.modal(false) )) (elements.modal.getBoundingClientRect()),
-				elements.modal.addEventListener('close',()=>this.lastFocus?.focus()),
-				elements.language.onchange = e=>this.lang(e.target.value),
-				elements.theme.onchange = e=>this.theme(e.target.value),
-				elements.hide.onchange = ()=>(elements.results.classList.toggle('hide-failed',elements.hide.checked),this.saveState()),
-				elements.input.oninput = ()=>(this.error(),this.updateInputStats()),
-				document.onkeydown = e=>this.key(e),
-				elements.list.onclick = e=>(r=> ( r && e.target.matches('.danger') && this.remove(+r.dataset.id) )) (e.target.closest('.party-row')),
-				elements.list.onchange = e=>(r=> ( (p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : e.target.value = p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (r && this.parties.find(p=>p.id === +r.dataset.id)) )) (e.target.closest('.party-row')),
-				(c=> (
-					(document.body.ondragenter = e=>(e.preventDefault(),c++,document.body.classList.add('drag-active')),
-					document.body.ondragleave = e=>(c--,c === 0 && document.body.classList.remove('drag-active')),
-					document.body.ondragover = e=>e.preventDefault(),
-					document.body.ondrop = e=>(e.preventDefault(),c = 0,document.body.classList.remove('drag-active'),(f=>f && this.load(f))(e.dataTransfer.files[0])))
-				)) (0))
+				const actions = {
+					add: () => this.add(),
+					clear: () => this.clear(),
+					calculate: () => this.calculate(),
+					edit: () => this.display('input'),
+					steps: () => this.modal(true),
+					close: () => this.modal(false),
+					copy: () => this.copy(),
+					export: () => this.export(),
+					import: () => elements.file.click()
+				};
+
+				for (const [id, h] of Object.entries(actions)) {
+					if (elements[id]) elements[id].onclick = h;
+				}
+
+				elements.file.onchange = e => this.load(e.target.files[0]);
+
+				elements.modal.onclick = e => {
+					const r = elements.modal.getBoundingClientRect();
+					const inside = r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width;
+					if (!inside) this.modal(false);
+				};
+
+				elements.modal.addEventListener('close', () => this.lastFocus?.focus());
+				elements.language.onchange = e => this.lang(e.target.value);
+				elements.theme.onchange = e => this.theme(e.target.value);
+
+				elements.hide.onchange = () => {
+					elements.results.classList.toggle('hide-failed', elements.hide.checked);
+					this.saveState();
+				};
+
+				elements.input.oninput = () => {
+					this.error();
+					this.updateInputStats();
+				};
+
+				document.onkeydown = e => this.key(e);
+
+				elements.list.onclick = e => {
+					const r = e.target.closest('.party-row');
+					if (r && e.target.matches('.danger')) {
+						this.remove(+r.dataset.id);
+					}
+				};
+
+				elements.list.onchange = e => {
+					const r = e.target.closest('.party-row');
+					if (r) {
+						const p = this.parties.find(p => p.id === +r.dataset.id);
+						if (p) {
+							if (e.target.type === 'text') {
+								p.name = e.target.value;
+							} else {
+								e.target.value = p.votes = Math.max(0, Math.round(+e.target.value) || 0);
+							}
+						}
+					}
+				};
+
+				let dragCount = 0;
+				document.body.ondragenter = e => {
+					e.preventDefault();
+					dragCount++;
+					document.body.classList.add('drag-active');
+				};
+				document.body.ondragleave = e => {
+					dragCount--;
+					if (dragCount === 0) document.body.classList.remove('drag-active');
+				};
+				document.body.ondragover = e => e.preventDefault();
+				document.body.ondrop = e => {
+					e.preventDefault();
+					dragCount = 0;
+					document.body.classList.remove('drag-active');
+					const f = e.dataTransfer.files[0];
+					if (f) this.load(f);
+				};
 			}
 
 			key(e) {
-				(e.key === 'Enter' && (
-					(e.ctrlKey || e.metaKey)
-						? (document.activeElement?.blur(), this.calculate())
-						: (r=> (
-							r ? e.target.matches?.('input') && (
-								e.preventDefault(),
-								(p=> ( p && (e.target.type === 'text' ? p.name = e.target.value : p.votes = Math.max(0,Math.round(+e.target.value) || 0)) )) (this.parties.find(p=>p.id === +r.dataset.id)),
-								e.target.type === 'text' ? e.target.nextElementSibling?.focus() : r.nextElementSibling ? r.nextElementSibling.querySelector('input')?.focus() : this.add()
-							) : e.target.matches?.('input') && (document.activeElement?.blur(), this.calculate())
-						)) (e.target.closest?.('.party-row'))
-				))
+				if (e.key === 'Enter') {
+					if (e.ctrlKey || e.metaKey) {
+						document.activeElement?.blur();
+						this.calculate();
+					} else {
+						const r = e.target.closest?.('.party-row');
+						if (r) {
+							if (e.target.matches?.('input')) {
+								e.preventDefault();
+								const p = this.parties.find(p => p.id === +r.dataset.id);
+								if (p) {
+									if (e.target.type === 'text') {
+										p.name = e.target.value;
+									} else {
+										p.votes = Math.max(0, Math.round(+e.target.value) || 0);
+									}
+								}
+								if (e.target.type === 'text') {
+									e.target.nextElementSibling?.focus();
+								} else if (r.nextElementSibling) {
+									r.nextElementSibling.querySelector('input')?.focus();
+								} else {
+									this.add();
+								}
+							}
+						} else if (e.target.matches?.('input')) {
+							document.activeElement?.blur();
+							this.calculate();
+						}
+					}
+				}
 			}
 
 			string(k) { return text[this.language]?.[k] ?? k }
@@ -1677,26 +1759,32 @@
 			}
 
 			updateInputStats() {
-				(v=> (
-					(t=> (
-						(m=> (
-							elements.inputStats.innerHTML = `${this.string('totalVotes')}: <strong>${this.format(v)}</strong> | ${this.string('thresholdVotes')} (${this.format(t)}%): <strong>${this.format(m,{ maximumFractionDigits: 2 })}</strong>`
-						)) (v * t / 100)
-					)) (parseFloat(elements.threshold.value.replace(',','.')) || 0)
-				)) ([...elements.list.querySelectorAll('input[type=number]')]
-					.reduce((s,i)=>s + Math.max(0,Math.round(+i.value) || 0),0))
+				let total = 0;
+				const inputs = elements.list.querySelectorAll('input[type=number]');
+				for (const input of inputs) {
+					total += Math.max(0, Math.round(+input.value) || 0);
+				}
+
+				const threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
+				const minVotes = total * threshold / 100;
+
+				elements.inputStats.innerHTML = `${this.string('totalVotes')}: <strong>${this.format(total)}</strong> | ${this.string('thresholdVotes')} (${this.format(threshold)}%): <strong>${this.format(minVotes, { maximumFractionDigits: 2 })}</strong>`;
 			}
 
 			renderParties() {
-				(elements.list.innerHTML = this.parties
-					.map((p,i)=>`
+				let html = '';
+				for (let i = 0; i < this.parties.length; i++) {
+					const p = this.parties[i];
+					html += `
 						<div class="party-row" data-id="${p.id}">
 							<input type="text" value="${this.escapeHtml(p.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${i + 1}">
 							<input type="number" value="${p.votes ?? ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${i + 1}">
 							<button class="danger" aria-label="${this.string('removeParty')} ${i + 1}">×</button>
 						</div>
-					`).join(''),
-				this.updateInputStats())
+					`;
+				}
+				elements.list.innerHTML = html;
+				this.updateInputStats();
 			}
 
 			load(f) {
@@ -1711,37 +1799,50 @@
 			}
 
 			parseNumber(s) {
-				return (v=> (n=> ( Math.max(0,Math.round(n) || 0) )) (parseFloat(v))) (!s
-					? '0'
-					: s.trim()
-						.replace(/\s/g,'')
-						.replace(this.language === 'id' ? /\./g : /,/g,'')
-						.replace(this.language === 'id' ? /,/ : /\./,'.'))
+				if (!s) return 0;
+				const clean = s.trim().replace(/\s/g, '');
+				const num = parseFloat(clean.replace(this.language === 'id' ? /\./g : /,/g, '').replace(this.language === 'id' ? /,/ : /\./, '.'));
+				return Math.max(0, Math.round(num) || 0);
 			}
 
 			parseCSV(t) {
-				(l=> (
-				  !l.length ? (()=>{throw new Error()})() :
-				  (s=> (
-					(p=> (
-					  (h=> (
-						(is=> (
-						  (ni=> (
-							(v_idx=> (
-							  (st=> (
-								( ((ni < 0 || v_idx < 0) && (st = 0,v_idx = h.findIndex(is),ni = (v_idx >= 0 && h.length === 2) ? 1 - v_idx : h.findIndex(c=>!is(c)))),
-								  ni < 0 || v_idx < 0 ? (()=>{throw new Error()})() : (ps=> ( !ps.length ? (()=>{throw new Error()})() : (this.parties = ps,this.error(),this.renderParties()) )) ( l.slice(st)
-									.map(ln=> (c=> !c[ni] ? null : ({id:this.nextIndex++,name:c[ni],votes:this.parseNumber(c[v_idx])}))(p(ln)))
-									.filter(Boolean) ) )
-							  )) (1)
-							)) (h.findIndex(c=>/vote|suara/i.test(c)))
-						  )) (h.findIndex(c=>/party|partai|name|nama/i.test(c)))
-						)) (c=>/^\d+$/.test(c?.replace(/[.,\s]/g,'')))
-					  )) (p(l[0]))
-					)) (ln=>ln.split(new RegExp(s === '\t' ? '\\t(?=(?:(?:[^"]*"){2})*[^"]*$)' : `\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`))
-						.map(c=>c.trim().replace(/^"|"$/g,'').replace(/""/g,'"')))
-		  )) ((rx=>['\t',';',','].reduce((a,b)=>l[0].split(rx(a)).length>l[0].split(rx(b)).length?a:b))(s=>new RegExp(s==='\t'?'\\t(?=(?:(?:[^"]*"){2})*[^"]*$)':`\\${s}(?=(?:(?:[^"]*"){2})*[^"]*$)`)))
-				)) (t.replace(/^\uFEFF/,'').split(/\r?\n/).filter(ln=>ln.trim()))
+				const lines = t.replace(/^\uFEFF/, '').split(/\r?\n/).filter(ln => ln.trim());
+				if (!lines.length) throw new Error();
+
+				const splitRegexes = {
+					'\t': /\t(?=(?:(?:[^"]*"){2})*[^"]*$)/,
+					';': /;(?=(?:(?:[^"]*"){2})*[^"]*$)/,
+					',': /,(?=(?:(?:[^"]*"){2})*[^"]*$)/
+				};
+				const bestDelim = ['\t', ';', ','].reduce((a, b) => lines[0].split(splitRegexes[a]).length > lines[0].split(splitRegexes[b]).length ? a : b);
+
+				const rx = splitRegexes[bestDelim];
+				const parseLine = ln => ln.split(rx).map(c => c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+				const header = parseLine(lines[0]);
+				const isNumeric = c => /^\d+$/.test(c?.replace(/[.,\s]/g, ''));
+
+				let nameIdx = header.findIndex(c => /party|partai|name|nama/i.test(c));
+				let voteIdx = header.findIndex(c => /vote|suara/i.test(c));
+				let start = 1;
+
+				if (nameIdx < 0 || voteIdx < 0) {
+					start = 0;
+					voteIdx = header.findIndex(isNumeric);
+					nameIdx = (voteIdx >= 0 && header.length === 2) ? 1 - voteIdx : header.findIndex(c => !isNumeric(c));
+				}
+				if (nameIdx < 0 || voteIdx < 0) throw new Error();
+
+				const ps = [];
+				for (let i = start; i < lines.length; i++) {
+					const cols = parseLine(lines[i]);
+					if (cols[nameIdx]) {
+						ps.push({ id: this.nextIndex++, name: cols[nameIdx], votes: this.parseNumber(cols[voteIdx]) });
+					}
+				}
+				if (!ps.length) throw new Error();
+				this.parties = ps;
+				this.error();
+				this.renderParties();
 			}
 
 			calculate() {
@@ -1757,27 +1858,72 @@
 				)) (Math.round(+elements.seats.value)))
 			}
 
-			computeAllocation(s,t,ps) {
-				return (v=> (
-					(tot=> ( tot === 0 ? { error: 'alertParties' } : (m=> (
-						(passed=> ( !passed.length ? { error: 'belowThreshold' } : (pt=> (
-							(q=> (
-								(passed.forEach(p=>(p.hare = Math.floor(p.votes * s / pt),p.remainder = (p.votes * s % pt) / pt,p.divisor = 1,p.quotient = p.votes)),
-								(rem=> ( rem.slice(0,s - passed.reduce((sum,p)=>sum + p.hare,0)).forEach(p=>p.hare++) )) ([...passed].sort((a,b)=>b.remainder - a.remainder || b.votes - a.votes)),
-								(steps=> (
-									((()=>{ for(let i=0;i<s;i++){
-										let w = passed[0];
-										for(let j=1;j<passed.length;j++) (passed[j].quotient > w.quotient || (passed[j].quotient === w.quotient && passed[j].votes > w.votes)) && (w = passed[j]);
-										i < SUMMARY_LIMIT && steps.push({ round: i + 1,winner: w.name,winnerId: w.id,value: w.quotient,divisor: w.divisor,all: i < STEPS_LIMIT ? passed.map(({ id,name,quotient,divisor })=>({ id,name,quotient,divisor })) : null });
-										w.sainteLague++; w.divisor += 2; w.quotient = w.votes / w.divisor;
-									}})()),
-									(res=> (cg=> ({ data: { total: tot,minimumVotes: m,threshold: t,seats: s,quota: q,steps,results: res,hareIndex: cg('hare'),sainteLagueIndex: cg('sainteLague') } })) (k=> Math.sqrt(0.5 * v.reduce((sum,p)=>sum + Math.pow((p.votes / tot * 100) - (p[k] / s * 100),2),0)))) (v.map(p=>({ ...p,passed: p.votes >= m - 1e-7 })))
-								)) ([]))
-							)) (pt / s)
-						)) (passed.reduce((sum,p)=>sum + p.votes,0))
-					)) (v.filter(p=>p.votes >= m - 1e-7)) )) (tot * t / 100) )) (v.reduce((sum,p)=>sum + p.votes,0))
-				)) (ps.filter(p=>p.votes >= 0 && (p.name.trim() || p.votes > 0))
-					.map(p=>({ ...p,name: p.name.trim() || `${this.string('party')} ${p.id}`,hare: 0,sainteLague: 0,remainder: 0 })))
+			computeAllocation(s, t, ps) {
+				const valid = [];
+				let tot = 0;
+				for (const p of ps) {
+					if (p.votes >= 0 && (p.name.trim() || p.votes > 0)) {
+						const v = { ...p, name: p.name.trim() || `${this.string('party')} ${p.id}`, hare: 0, sainteLague: 0, remainder: 0 };
+						valid.push(v);
+						tot += v.votes;
+					}
+				}
+
+				if (tot === 0) return { error: 'alertParties' };
+
+				const min = tot * t / 100;
+				const passed = [];
+				let pt = 0;
+				for (const p of valid) {
+					if (p.votes >= min - 1e-7) {
+						passed.push(p);
+						pt += p.votes;
+					}
+				}
+
+				if (!passed.length) return { error: 'belowThreshold' };
+
+				let sumHare = 0;
+				for (const p of passed) {
+					p.hare = Math.floor(p.votes * s / pt);
+					p.remainder = (p.votes * s % pt) / pt;
+					p.divisor = 1;
+					p.quotient = p.votes;
+					sumHare += p.hare;
+				}
+
+				[...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes).slice(0, s - sumHare).forEach(p => p.hare++);
+
+				const steps = [];
+				for (let i = 0; i < s; i++) {
+					let w = passed[0];
+					for (let j = 1; j < passed.length; j++) {
+						if (passed[j].quotient > w.quotient || (passed[j].quotient === w.quotient && passed[j].votes > w.votes)) {
+							w = passed[j];
+						}
+					}
+					if (i < SUMMARY_LIMIT) {
+						steps.push({ round: i + 1, winner: w.name, winnerId: w.id, value: w.quotient, divisor: w.divisor, all: i < STEPS_LIMIT ? passed.map(({ id, name, quotient, divisor }) => ({ id, name, quotient, divisor })) : null });
+					}
+					w.sainteLague++;
+					w.divisor += 2;
+					w.quotient = w.votes / w.divisor;
+				}
+
+				const cg = (k) => {
+					let sum = 0;
+					for (const p of valid) {
+						const diff = (p.votes / tot * 100) - (p[k] / s * 100);
+						sum += diff * diff;
+					}
+					return Math.sqrt(0.5 * sum);
+				};
+
+				for (const p of valid) {
+					p.passed = p.votes >= min - 1e-7;
+				}
+
+				return { data: { total: tot, minimumVotes: min, threshold: t, seats: s, quota: pt / s, steps, results: valid, hareIndex: cg('hare'), sainteLagueIndex: cg('sainteLague') } };
 			}
 
 			renderResults() {
@@ -1834,31 +1980,53 @@
 			}
 
 			copy() {
-				this.data && (r=> (
-				  (t=> (
-					(h=> (
-					  (tsv=> (
-						navigator.clipboard.writeText(tsv)
-							.then(()=>(b=> (b.textContent = this.string('copied'),setTimeout(()=>b.textContent = this.string('copy'), 2000))) (elements.copy))
-					  )) ( [h,...r.map(res=>[res.name,res.votes,this.format(res.votes / t * 100,{ minimumFractionDigits: 2,maximumFractionDigits: 2 }) + '%',res.hare,res.sainteLague,res.sainteLague - res.hare].join('\t'))].join('\n') )
-					)) ( [this.string('party'),this.string('votes'),this.string('share'),this.string('hareSeatsHeader'),this.string('sainteLagueSeatsHeader'),this.string('diff')].join('\t') )
-				  )) ( r.reduce((sum,p)=>sum + p.votes,0) )
-				)) (this.data.results)
+				if (!this.data) return;
+
+				let t = 0;
+				for (const res of this.data.results) {
+					t += res.votes;
+				}
+
+				const h = [this.string('party'), this.string('votes'), this.string('share'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('diff')].join('\t');
+
+				const lines = [h];
+				for (const res of this.data.results) {
+					const share = this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+					lines.push([res.name, res.votes, share, res.hare, res.sainteLague, res.sainteLague - res.hare].join('\t'));
+				}
+
+				const tsv = lines.join('\n');
+
+				navigator.clipboard.writeText(tsv).then(() => {
+					elements.copy.textContent = this.string('copied');
+					setTimeout(() => elements.copy.textContent = this.string('copy'), 2000);
+				});
 			}
 
 			export() {
-				this.data && (r=> (
-				  (t=> (
-					(h=> (
-					  (csv=> (
-						Object.assign(document.createElement('a'), {
-							href: URL.createObjectURL(new Blob(['\uFEFF', csv],{ type: 'text/csv' })),
-							download: `apportionment_${new Date().toISOString().slice(0,19).replace(/[T:]/g,'-')}.csv`
-						}).click()
-					  )) ( [h,...r.map(res=>`"${res.name.replace(/"/g,'""')}",${res.votes},"${this.format(res.votes / t * 100,{ minimumFractionDigits: 2,maximumFractionDigits: 2 })}",${res.passed ? this.string('yes') : this.string('no')},${res.hare},${res.sainteLague},${res.sainteLague - res.hare}`)].join('\n') )
-					)) ( [this.string('party'),this.string('votes'),this.string('share'),this.string('passedHeader'),this.string('hareSeatsHeader'),this.string('sainteLagueSeatsHeader'),this.string('differenceHeader')].join(',') )
-				  )) ( r.reduce((sum,p)=>sum + p.votes,0) )
-				)) (this.data.results)
+				if (!this.data) return;
+
+				let t = 0;
+				for (const res of this.data.results) {
+					t += res.votes;
+				}
+
+				const h = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
+
+				const lines = [h];
+				for (const res of this.data.results) {
+					const share = this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+					const passedStr = res.passed ? this.string('yes') : this.string('no');
+					const nameStr = `"${res.name.replace(/"/g, '""')}"`;
+					lines.push([nameStr, res.votes, `"${share}"`, passedStr, res.hare, res.sainteLague, res.sainteLague - res.hare].join(','));
+				}
+
+				const csv = lines.join('\n');
+
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv' }));
+				a.download = `apportionment_${new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-')}.csv`;
+				a.click();
 			}
 		}
 		new ApportionmentCalc();
