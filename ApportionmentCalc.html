@@ -1558,11 +1558,7 @@
 					elements.threshold.value = s.threshold ?? 0;
 					elements.hide.checked = !!s.hide;
 
-					this.parties = [];
-					for (let i = 0; i < s.parties.length; i++) {
-						const p = s.parties[i];
-						this.parties.push({ id: i + 1, name: p.name || '', votes: p.votes || 0 });
-					}
+					this.parties = s.parties.map((p, i) => ({ id: i + 1, name: p.name || '', votes: p.votes || 0 }));
 
 					this.nextIndex = this.parties.length + 1;
 					this.renderParties();
@@ -1577,11 +1573,8 @@
 					seats: elements.seats.value,
 					threshold: elements.threshold.value,
 					hide: elements.hide.checked,
-					parties: []
+					parties: this.parties.map(p => ({ name: p.name, votes: p.votes }))
 				};
-				for (const p of this.parties) {
-					s.parties.push({ name: p.name, votes: p.votes });
-				}
 				const h = encodeURIComponent(JSON.stringify(s));
 				if (location.hash !== '#' + h) {
 					this._skipHash = true;
@@ -1808,18 +1801,13 @@
 			}
 
 			renderParties() {
-				let html = '';
-				for (let i = 0; i < this.parties.length; i++) {
-					const p = this.parties[i];
-					html += `
+				elements.list.innerHTML = this.parties.map((p, i) => `
 						<div class="party-row" data-id="${p.id}">
 							<input type="text" value="${this.escapeHtml(p.name)}" placeholder="${this.string('partyPlaceholder')}" aria-label="${this.string('partyPlaceholder')} ${i + 1}">
 							<input type="number" value="${p.votes ?? ''}" placeholder="${this.string('votesPlaceholder')}" min="0" aria-label="${this.string('votesPlaceholder')} ${i + 1}">
 							<button class="danger" aria-label="${this.string('removeParty')} ${i + 1}">×</button>
 						</div>
-					`;
-				}
-				elements.list.innerHTML = html;
+					`).join('');
 				this.updateInputStats();
 			}
 
@@ -2039,18 +2027,17 @@
 			copy() {
 				if (!this.data) return;
 
-				let t = 0;
-				for (const res of this.data.results) {
-					t += res.votes;
-				}
-
+				const t = this.data.total;
 				const h = [this.string('party'), this.string('votes'), this.string('share'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('diff')].join('\t');
 
-				const lines = [h];
-				for (const res of this.data.results) {
-					const share = this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
-					lines.push([res.name, res.votes, share, res.hare, res.sainteLague, res.sainteLague - res.hare].join('\t'));
-				}
+				const lines = [h, ...this.data.results.map(res => [
+					res.name,
+					res.votes,
+					this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%',
+					res.hare,
+					res.sainteLague,
+					res.sainteLague - res.hare
+				].join('\t'))];
 
 				const tsv = lines.join('\n');
 
@@ -2063,20 +2050,18 @@
 			export() {
 				if (!this.data) return;
 
-				let t = 0;
-				for (const res of this.data.results) {
-					t += res.votes;
-				}
-
+				const t = this.data.total;
 				const h = [this.string('party'), this.string('votes'), this.string('share'), this.string('passedHeader'), this.string('hareSeatsHeader'), this.string('sainteLagueSeatsHeader'), this.string('differenceHeader')].join(',');
 
-				const lines = [h];
-				for (const res of this.data.results) {
-					const share = this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-					const passedStr = res.passed ? this.string('yes') : this.string('no');
-					const nameStr = `"${res.name.replace(/"/g, '""')}"`;
-					lines.push([nameStr, res.votes, `"${share}"`, passedStr, res.hare, res.sainteLague, res.sainteLague - res.hare].join(','));
-				}
+				const lines = [h, ...this.data.results.map(res => [
+					`"${res.name.replace(/"/g, '""')}"`,
+					res.votes,
+					`"${this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}"`,
+					res.passed ? this.string('yes') : this.string('no'),
+					res.hare,
+					res.sainteLague,
+					res.sainteLague - res.hare
+				].join(','))];
 
 				const csv = lines.join('\n');
 

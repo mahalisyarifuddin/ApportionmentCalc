@@ -27,3 +27,7 @@
 **Mode:** Palette
 **Learning:** In tables displaying vote shares, dynamic decimal lengths (e.g., `10%` vs `12.50%`) break vertical alignment, making it harder to scan figures. Additionally, exporting CSVs with special characters (like "Sainte-Laguë") without a Byte Order Mark (\uFEFF) causes mangled encoding in Microsoft Excel, especially in locales where Excel uses semicolon delimiters instead of commas.
 **Action:** Use `minimumFractionDigits` in `Intl.NumberFormat` to force uniform decimal widths for percentages. Always prepend `\uFEFF` to the Blob payload when creating a text/csv file export to ensure correct UTF-8 parsing in Excel. Use CSS opacity rules (like `.neutral { opacity: 0.4; }`) to de-emphasize zero differences, making true variations stand out.
+## 2026-09-05 - ApportionmentCalc Refactoring
+**Mode:** Razor
+**Learning:** The `this.data` object generated in `computeAllocation` already caches values like `total`, which can be leveraged in subsequent methods like `copy` and `export` to avoid redundant O(N) traversal loops over the results array.
+**Action:** When working on standalone HTML apps with centralized state mutations, check the main computation functions first to see if necessary aggregates are already available in the output object before manually recalculating them.
