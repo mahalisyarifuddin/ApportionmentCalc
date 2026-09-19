@@ -1625,22 +1625,22 @@
 
 				elements.list.onclick = e => {
 					const r = e.target.closest('.party-row');
-					if (r && e.target.matches('.danger')) {
-						this.remove(+r.dataset.id);
-					}
+					if (!r || !e.target.matches('.danger')) return;
+
+					this.remove(+r.dataset.id);
 				};
 
 				elements.list.onchange = e => {
 					const r = e.target.closest('.party-row');
-					if (r) {
-						const p = this.parties.find(p => p.id === +r.dataset.id);
-						if (p) {
-							if (e.target.type === 'text') {
-								p.name = e.target.value;
-							} else {
-								e.target.value = p.votes = Math.max(0, Math.round(+e.target.value) || 0);
-							}
-						}
+					if (!r) return;
+
+					const p = this.parties.find(p => p.id === +r.dataset.id);
+					if (!p) return;
+
+					if (e.target.type === 'text') {
+						p.name = e.target.value;
+					} else {
+						e.target.value = p.votes = Math.max(0, Math.round(+e.target.value) || 0);
 					}
 				};
 
@@ -1665,36 +1665,40 @@
 			}
 
 			key(e) {
-				if (e.key === 'Enter') {
-					if (e.ctrlKey || e.metaKey) {
+				if (e.key !== 'Enter') return;
+
+				if (e.ctrlKey || e.metaKey) {
+					document.activeElement?.blur();
+					return this.calculate();
+				}
+
+				const r = e.target.closest?.('.party-row');
+				if (!r) {
+					if (e.target.matches?.('input')) {
 						document.activeElement?.blur();
 						this.calculate();
-					} else {
-						const r = e.target.closest?.('.party-row');
-						if (r) {
-							if (e.target.matches?.('input')) {
-								e.preventDefault();
-								const p = this.parties.find(p => p.id === +r.dataset.id);
-								if (p) {
-									if (e.target.type === 'text') {
-										p.name = e.target.value;
-									} else {
-										p.votes = Math.max(0, Math.round(+e.target.value) || 0);
-									}
-								}
-								if (e.target.type === 'text') {
-									e.target.nextElementSibling?.focus();
-								} else if (r.nextElementSibling) {
-									r.nextElementSibling.querySelector('input')?.focus();
-								} else {
-									this.add();
-								}
-							}
-						} else if (e.target.matches?.('input')) {
-							document.activeElement?.blur();
-							this.calculate();
-						}
 					}
+					return;
+				}
+
+				if (!e.target.matches?.('input')) return;
+
+				e.preventDefault();
+				const p = this.parties.find(p => p.id === +r.dataset.id);
+				if (p) {
+					if (e.target.type === 'text') {
+						p.name = e.target.value;
+					} else {
+						p.votes = Math.max(0, Math.round(+e.target.value) || 0);
+					}
+				}
+
+				if (e.target.type === 'text') {
+					e.target.nextElementSibling?.focus();
+				} else if (r.nextElementSibling) {
+					r.nextElementSibling.querySelector('input')?.focus();
+				} else {
+					this.add();
 				}
 			}
 
@@ -1812,18 +1816,18 @@
 			}
 
 			load(f) {
-				if (f) {
-					const r = new FileReader();
-					r.onload = e => {
-						elements.file.value = '';
-						try {
-							this.parseCSV(e.target.result);
-						} catch (err) {
-							this.error(this.string('alertImport'));
-						}
-					};
-					r.readAsText(f);
-				}
+				if (!f) return;
+
+				elements.file.value = '';
+				const r = new FileReader();
+				r.onload = e => {
+					try {
+						this.parseCSV(e.target.result);
+					} catch (err) {
+						this.error(this.string('alertImport'));
+					}
+				};
+				r.readAsText(f);
 			}
 
 			parseNumber(s) {
@@ -1879,18 +1883,18 @@
 				const t = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
 
 				if (isNaN(s) || s < 1) {
-					this.error(this.string('alertSeats'));
-				} else {
-					const res = this.computeAllocation(s, t, this.parties);
-					if (res.error) {
-						this.error(this.string(res.error));
-					} else {
-						this.saveState();
-						this.data = res.data;
-						this.renderResults();
-						this.display('results');
-					}
+					return this.error(this.string('alertSeats'));
 				}
+
+				const res = this.computeAllocation(s, t, this.parties);
+				if (res.error) {
+					return this.error(this.string(res.error));
+				}
+
+				this.saveState();
+				this.data = res.data;
+				this.renderResults();
+				this.display('results');
 			}
 
 			computeAllocation(s, t, ps) {
