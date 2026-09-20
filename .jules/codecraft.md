@@ -31,3 +31,8 @@
 **Mode:** Razor
 **Learning:** The `this.data` object generated in `computeAllocation` already caches values like `total`, which can be leveraged in subsequent methods like `copy` and `export` to avoid redundant O(N) traversal loops over the results array.
 **Action:** When working on standalone HTML apps with centralized state mutations, check the main computation functions first to see if necessary aggregates are already available in the output object before manually recalculating them.
+
+## 2026-09-06 - Validating Inline JavaScript Syntax
+**Mode:** Razor
+**Learning:** `node -c` (Syntax Check) fails when run directly against `.html` files (`ERR_UNKNOWN_FILE_EXTENSION`).
+**Action:** To verify JavaScript syntax of inline `<script>` blocks within HTML files, extract the contents to temporary files in the `verification/` directory and run `node -c` on them.
