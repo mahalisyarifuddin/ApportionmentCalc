@@ -1684,14 +1684,7 @@
 				if (!e.target.matches?.('input')) return;
 
 				e.preventDefault();
-				const p = this.parties.find(p => p.id === +r.dataset.id);
-				if (p) {
-					if (e.target.type === 'text') {
-						p.name = e.target.value;
-					} else {
-						p.votes = Math.max(0, Math.round(+e.target.value) || 0);
-					}
-				}
+				document.activeElement?.blur();
 
 				if (e.target.type === 'text') {
 					e.target.nextElementSibling?.focus();
