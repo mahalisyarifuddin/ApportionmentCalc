@@ -1556,7 +1556,7 @@
 
 					elements.seats.value = s.seats;
 					elements.threshold.value = s.threshold ?? 0;
-					elements.hide.checked = !!s.hide;
+					elements.hide.checked = Boolean(s.hide);
 
 					this.parties = s.parties.map((p, i) => ({ id: i + 1, name: p.name || '', votes: p.votes || 0 }));
 
@@ -1603,7 +1603,7 @@
 
 				elements.modal.onclick = e => {
 					const r = elements.modal.getBoundingClientRect();
-					const inside = r.top <= e.clientY && e.clientY <= r.top + r.height && r.left <= e.clientX && e.clientX <= r.left + r.width;
+					const inside = r.top <= e.clientY && e.clientY <= r.bottom && r.left <= e.clientX && e.clientX <= r.right;
 					if (!inside) this.modal(false);
 				};
 
@@ -1705,6 +1705,7 @@
 				return this._fmt[key].format(v);
 			}
 
+			formatPct(v) { return this.format(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 			escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;') }
 			table(h,b) { return `<table><thead><tr>${h.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${b}</tbody></table>` }
 
@@ -1907,7 +1908,8 @@
 				const passed = [];
 				let pt = 0;
 				for (const p of valid) {
-					if (p.votes >= min - 1e-7) {
+					p.passed = p.votes >= min - 1e-7;
+					if (p.passed) {
 						passed.push(p);
 						pt += p.votes;
 					}
@@ -1951,10 +1953,6 @@
 					return Math.sqrt(0.5 * sum);
 				};
 
-				for (const p of valid) {
-					p.passed = p.votes >= min - 1e-7;
-				}
-
 				return { data: { total: tot, minimumVotes: min, threshold: t, seats: s, quota: pt / s, steps, results: valid, hareIndex: cg('hare'), sainteLagueIndex: cg('sainteLague') } };
 			}
 
@@ -1966,14 +1964,14 @@
 
 				const r = (res, count, extra = '') => {
 					const pct = res.votes / d.total * 100;
-					const formattedPct = this.format(pct, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+					const formattedPct = this.formatPct(pct);
 					return `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td class="gradient-bar" style="--percentage:${pct}%">${formattedPct}%</td><td><strong>${count}</strong></td>${extra}</tr>`;
 				};
 
 				elements.stats.innerHTML = `<div class="info">${this.string('totalVotes')}: ${this.format(d.total)}<br>${this.string('thresholdVotes')} (${this.format(d.threshold)}%): ${this.format(d.minimumVotes, { maximumFractionDigits: 2 })}</div>`;
 
 				elements.hare.innerHTML = `<p class="info">${this.string('quota')}: ${this.format(d.quota)} | ${this.string('gallagher')}: ${this.format(d.hareIndex, { maximumFractionDigits: 4 })}</p>`
-					+ this.table([...['party', 'votes', 'share', 'seatsColumn'].map(k => this.string(k)), this.string('remainder')], [...d.results]
+					+ this.table(['party', 'votes', 'share', 'seatsColumn', 'remainder'].map(k => this.string(k)), [...d.results]
 						.sort((a, b) => b.hare - a.hare || b.votes - a.votes)
 						.map(res => r(res, res.hare, `<td>${this.format(res.remainder, { maximumFractionDigits: 6 })}</td>`))
 						.join(''));
@@ -1988,7 +1986,7 @@
 					.sort((a, b) => b.votes - a.votes)
 					.map(res => {
 						const diff = res.sainteLague - res.hare;
-						const pct = this.format(res.votes / d.total * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+						const pct = this.formatPct(res.votes / d.total * 100);
 						const diffClass = diff > 0 ? 'positive' : diff < 0 ? 'negative' : 'neutral';
 						const diffStr = diff > 0 ? '+' + diff : diff;
 						return `<tr class="${res.passed ? '' : 'failed-party'}"><td role="rowheader">${this.escapeHtml(res.name)}</td><td>${this.format(res.votes)}</td><td>${pct}%</td><td>${res.hare}</td><td>${res.sainteLague}</td><td class="${diffClass}">${diffStr}</td></tr>`;
@@ -2030,7 +2028,7 @@
 				const lines = [h, ...this.data.results.map(res => [
 					res.name,
 					res.votes,
-					this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%',
+					this.formatPct(res.votes / t * 100) + '%',
 					res.hare,
 					res.sainteLague,
 					res.sainteLague - res.hare
@@ -2053,7 +2051,7 @@
 				const lines = [h, ...this.data.results.map(res => [
 					`"${res.name.replace(/"/g, '""')}"`,
 					res.votes,
-					`"${this.format(res.votes / t * 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}"`,
+					`"${this.formatPct(res.votes / t * 100)}"`,
 					res.passed ? this.string('yes') : this.string('no'),
 					res.hare,
 					res.sainteLague,

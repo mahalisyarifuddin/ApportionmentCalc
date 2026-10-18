@@ -36,3 +36,8 @@
 **Mode:** Razor
 **Learning:** `node -c` (Syntax Check) fails when run directly against `.html` files (`ERR_UNKNOWN_FILE_EXTENSION`).
 **Action:** To verify JavaScript syntax of inline `<script>` blocks within HTML files, extract the contents to temporary files in the `verification/` directory and run `node -c` on them.
+
+## 2026-09-06 - Optimize Percentage Formatting Utility
+**Mode:** Razor
+**Learning:** Repetitive configuration objects in function calls (e.g., `this.format(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })`) across multiple sites create significant DRY violations and verbosity.
+**Action:** Extract the repetitive configuration into a dedicated helper function (e.g., `formatPct(val)`) and apply it globally to simplify method calls and save characters.
