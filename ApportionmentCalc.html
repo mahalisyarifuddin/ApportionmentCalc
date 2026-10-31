@@ -1786,12 +1786,7 @@
 			}
 
 			updateInputStats() {
-				let total = 0;
-				const inputs = elements.list.querySelectorAll('input[type=number]');
-				for (const input of inputs) {
-					total += Math.max(0, Math.round(+input.value) || 0);
-				}
-
+				const total = Array.from(elements.list.querySelectorAll('input[type=number]')).reduce((sum, input) => sum + Math.max(0, Math.round(+input.value) || 0), 0);
 				const threshold = parseFloat(elements.threshold.value.replace(',', '.')) || 0;
 				const minVotes = total * threshold / 100;
 
@@ -1892,39 +1887,33 @@
 			}
 
 			computeAllocation(s, t, ps) {
-				const valid = [];
-				let tot = 0;
-				for (const p of ps) {
+				const valid = ps.reduce((acc, p) => {
 					if (p.votes >= 0 && (p.name.trim() || p.votes > 0)) {
-						const v = { ...p, name: p.name.trim() || `${this.string('party')} ${p.id}`, hare: 0, sainteLague: 0, remainder: 0 };
-						valid.push(v);
-						tot += v.votes;
+						acc.push({ ...p, name: p.name.trim() || `${this.string('party')} ${p.id}`, hare: 0, sainteLague: 0, remainder: 0 });
 					}
-				}
+					return acc;
+				}, []);
+				const tot = valid.reduce((sum, p) => sum + p.votes, 0);
 
 				if (tot === 0) return { error: 'alertParties' };
 
 				const min = tot * t / 100;
-				const passed = [];
-				let pt = 0;
-				for (const p of valid) {
+				const passed = valid.reduce((acc, p) => {
 					p.passed = p.votes >= min - 1e-7;
-					if (p.passed) {
-						passed.push(p);
-						pt += p.votes;
-					}
-				}
+					if (p.passed) acc.push(p);
+					return acc;
+				}, []);
+				const pt = passed.reduce((sum, p) => sum + p.votes, 0);
 
 				if (!passed.length) return { error: 'belowThreshold' };
 
-				let sumHare = 0;
-				for (const p of passed) {
+				const sumHare = passed.reduce((sum, p) => {
 					p.hare = Math.floor(p.votes * s / pt);
 					p.remainder = (p.votes * s % pt) / pt;
 					p.divisor = 1;
 					p.quotient = p.votes;
-					sumHare += p.hare;
-				}
+					return sum + p.hare;
+				}, 0);
 
 				[...passed].sort((a, b) => b.remainder - a.remainder || b.votes - a.votes).slice(0, s - sumHare).forEach(p => p.hare++);
 
@@ -1944,14 +1933,10 @@
 					w.quotient = w.votes / w.divisor;
 				}
 
-				const cg = (k) => {
-					let sum = 0;
-					for (const p of valid) {
-						const diff = (p.votes / tot * 100) - (p[k] / s * 100);
-						sum += diff * diff;
-					}
-					return Math.sqrt(0.5 * sum);
-				};
+				const cg = (k) => Math.sqrt(0.5 * valid.reduce((sum, p) => {
+					const diff = (p.votes / tot * 100) - (p[k] / s * 100);
+					return sum + diff * diff;
+				}, 0));
 
 				return { data: { total: tot, minimumVotes: min, threshold: t, seats: s, quota: pt / s, steps, results: valid, hareIndex: cg('hare'), sainteLagueIndex: cg('sainteLague') } };
 			}
