@@ -41,3 +41,7 @@
 **Mode:** Razor
 **Learning:** Repetitive configuration objects in function calls (e.g., `this.format(val, { minimumFractionDigits: 2, maximumFractionDigits: 2 })`) across multiple sites create significant DRY violations and verbosity.
 **Action:** Extract the repetitive configuration into a dedicated helper function (e.g., `formatPct(val)`) and apply it globally to simplify method calls and save characters.
+## 2026-09-06 - Replacing reduce with inline for loops for performance
+**Mode:** Razor / Bolt
+**Learning:** Chaining multiple `.reduce()` calls to compute totals, filter objects, and map results creates excessive intermediate garbage objects and dramatically decreases performance in hot paths. Even without intermediate arrays, `.reduce()` requires callback allocations which makes it slower than raw `for` loops.
+**Action:** When computing sums across lists where filtering is required, use traditional `for...of` loops and consolidate summing/counting into a single pass alongside array building instead of mapping and reducing sequentially.
